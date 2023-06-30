@@ -1,0 +1,6 @@
+.\_release
+.\source
+.\work
+.\*.bat
+.\readme.md
+.\gpl-3.0.txt
