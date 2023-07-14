@@ -38,6 +38,10 @@
 //      + Added Terminate. Check this in every loop, if true, close the program.
 //      + Added FlipNoLimit. This fLipping will not limit the fps and updates
 //        the FPS counter. Will fully use one cpu core.
+//   V1.10 - 2023.06.22
+//      + Added FPS counter update to Flip.
+//   V1.11 - 2023.07.14
+//      + Added TWindow.CreateCustomSized.
 
 
 {$ifdef fpc}
@@ -61,10 +65,14 @@ const
   Terminate:boolean=false;
 
 type
+
+  { TWindow }
+
   TWindow=class
     constructor Create(Left,Top,Width,Height:integer;Title:string);
     constructor CreateDoubleSized(Left,Top,Width,Height:integer;Title:string);
     constructor CreateFullScreenBordered(Width,Height:integer;Title:string);
+    constructor CreateCustomSized(Left,Top,Width,Height,LogicalWidth,LogicalHeight:integer;Title:string);
     destructor Destroy; override;
   private
     fLogicalWidth,fLogicalHeight:integer;
@@ -150,7 +158,7 @@ uses SysUtils, Logger;
 
 const 
   Fstr={$I %FILE%}+', ';
-  Version='1.09';
+  Version='1.11';
 
 type
   TEventHandlers=array of TEventHandlerProc;
@@ -210,6 +218,22 @@ begin
   if PrimaryWindow=nil then PrimaryWindow:=Self;
   fLogicalWidth:=Width;
   fLogicalHeight:=Height;
+  FrameCount:=0;
+  fps:=0;
+  prevTicks:=SDL_GetTicks;
+end;
+
+constructor TWindow.CreateCustomSized(Left,Top,Width,Height,
+  LogicalWidth,LogicalHeight:integer; Title:string);
+begin
+  fWindow:=SDL_CreateWindow(PChar(Title), Left, Top, Width, Height, SDL_WINDOW_OPENGL);
+  if fWindow=nil then raise Exception.Create('Could not create window!');
+  fRenderer:=SDL_CreateRenderer(fWindow, -1, 0);
+  if fRenderer=nil then raise Exception.Create('Could not create renderer!');
+  SDL_RenderSetLogicalSize(fRenderer, LogicalWidth, LogicalHeight);
+  if PrimaryWindow=nil then PrimaryWindow:=Self;
+  fLogicalWidth:=LogicalWidth;
+  fLogicalHeight:=LogicalHeight;
   FrameCount:=0;
   fps:=0;
   prevTicks:=SDL_GetTicks;
@@ -367,8 +391,14 @@ var i:integer;
 begin
   i:=TimeLeft;
   FullTime+=i;
-  Log.Trace(i);
   while Timeleft>0 do SDL_Delay(TimeLeft);
+  i:=SDL_GetTicks;
+  if i-prevTicks>1000 then begin
+    fps:=FrameCount;
+    FrameCount:=0;
+    prevTicks:=i;
+  end;
+  inc(FrameCount);
   SDL_RenderPresent(PrimaryWindow.Renderer);
 end;
 
