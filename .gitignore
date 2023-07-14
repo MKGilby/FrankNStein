@@ -44,7 +44,6 @@ BurdockPaint.ini
 backups/
 notused/
 data/
-work/
 *.data
 *.bpprj
 source/FrankNStein.exe
