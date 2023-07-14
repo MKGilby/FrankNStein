@@ -1,0 +1,38 @@
+MAPT
+WI32
+HE22
+AUColin Stewart
+MNOriginal Map 01
+GMFrank'N'Stein
+MP
+MP
+MP
+MP
+MP[===]   [=====][==][=====]
+MP    \>
+MP     \>
+MP       ---1---:
+MP
+MP
+MP          --:---2-
+MP         </
+MP        </
+MP   6----        7:------------^3
+MP                              |
+MP                              |
+MP -()--------!----4----:       |
+MP                              v
+MP
+MP
+MP5------:----------:------!-----:
+MP
+EX2
+EX15,0,21,16,-4,1
+EX12,15,30,26,-1,2
+EX19,0,30,3,2,3
+EX.
+EX.
+EXwindow,3,8
+EXwindow,20,8
+EXwindow,26,8
+XX
