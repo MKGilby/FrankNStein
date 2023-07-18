@@ -43,7 +43,7 @@ tools/MADrepo.txt
 BurdockPaint.ini
 backups/
 notused/
-data/
+/data/
 *.data
 *.bpprj
 source/FrankNStein.exe
