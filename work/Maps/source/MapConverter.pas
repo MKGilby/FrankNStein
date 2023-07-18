@@ -242,7 +242,7 @@ begin
   ProcessMAP('old\25.mpt','new\33.bin',0);
   ProcessMAP('old\27.mpt','new\gratz.bin',3);
   FreeAndNil(Pack);
-  Order.SaveToFile('new\order.txt');
+//  Order.SaveToFile('new\order.txt');
   FreeAndNil(Order);
 //  FreeAndNil(Deco);
 end.
