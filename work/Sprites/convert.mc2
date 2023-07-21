@@ -3,8 +3,8 @@ m createatlas 111 18 1 2
 r tga data\prof.tga 1
 m setcolorkey 0 0 0 1
 m clearextra 1
-m addanimation ProfLeft 10 16 8 5 0 0 4  0 0 10 0 20 0 30 0 40 0 30 0 20 0 10 0  1
-m addanimation ProfRight 10 16 8 5 0 0 4  50 0 60 0 70 0 80 0 90 0 80 0 70 0 60 0  1
+m addanimation ProfLeft 10 16 8 5 0 0 3  0 0 10 0 20 0 30 0 40 0 30 0 20 0 10 0  1
+m addanimation ProfRight 10 16 8 5 0 0 3  50 0 60 0 70 0 80 0 90 0 80 0 70 0 60 0  1
 m addall 1 2
 
 w png sprites.png 2
