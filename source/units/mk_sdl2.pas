@@ -42,6 +42,8 @@
 //      + Added FPS counter update to Flip.
 //   V1.11 - 2023.07.14
 //      + Added TWindow.CreateCustomSized.
+//   V1.12 - 2023.07.21
+//      + Added FindController.
 
 
 {$ifdef fpc}
@@ -152,13 +154,15 @@ var
   procedure PutTexturePart(x,y,sx,sy,w,h:integer;Texture:TTexture); overload;
   procedure PutTexturePart(sx,sy,sw,sh,tx,ty,tw,th:integer;Texture:TTexture); overload;
 
+  function FindController:PSDL_GameController;
+
 implementation
 
 uses SysUtils, Logger;
 
-const 
+const
   Fstr={$I %FILE%}+', ';
-  Version='1.11';
+  Version='1.12';
 
 type
   TEventHandlers=array of TEventHandlerProc;
@@ -384,6 +388,18 @@ begin
                  Texture.Texture,
                  @SourceRect,
                  @DestRect);
+end;
+
+function FindController: PSDL_GameController;
+var i,n:integer;
+begin
+  n:=SDL_NumJoysticks;
+//  if n<0
+  Result:=nil;
+  for i:=0 to n-1 do
+    if SDL_IsGameController(i) then
+      Result:=SDL_GameControllerOpen(i);
+
 end;
 
 procedure Flip;
