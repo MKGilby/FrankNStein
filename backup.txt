@@ -1,6 +1,10 @@
 .\_release
+.\data
 .\source
 .\work
 .\*.bat
 .\readme.md
 .\gpl-3.0.txt
+.\license.txt
+.\*.bpprj
+.\readme-sdl.txt
