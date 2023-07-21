@@ -9,4 +9,6 @@ cd ..\fonts
 call run.bat
 cd ..\logo
 call run.bat
+cd ..\sprites
+call run.bat
 cd ..
