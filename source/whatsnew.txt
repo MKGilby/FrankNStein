@@ -1,0 +1,16 @@
+2023.07.21
+- Added controller support.
+- Updated start screen with authors and used tools.
+
+2023.07.18
+- Didn't like font, ripped original from Re-Booted. Modified it a bit by filling
+  the holes with light grey pixels.
+- Logo screen added.
+
+2023.07.17
+- Created logo.
+
+2023.07.14
+- Decided game resolution. (256*192 as original)
+- Created font.
+
