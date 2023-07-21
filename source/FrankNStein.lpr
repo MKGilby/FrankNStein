@@ -20,8 +20,11 @@
 
 program FrankNStein;
 
+{$ifndef DEBUG}{$apptype GUI}{$endif}
+
 uses
-  FNSMain;
+  ARGBImagePNGReaderUnit,
+  FNSMain, FNSSlotSelector, FNSStartScreen;
 
 const
   VERSION='0.9';

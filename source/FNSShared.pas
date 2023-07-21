@@ -24,11 +24,51 @@ unit FNSShared;
 
 interface
 
+uses MediaManagerUnit, sdl2;
+
 const
-  WindowWidth=512;
-  WindowHeight=384;
+  LOGICALWINDOWWIDTH=256;
+  LOGICALWINDOWHEIGHT=192;
+  WINDOWWIDTH=LOGICALWINDOWWIDTH*4;
+  WINDOWHEIGHT=LOGICALWINDOWHEIGHT*4;
+
+var
+  MM:TMediaManager;
+  Controller:PSDL_GameController;
+
+procedure LoadAssets;
+procedure FreeAssets;
 
 implementation
+
+procedure LoadFont(name:string;r,g,b:integer);
+begin
+  MM.Load('cs_font.png',Name);
+  MM.Fonts[Name].SpaceSpace:=7;
+  MM.Fonts[Name].SetColor(r,g,b);
+end;
+
+procedure LoadAssets;
+begin
+  MM:=TMediaManager.Create;
+  LoadFont('White',255,255,255);
+  LoadFont('Blue',40,128,240);
+  LoadFont('Green',40,240,128);
+  LoadFont('Yellow',240,128,40);
+  LoadFont('Pink',240,40,128);
+  LoadFont('Purple',128,40,240);
+  MM.Load('logo.png','Logo',MM_CREATETEXTUREWHENNOANIMATIONDATA);
+  MM.Load('resurrected.png','LogoRes',MM_CREATETEXTUREWHENNOANIMATIONDATA);
+  MM.Load('sprites.png','Sprites');
+  MM.LoadMusic('music\rb_theme.mo3','Main');
+end;
+
+procedure FreeAssets;
+begin
+  MM.Free;
+end;
+
+
 
 end.
 

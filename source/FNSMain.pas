@@ -26,7 +26,7 @@ unit FNSMain;
 interface
 
 uses
-  SysUtils, mk_sdl2;
+  SysUtils, mk_sdl2, FNSStartScreen;
 
 type
 
@@ -38,38 +38,56 @@ type
     procedure Run;
   private
     fMainWindow:TWindow;
+    fStartScreen:TStartScreen;
   end;
 
 implementation
 
-uses sdl2, MKToolbox, Logger, MKStream, FNSShared;
+uses sdl2, MKToolbox, Logger, MKStream, FNSShared, MAD4MidLevelUnit, MKAudio,
+  Animation2Unit;
 
 { TMain }
 
 constructor TMain.Create(iVersion,iBuildDate:string);
+{$ifndef DEBUG}var MAD4:TMAD4MidLevel;{$endif}
 begin
 {$IFDEF DEBUG}
   // Set logging level
   Log.SetLogLevel(llAll);
+  MKStreamOpener.AddDirectory('..\data',0);
 {$ELSE}
   // Set logging level
   Log.SetLogLevel(llStatus);
-{$ENDIF}
-
   MKStreamOpener.AddDirectory('.',0);
-  fMainWindow:=TWindow.CreateDoubleSized(
+  MAD4:=TMAD4MidLevel.Create(ExtractFilePath(paramstr(0))+'\FrankNStein.data');
+  MKStreamOpener.AddOtherSource(MAD4,100);
+{$ENDIF}
+  SDL_Init(SDL_INIT_VIDEO or SDL_INIT_GAMECONTROLLER);
+
+  fMainWindow:=TWindow.CreateCustomSized(
     SDL_WINDOWPOS_CENTERED,
     SDL_WINDOWPOS_CENTERED,
     WINDOWWIDTH,
     WINDOWHEIGHT,
+    LOGICALWINDOWWIDTH,
+    LOGICALWINDOWHEIGHT,
     Format('Frank N Stein Resurrected V%s (%s)',[iVersion,replace(iBuildDate,'/','.')]));
+
+  Controller:=FindController;
+
+  Init_Audio;
 
   SetFPS(60);
 
+  LoadAssets;
+
+  fStartScreen:=TStartScreen.Create;
 end;
 
 destructor TMain.Destroy;
 begin
+  if Assigned(fStartScreen) then fStartScreen.Free;
+  FreeAssets;
   if Assigned(fMainWindow) then fMainWindow.Free;
   inherited Destroy;
 end;
@@ -77,15 +95,9 @@ end;
 procedure TMain.Run;
 var quit:boolean;
 begin
-  repeat
-    SDL_SetRenderDrawColor(PrimaryWindow.Renderer,48,12,24,255);
-    SDL_RenderClear(fMainWindow.Renderer);
-
-    {$ifndef LimitFPS} FlipNoLimit; {$else} Flip; {$endif}
-    HandleMessages;
-    quit:=Terminate;
-    if keys[SDL_SCANCODE_ESCAPE] then quit:=true;
-  until quit;
+  MM.Musics.ItemByName['Main']._music.Play;
+  fStartScreen.Run;
+  MM.Musics.ItemByName['Main']._music.Stop;
 end;
 
 end.
