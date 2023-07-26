@@ -44,6 +44,8 @@
 //      + Added TWindow.CreateCustomSized.
 //   V1.12 - 2023.07.21
 //      + Added FindController.
+//   V1.13 - 2023.07.26
+//      + Added ControllerButtons array. It works like Keys array.
 
 
 {$ifdef fpc}
@@ -127,6 +129,7 @@ const
 
 var
   keys : array[0..SDL_NUM_SCANCODES] of boolean;
+  controllerbuttons : array[0..SDL_CONTROLLER_BUTTON_MAX] of boolean;
   FrameCount : UInt32;
   fps: integer;
 
@@ -137,6 +140,7 @@ var
 //  function ReadKeyEx(wait:boolean):char;
 //  procedure ClearKeyBuffer;
   procedure ClearKeys;
+  procedure ClearControllerButtons;
   function TimeLeft : UInt32;   // From Kichy's Oxygene spriteenginedemo...
   procedure SetFPS(value:uint32);
   function GetDesktopSize:TRect;
@@ -162,7 +166,7 @@ uses SysUtils, Logger;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.12';
+  Version='1.13';
 
 type
   TEventHandlers=array of TEventHandlerProc;
@@ -461,12 +465,8 @@ begin
           keys[Event.Key.keysym.scancode]:=false;
         end;
         SDL_MOUSEMOTION: begin
-//          if not P2x2 then begin
           MouseX:=Event.Motion.X;
           MouseY:=Event.Motion.Y;
-//          end else begin
-//            MouseX:=Event.Motion.X >> 1;
-//            MouseY:=Event.Motion.Y >> 1;
         end;
         SDL_MOUSEBUTTONDOWN:begin
           MouseButtonDown:=true;
@@ -474,6 +474,12 @@ begin
         end;
         SDL_MOUSEBUTTONUP:begin
           MouseButtonDown:=false;
+        end;
+        SDL_CONTROLLERBUTTONDOWN:begin
+          controllerbuttons[Event.cbutton.button]:=true;
+        end;
+        SDL_CONTROLLERBUTTONUP:begin
+          controllerbuttons[Event.cbutton.button]:=false;
         end;
       end;
     end;
@@ -483,11 +489,17 @@ end;
 procedure ClearKeys;
 var i:integer;
 begin
-  for i:=0 to 511 do keys[i]:=false;
+  for i:=0 to SDL_NUM_SCANCODES do keys[i]:=false;
 end;
 
 const next_time:UInt32=0;
 const TICK_INTERVAL:UInt32=1000 div 40;
+
+procedure ClearControllerButtons;
+var i:integer;
+begin
+  for i:=0 to SDL_CONTROLLER_BUTTON_MAX do controllerbuttons[i]:=false;
+end;
 
 function TimeLeft : UInt32;   // From Kichy's Oxygene spriteenginedemo...
 var
