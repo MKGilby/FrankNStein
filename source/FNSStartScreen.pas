@@ -67,10 +67,13 @@ begin
     HandleMessages;
     if keys[SDL_SCANCODE_ESCAPE] then Result:=-1;
     if keys[SDL_SCANCODE_RETURN] or keys[SDL_SCANCODE_SPACE] then Result:=1;
-    if (SDL_GameControllerGetButton(Controller, SDL_CONTROLLER_BUTTON_A))<>0 then Result:=1;
-    if (SDL_GameControllerGetButton(Controller, SDL_CONTROLLER_BUTTON_B))<>0 then Result:=-1;
+    if controllerbuttons[SDL_CONTROLLER_BUTTON_A] then Result:=1;
+    if controllerbuttons[SDL_CONTROLLER_BUTTON_B] then Result:=-1;
+//    if SDL_GameControllerGetButton(Controller, SDL_CONTROLLER_BUTTON_A)<>0 then Result:=1;
+//    if SDL_GameControllerGetButton(Controller, SDL_CONTROLLER_BUTTON_B)<>0 then Result:=-1;
     if Terminate then Result:=-1;
   until Result<>0;
+  ClearControllerButtons;
 end;
 
 end.

@@ -98,6 +98,7 @@ end;
 procedure TMain.Run;
 var res:integer;
 begin
+  VMU.SetSlotUsed(0);
 //  MM.Musics.ItemByName['Main']._music.Play;
   repeat
     res:=fStartScreen.Run;

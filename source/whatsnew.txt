@@ -1,6 +1,6 @@
 2023.07.26
 - Added slot selector with animated Professor.
-  (Slot selector not yet supports the controller.)
+- Added progress and last played date to slot selector.
 
 2023.07.25
 - Added VMU code.

@@ -41,6 +41,8 @@ type
     fSlot:integer;
     fLeft:integer;
     fCompletedMapCount:integer;
+    fIsUsed:boolean;
+    fLastDate,fLastTime:string;
   public
     Active:boolean;
   end;
@@ -60,10 +62,12 @@ implementation
 uses FNSShared, mk_sdl2, sdl2;
 
 const
-  SLOTWIDTH=72;
+  SLOTWIDTH=76;
   SLOTSPACE=(LOGICALWINDOWWIDTH-(SLOTWIDTH*3)) div 4;
-  SLOTTOP=44;
+  SLOTTOP=44+16;
   SLOTHEIGHT=128;
+  SLOTLINEHEIGHT=8;
+  SLOTMARGIN=6;
 
 { TSlot }
 
@@ -72,6 +76,14 @@ begin
   fSlot:=iSlot;
   fLeft:=iLeft;
   fProf:=MM.Animations.ItemByName['ProfRight'].SpawnAnimation;
+  fIsUsed:=VMU.IsSlotUsed(fSlot);
+  if fIsUsed then begin
+    fLastDate:=VMU.GetSlotLastUseDate(fSlot);
+    fLastTime:=VMU.GetSlotLastUseTime(fSlot);
+  end else begin
+    fLastDate:='';
+    fLastTime:='';
+  end;
   fCompletedMapCount:=VMU.GetCompletedMapCount(fSlot);
 end;
 
@@ -82,6 +94,12 @@ begin
 end;
 
 procedure TSlot.Draw;
+
+  procedure Print(pFont,pText:string;pX,pLine,pAlign:integer); inline;
+  begin
+    MM.Fonts[pFont].OutText(pText,fLeft+pX,SLOTTOP+SLOTMARGIN+SLOTLINEHEIGHT*pLine,pAlign);
+  end;
+
 begin
   Rectangle(fLeft,SLOTTOP,SLOTWIDTH,SLOTHEIGHT,0,0,0);
   if Active then begin
@@ -91,11 +109,20 @@ begin
     Rectangle(fLeft+1,SLOTTOP+1,SLOTWIDTH-2,SLOTHEIGHT-2,64,64,64);
     Bar(fLeft+2,SLOTTOP+2,SLOTWIDTH-4,SLOTHEIGHT-4,DEFAULTCOLORS[1,0],DEFAULTCOLORS[1,1],DEFAULTCOLORS[1,2]);
   end;
-  MM.Fonts['Blue'].OutText('MAPS:',fLeft+6,SLOTTOP+6,0);
-  // We write mapcount-1 because the congratulations map is not counted.
-  MM.Fonts['Yellow'].OutText(Format('%d/%d',[fCompletedMapCount,Maps.Count-1]),fLeft+SLOTWIDTH-6,SLOTTOP+14,2);
-  fProf.PutFrame(fLeft+SLOTWIDTH div 2-5,SLOTTOP+SLOTHEIGHT-6-16);
-  if Active then fProf.Animate;
+  Print('Blue',Format('SLOT %d',[fSlot+1]),SLOTWIDTH div 2,0,1);
+  if fIsUsed then begin
+    Print('Purple','MAPS:',SLOTMARGIN,2,0);
+    // We write mapcount-1 because the congratulations map is not counted.
+    Print('Yellow',Format('%d/%d',[fCompletedMapCount,Maps.Count-1]),SLOTWIDTH-SLOTMARGIN,3,2);
+    Print('Purple','LAST',SLOTMARGIN,5,0);
+    Print('Purple','PLAYED:',SLOTWIDTH-SLOTMARGIN,6,2);
+    Print('Yellow',fLastDate,SLOTWIDTH div 2,7,1);
+    Print('Yellow',fLastTime,SLOTWIDTH div 2,8,1);
+    fProf.PutFrame(fLeft+SLOTWIDTH div 2-5,SLOTTOP+SLOTHEIGHT-6-16);
+    if Active then fProf.Animate;
+  end else begin
+    Print('Pink','EMPTY',SLOTWIDTH div 2,7,1);
+  end;
 end;
 
 { TSlotSelector }
@@ -124,26 +151,36 @@ begin
     SDL_SetRenderDrawColor(PrimaryWindow.Renderer,DEFAULTCOLORS[0,0],DEFAULTCOLORS[0,1],DEFAULTCOLORS[0,2],255);
     SDL_RenderClear(PrimaryWindow.Renderer);
 
-    MM.Fonts['White'].OutText('SELECT SAVE SLOT!',LOGICALWINDOWWIDTH div 2,178,1);
+//    MM.Fonts['White'].OutText('SELECT SAVE SLOT!',LOGICALWINDOWWIDTH div 2,178,1);
+    MM.Fonts['White'].OutText('SELECT SAVE SLOT!',LOGICALWINDOWWIDTH div 2,44,1);
     PutTexture(57,8,MM.Textures.ItemByName['Logo']);
     PutTexture(155,28,MM.Textures.ItemByName['LogoRes']);
     for i:=0 to 2 do fSlots[i].Draw;
     Flip;
     HandleMessages;
-    if keys[SDL_SCANCODE_LEFT] and (Result>0) then begin
+    if (keys[SDL_SCANCODE_LEFT] or controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT])
+        and (Result>0) then begin
       fSlots[Result].Active:=false;
       dec(Result);
       fSlots[Result].Active:=true;
       keys[SDL_SCANCODE_LEFT]:=false;
+      controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT]:=false;
     end;
-    if keys[SDL_SCANCODE_RIGHT] and (Result<MAXSLOTS-1) then begin
+    if (keys[SDL_SCANCODE_RIGHT] or controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT])
+        and (Result<MAXSLOTS-1) then begin
       fSlots[Result].Active:=false;
       inc(Result);
       fSlots[Result].Active:=true;
       keys[SDL_SCANCODE_RIGHT]:=false;
+      controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT]:=false;
     end;
-  until keys[SDL_SCANCODE_RETURN] or keys[SDL_SCANCODE_SPACE] or keys[SDL_SCANCODE_ESCAPE];
-  if keys[SDL_SCANCODE_ESCAPE] then Result:=-1;
+  until keys[SDL_SCANCODE_RETURN] or
+        keys[SDL_SCANCODE_SPACE] or
+        keys[SDL_SCANCODE_ESCAPE] or
+        controllerbuttons[SDL_CONTROLLER_BUTTON_A] or
+        controllerbuttons[SDL_CONTROLLER_BUTTON_B];
+  if controllerbuttons[SDL_CONTROLLER_BUTTON_B] or keys[SDL_SCANCODE_ESCAPE] then Result:=-1;
+  ClearControllerButtons;
 end;
 
 end.
