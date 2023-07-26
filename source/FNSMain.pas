@@ -26,7 +26,7 @@ unit FNSMain;
 interface
 
 uses
-  SysUtils, mk_sdl2, FNSStartScreen;
+  SysUtils, mk_sdl2, FNSStartScreen, FNSSlotSelector;
 
 type
 
@@ -39,6 +39,7 @@ type
   private
     fMainWindow:TWindow;
     fStartScreen:TStartScreen;
+    fSlotSelector:TSlotSelector;
   end;
 
 implementation
@@ -82,10 +83,12 @@ begin
   LoadAssets;
 
   fStartScreen:=TStartScreen.Create;
+  fSlotSelector:=TSlotSelector.Create;
 end;
 
 destructor TMain.Destroy;
 begin
+  if Assigned(fSlotSelector) then fSlotSelector.Free;
   if Assigned(fStartScreen) then fStartScreen.Free;
   FreeAssets;
   if Assigned(fMainWindow) then fMainWindow.Free;
@@ -93,11 +96,14 @@ begin
 end;
 
 procedure TMain.Run;
-var quit:boolean;
+var res:integer;
 begin
-  MM.Musics.ItemByName['Main']._music.Play;
-  fStartScreen.Run;
-  MM.Musics.ItemByName['Main']._music.Stop;
+//  MM.Musics.ItemByName['Main']._music.Play;
+  repeat
+    res:=fStartScreen.Run;
+    if res>-1 then res:=fSlotSelector.Run;
+  until res=-1;
+//  MM.Musics.ItemByName['Main']._music.Stop;
 end;
 
 end.

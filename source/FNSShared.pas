@@ -24,22 +24,32 @@ unit FNSShared;
 
 interface
 
-uses MediaManagerUnit, sdl2;
+uses MediaManagerUnit, sdl2, FNSVMU, FNSMap;
 
 const
   LOGICALWINDOWWIDTH=256;
   LOGICALWINDOWHEIGHT=192;
   WINDOWWIDTH=LOGICALWINDOWWIDTH*4;
   WINDOWHEIGHT=LOGICALWINDOWHEIGHT*4;
+  DEFAULTCOLORS:array[0..2,0..2] of byte=(
+     (24,36,48),   // Main background color
+     (48,24,36),   // Inactive slot background color
+     (64,36,54)    // Active slot background color
+  );
+  MAXSLOTS=3;
 
 var
   MM:TMediaManager;
   Controller:PSDL_GameController;
+  VMU:TVMU;
+  Maps:TMapList;
 
 procedure LoadAssets;
 procedure FreeAssets;
 
 implementation
+
+uses Logger;
 
 procedure LoadFont(name:string;r,g,b:integer);
 begin
@@ -50,22 +60,37 @@ end;
 
 procedure LoadAssets;
 begin
+  Log.LogStatus('Loading assets...');
   MM:=TMediaManager.Create;
+  Log.LogStatus('  Fonts...');
   LoadFont('White',255,255,255);
   LoadFont('Blue',40,128,240);
   LoadFont('Green',40,240,128);
   LoadFont('Yellow',240,128,40);
   LoadFont('Pink',240,40,128);
   LoadFont('Purple',128,40,240);
+  LoadFont('Lime',128,240,40);
+  Log.LogStatus('  Logo...');
   MM.Load('logo.png','Logo',MM_CREATETEXTUREWHENNOANIMATIONDATA);
   MM.Load('resurrected.png','LogoRes',MM_CREATETEXTUREWHENNOANIMATIONDATA);
+  Log.LogStatus('  Sprites...');
   MM.Load('sprites.png','Sprites');
+  Log.LogStatus('  Music...');
   MM.LoadMusic('music\rb_theme.mo3','Main');
+  Log.LogStatus('  Maps...');
+  Maps:=TMapList.Create('maps.bin');
+  Log.LogStatus('Loading VMU...');
+  VMU:=TVMU.Create;
+  VMU.MapCount:=Maps.Count;
 end;
 
 procedure FreeAssets;
 begin
-  MM.Free;
+  Log.LogStatus('Freeing VMU...');
+  if Assigned(VMU) then VMU.Free;
+  Log.LogStatus('Freeing assets...');
+  if Assigned(Maps) then Maps.Free;
+  if Assigned(MM) then MM.Free;
 end;
 
 

@@ -1,3 +1,10 @@
+2023.07.26
+- Added slot selector with animated Professor.
+  (Slot selector not yet supports the controller.)
+
+2023.07.25
+- Added VMU code.
+
 2023.07.21
 - Added controller support.
 - Updated start screen with authors and used tools.

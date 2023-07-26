@@ -1,3 +1,23 @@
+{
+  Frank N Stein Resurrected - Copyright 2023 MKSZTSZ
+  Written by Szabó "Gilby" Zsolt / MKSZTSZ
+
+  This file is part of the source code of Frank N Stein Resurrected.
+
+  Frank N Stein Resurrected is free software: you can redistribute it
+  and/or modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation, either version 3 of the License,
+  or (at your option) any later version.
+
+  Frank N Stein Resurrected is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along with
+  Frank N Stein Resurrected. If not, see <https://www.gnu.org/licenses/>.
+}
+
 unit FNSStartScreen;
 
 {$mode ObjFPC}{$H+}
@@ -24,10 +44,11 @@ uses SDL2, mk_sdl2, FNSShared;
 
 function TStartScreen.Run: integer;
 const TEXTTOP=110;
-var quit:boolean;
 begin
+  Result:=0;
+  ClearKeys;
   repeat
-    SDL_SetRenderDrawColor(PrimaryWindow.Renderer,24,36,48,255);
+    SDL_SetRenderDrawColor(PrimaryWindow.Renderer,DEFAULTCOLORS[0,0],DEFAULTCOLORS[0,1],DEFAULTCOLORS[0,2],255);
     SDL_RenderClear(PrimaryWindow.Renderer);
 
     PutTexture(57,8,MM.Textures.ItemByName['Logo']);
@@ -44,11 +65,12 @@ begin
 
     {$ifndef LimitFPS} FlipNoLimit; {$else} Flip; {$endif}
     HandleMessages;
-    quit:=Terminate;
-    if keys[SDL_SCANCODE_ESCAPE] then quit:=true;
-    if (SDL_GameControllerGetButton(Controller, SDL_CONTROLLER_BUTTON_A))<>0 then quit:=true;
-  until quit;
-  Result:=0;
+    if keys[SDL_SCANCODE_ESCAPE] then Result:=-1;
+    if keys[SDL_SCANCODE_RETURN] or keys[SDL_SCANCODE_SPACE] then Result:=1;
+    if (SDL_GameControllerGetButton(Controller, SDL_CONTROLLER_BUTTON_A))<>0 then Result:=1;
+    if (SDL_GameControllerGetButton(Controller, SDL_CONTROLLER_BUTTON_B))<>0 then Result:=-1;
+    if Terminate then Result:=-1;
+  until Result<>0;
 end;
 
 end.

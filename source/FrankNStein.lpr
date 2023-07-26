@@ -24,7 +24,7 @@ program FrankNStein;
 
 uses
   ARGBImagePNGReaderUnit,
-  FNSMain, FNSSlotSelector, FNSStartScreen;
+  FNSMain, FNSSlotSelector, FNSStartScreen, FNSVMU;
 
 const
   VERSION='0.9';
