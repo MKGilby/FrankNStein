@@ -151,8 +151,7 @@ begin
     SDL_SetRenderDrawColor(PrimaryWindow.Renderer,DEFAULTCOLORS[0,0],DEFAULTCOLORS[0,1],DEFAULTCOLORS[0,2],255);
     SDL_RenderClear(PrimaryWindow.Renderer);
 
-//    MM.Fonts['White'].OutText('SELECT SAVE SLOT!',LOGICALWINDOWWIDTH div 2,178,1);
-    MM.Fonts['White'].OutText('SELECT SAVE SLOT!',LOGICALWINDOWWIDTH div 2,44,1);
+    MM.Fonts['White'].OutText('SELECT SAVE SLOT',LOGICALWINDOWWIDTH div 2,44,1);
     PutTexture(57,8,MM.Textures.ItemByName['Logo']);
     PutTexture(155,28,MM.Textures.ItemByName['LogoRes']);
     for i:=0 to 2 do fSlots[i].Draw;

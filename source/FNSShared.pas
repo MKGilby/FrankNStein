@@ -37,6 +37,10 @@ const
      (64,36,54)    // Active slot background color
   );
   MAXSLOTS=3;
+  MAPTYPECONSTRUCTING=0;
+  MAPTYPEINTERIMORIGINAL=1;
+  MAPTYPEINTERIMREBOOTED=2;
+  MAPTYPECONGRATULATIONS=3;
 
 var
   MM:TMediaManager;
@@ -75,6 +79,9 @@ begin
   MM.Load('resurrected.png','LogoRes',MM_CREATETEXTUREWHENNOANIMATIONDATA);
   Log.LogStatus('  Sprites...');
   MM.Load('sprites.png','Sprites');
+  Log.LogStatus('  Decorations...');
+  MM.Load('backwall.png','Stones');
+  MM.Load('decorations.png','Decorations');
   Log.LogStatus('  Music...');
   MM.LoadMusic('music\rb_theme.mo3','Main');
   Log.LogStatus('  Maps...');

@@ -1,3 +1,9 @@
+2023.07.28
+- Added background bricks.
+- Added lightbulb, bookshelf and life number picture frame.
+- Added top platform made from half height stones.
+- All these things appear when a save slot is selected.
+
 2023.07.27
 - Added '!' and '?' chars to font.
 

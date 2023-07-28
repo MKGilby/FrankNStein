@@ -26,7 +26,7 @@ unit FNSMain;
 interface
 
 uses
-  SysUtils, mk_sdl2, FNSStartScreen, FNSSlotSelector;
+  SysUtils, mk_sdl2, FNSStartScreen, FNSSlotSelector, FNSMapSelect;
 
 type
 
@@ -40,6 +40,7 @@ type
     fMainWindow:TWindow;
     fStartScreen:TStartScreen;
     fSlotSelector:TSlotSelector;
+    fMapSelect:TMapSelect;
   end;
 
 implementation
@@ -52,6 +53,7 @@ uses sdl2, MKToolbox, Logger, MKStream, FNSShared, MAD4MidLevelUnit, MKAudio,
 constructor TMain.Create(iVersion,iBuildDate:string);
 {$ifndef DEBUG}var MAD4:TMAD4MidLevel;{$endif}
 begin
+  randomize;
 {$IFDEF DEBUG}
   // Set logging level
   Log.SetLogLevel(llAll);
@@ -84,10 +86,12 @@ begin
 
   fStartScreen:=TStartScreen.Create;
   fSlotSelector:=TSlotSelector.Create;
+  fMapSelect:=TMapSelect.Create(0);
 end;
 
 destructor TMain.Destroy;
 begin
+  if Assigned(fMapSelect) then fMapSelect.Free;
   if Assigned(fSlotSelector) then fSlotSelector.Free;
   if Assigned(fStartScreen) then fStartScreen.Free;
   FreeAssets;
@@ -102,7 +106,11 @@ begin
 //  MM.Musics.ItemByName['Main']._music.Play;
   repeat
     res:=fStartScreen.Run;
-    if res>-1 then res:=fSlotSelector.Run;
+    if res>-1 then
+      repeat
+        res:=fSlotSelector.Run;
+        if res>-1 then fMapSelect.Run;
+      until res=-1;
   until res=-1;
 //  MM.Musics.ItemByName['Main']._music.Stop;
 end;
