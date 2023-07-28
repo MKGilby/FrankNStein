@@ -1,3 +1,6 @@
+2023.07.27
+- Added '!' and '?' chars to font.
+
 2023.07.26
 - Added slot selector with animated Professor.
 - Added progress and last played date to slot selector.
