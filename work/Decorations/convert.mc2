@@ -1,30 +1,9 @@
-; This script can be feed to MKConv2 to convert the TGAs to PNGs and to
-; add the hanger to the picboat image.
+; This script can be feed to MKConv2 to convert the decorations to PNGs.
 
-; Creating macro to convert one file from .\data folder
-@ tgapng
-r tga data\%1.tga 1
-w png %1.png 1
-@
+r bdc data\decorations1.bdc 1
+m setcolorkey 0 0 0 1
+w png decorations.png 1
 
-; Converting TGAs to PNGs
-! tgapng bulb
-! tgapng device2
-! tgapng gold2
-! tgapng lifepic
-! tgapng meter
-! tgapng piccy
-! tgapng piccy2
-! tgapng shelf
-! tgapng wire2
-
-; Adding hanger to picboat
-; 1. Read a picture that already has the hanger into slot 1
-r tga data\piccy.tga 1
-; 2. Read the picboat with the missing hanger into slot 2
-r bdc data\picboat.bdc 2
-; 3. Copy the picboat picture over the picture loaded in 1.
-m copyto 0 0 32 24 0 8 2 1
-; 4. Save the merged picture into PNG.
-w png picboat.png 1
+r bdc data\backwall.bdc 1
+w png backwall.png 1
 
