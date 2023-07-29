@@ -34,11 +34,17 @@ begin
   FillBackWithStones(tmp);
   MM.Images.ItemByName['Decorations'].CopyTo(0,0,8,16,48,0,tmp,true);  // Bulb
   MM.Images.ItemByName['Decorations'].CopyTo(8,0,48,16,112,0,tmp,true);  // Shelf
-  MM.Images.ItemByName['Decorations'].CopyTo(64,0,24,16,8,0,tmp,true);  // Lives
+  MM.Images.ItemByName['Decorations'].CopyTo(56,0,24,16,8,0,tmp,true);  // Lives
   if Maps[iMapNo].MapType=MAPTYPECONSTRUCTING then begin
-    for i:=0 to 31 do
-      if i in [0..4,8..24] then
-        MM.Images.ItemByName['Decorations'].CopyTo(56,random(2)*4,8,4,i*8,32,tmp,true);  // Top platform
+    for i:=0 to 4 do
+      MM.Images.ItemByName['Decorations'].CopyTo(80,random(2)*4+8,8,4,i*8,32,tmp,true);  // Top platform
+    for i:=8 to 25 do
+      if i in [8,15,19] then
+        MM.Images.ItemByName['Decorations'].CopyTo(80,0,8,8,i*8,32,tmp,true)  // Top platform
+      else if i in [14,18,25] then
+        MM.Images.ItemByName['Decorations'].CopyTo(96,0,8,8,i*8,32,tmp,true)  // Top platform
+      else
+        MM.Images.ItemByName['Decorations'].CopyTo(88,0,8,8,i*8,32,tmp,true);  // Top platform
   end;
   fTexture:=TStaticTexture.Create(tmp);
   tmp.Free;
