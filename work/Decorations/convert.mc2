@@ -1,6 +1,6 @@
 ; This script can be feed to MKConv2 to convert the decorations to PNGs.
 
-r bdc data\decorations1.bdc 1
+r png data\decorations1.png 1
 m setcolorkey 0 0 0 1
 w png decorations.png 1
 

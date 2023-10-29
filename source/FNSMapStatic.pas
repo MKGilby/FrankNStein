@@ -27,6 +27,7 @@ uses FNSShared;
 { TMapStatic }
 
 constructor TMapStatic.Create(iMapNo:integer);
+const platf='12345   123334512451233345';
 var tmp:TARGBImage;i:integer;
 begin
   tmp:=TARGBImage.Create(LOGICALWINDOWWIDTH,LOGICALWINDOWHEIGHT);
@@ -36,15 +37,8 @@ begin
   MM.Images.ItemByName['Decorations'].CopyTo(8,0,48,16,112,0,tmp,true);  // Shelf
   MM.Images.ItemByName['Decorations'].CopyTo(56,0,24,16,8,0,tmp,true);  // Lives
   if Maps[iMapNo].MapType=MAPTYPECONSTRUCTING then begin
-    for i:=0 to 4 do
-      MM.Images.ItemByName['Decorations'].CopyTo(80,random(2)*4+8,8,4,i*8,32,tmp,true);  // Top platform
-    for i:=8 to 25 do
-      if i in [8,15,19] then
-        MM.Images.ItemByName['Decorations'].CopyTo(80,0,8,8,i*8,32,tmp,true)  // Top platform
-      else if i in [14,18,25] then
-        MM.Images.ItemByName['Decorations'].CopyTo(96,0,8,8,i*8,32,tmp,true)  // Top platform
-      else
-        MM.Images.ItemByName['Decorations'].CopyTo(88,0,8,8,i*8,32,tmp,true);  // Top platform
+    for i:=0 to 25 do
+      MM.Images.ItemByName['Decorations'].CopyTo(80+(ord(platf[i+1])-49)*8,0,8,8,i*8,32,tmp,true)  // Top platform
   end;
   fTexture:=TStaticTexture.Create(tmp);
   tmp.Free;

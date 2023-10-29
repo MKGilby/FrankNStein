@@ -1,3 +1,6 @@
+2023.10.29
+- Top platform is changed to metal as in original.
+
 2023.07.28
 - Added background bricks.
 - Added lightbulb, bookshelf and life number picture frame.
