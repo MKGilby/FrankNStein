@@ -7,3 +7,12 @@ w png decorations.png 1
 r bdc data\backwall.bdc 1
 w png backwall.png 1
 
+r tga data\device.tga 1
+m setcolorkey 0 0 0 1
+w png device.png 1
+
+r tga data\meter.tga 1
+m setcolorkey 0 0 0 1
+w png meter.png 1
+
+

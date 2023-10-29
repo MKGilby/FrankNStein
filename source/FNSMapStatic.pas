@@ -40,6 +40,8 @@ begin
     for i:=0 to 25 do
       MM.Images.ItemByName['Decorations'].CopyTo(80+(ord(platf[i+1])-49)*8,0,8,8,i*8,32,tmp,true)  // Top platform
   end;
+  with MM.Images.ItemByName['Device'] do
+    CopyTo(0,0,Width,Height,26*8,8,tmp,true);
   fTexture:=TStaticTexture.Create(tmp);
   tmp.Free;
 end;

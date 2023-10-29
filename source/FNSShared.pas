@@ -82,6 +82,8 @@ begin
   Log.LogStatus('  Decorations...');
   MM.Load('backwall.png','Stones');
   MM.Load('decorations.png','Decorations');
+  MM.Load('device.png','Device');
+  MM.Load('meter.png','Meter');
   Log.LogStatus('  Music...');
   MM.LoadMusic('music\rb_theme.mo3','Main');
   Log.LogStatus('  Maps...');
