@@ -76,7 +76,8 @@ begin
   LoadFont('Lime',128,240,40);
   Log.LogStatus('  Logo...');
   MM.Load('logo.png','Logo',MM_CREATETEXTUREWHENNOANIMATIONDATA);
-  MM.Load('resurrected.png','LogoRes',MM_CREATETEXTUREWHENNOANIMATIONDATA);
+//  MM.Load('resurrected.png','LogoRes',MM_CREATETEXTUREWHENNOANIMATIONDATA);
+  MM.Load('refurbished.png','LogoRes',MM_CREATETEXTUREWHENNOANIMATIONDATA);
   Log.LogStatus('  Sprites...');
   MM.Load('sprites.png','Sprites');
   Log.LogStatus('  Decorations...');

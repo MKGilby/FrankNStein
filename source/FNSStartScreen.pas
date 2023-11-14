@@ -52,7 +52,7 @@ begin
     SDL_RenderClear(PrimaryWindow.Renderer);
 
     PutTexture(57,8,MM.Textures.ItemByName['Logo']);
-    PutTexture(155,28,MM.Textures.ItemByName['LogoRes']);
+    PutTexture(198-MM.Textures.ItemByName['LogoRes'].Width,28,MM.Textures.ItemByName['LogoRes']);
     if GetTickCount64 mod 1000<500 then
       MM.Fonts['White'].OutText('PRESS START',LOGICALWINDOWWIDTH div 2,64,1);
     MM.Fonts['Blue'].OutText('FRANK N. STEIN RE-BOOTED',LOGICALWINDOWWIDTH div 2,TEXTTOP,1);
