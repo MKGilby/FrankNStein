@@ -1,5 +1,5 @@
 @echo off
-rem This script builds the release version of FrankNStein Resurrected.
+rem This script builds the release version of FrankNStein Refurbished.
 rem - Graphics and maps
 cd work
 call build_all.bat

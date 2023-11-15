@@ -1,21 +1,21 @@
 {
-  Frank N Stein Resurrected - Copyright 2023 MKSZTSZ
+  Frank N Stein Refurbished - Copyright 2023 MKSZTSZ
   Written by Szabó "Gilby" Zsolt / MKSZTSZ
 
-  This file is part of the source code of Frank N Stein Resurrected.
+  This file is part of the source code of Frank N Stein Refurbished.
 
-  Frank N Stein Resurrected is free software: you can redistribute it
+  Frank N Stein Refurbished is free software: you can redistribute it
   and/or modify it under the terms of the GNU General Public License
   as published by the Free Software Foundation, either version 3 of the License,
   or (at your option) any later version.
 
-  Frank N Stein Resurrected is distributed in the hope that it will be useful,
+  Frank N Stein Refurbished is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License along with
-  Frank N Stein Resurrected. If not, see <https://www.gnu.org/licenses/>.
+  Frank N Stein Refurbished. If not, see <https://www.gnu.org/licenses/>.
 }
 
 unit FNSStartScreen;
@@ -52,7 +52,6 @@ begin
     SDL_RenderClear(PrimaryWindow.Renderer);
 
     PutTexture(57,8,MM.Textures.ItemByName['Logo']);
-    PutTexture(198-MM.Textures.ItemByName['LogoRes'].Width,28,MM.Textures.ItemByName['LogoRes']);
     if GetTickCount64 mod 1000<500 then
       MM.Fonts['White'].OutText('PRESS START',LOGICALWINDOWWIDTH div 2,64,1);
     MM.Fonts['Blue'].OutText('FRANK N. STEIN RE-BOOTED',LOGICALWINDOWWIDTH div 2,TEXTTOP,1);
@@ -61,7 +60,7 @@ begin
     MM.Fonts['Yellow'].OutText('MUSIC AND SOUND - MIKE FRALEY',LOGICALWINDOWWIDTH div 2,TEXTTOP+34,1);
     MM.Fonts['Yellow'].OutText('GFX AND CODE - GILBY',LOGICALWINDOWWIDTH div 2,TEXTTOP+44,1);
     MM.Fonts['Purple'].OutText('DEVELOPED USING SDL2, BASS',LOGICALWINDOWWIDTH div 2,TEXTTOP+56,1);
-    MM.Fonts['Purple'].OutText('AND LAZARUS 3.0 RC 1',LOGICALWINDOWWIDTH div 2,TEXTTOP+66,1);
+    MM.Fonts['Purple'].OutText('AND LAZARUS 3.0 RC 2',LOGICALWINDOWWIDTH div 2,TEXTTOP+66,1);
 
     {$ifndef LimitFPS} FlipNoLimit; {$else} Flip; {$endif}
     HandleMessages;
