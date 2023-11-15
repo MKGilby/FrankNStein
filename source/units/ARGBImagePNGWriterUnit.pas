@@ -21,10 +21,12 @@
 //     * Following changes in TAnimData
 //   1.05 - Gilby - 2022.07.19
 //     + Added ReverseAnim flag
-//   1.06 - Gilby - 2022.07.19
+//   1.06 - Gilby - 2023.02.12
 //     * Bugfix with writing colormode 3 images with odd width and 4, 2 or 1 bitdepth.
-//   1.07 - Gilby - 2022.07.19
+//   1.07 - Gilby - 2023.06.28
 //     * Bugfix with writing unnamed animations.
+//   1.08 - Gilby - 2023.07.17
+//     * Bugfix with writing colormode 3 images with odd width and 4, 2 or 1 bitdepth.
 
 unit ARGBImagePNGWriterUnit;
 
@@ -48,7 +50,7 @@ uses Classes, SysUtils, ARGBImageUnit, CRC32Unit, FastPaletteUnit,
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.07';
+  Version='1.08';
 
   HEADER=#137#80#78#71#13#10#26#10;
   IHDR:uint32=$52444849; //  #82#68#72#73;
@@ -377,6 +379,7 @@ begin
               b:=(b<<bitdepth) and $ff;
             end;
             if pWidth mod (8 div bitdepth)<>0 then begin
+              b:=(b<<(bitdepth*((8 div bitdepth)-(pWidth mod (8 div bitdepth))-1))) and $ff;
               byte(pr^):=b;
               inc(pr);
             end;
