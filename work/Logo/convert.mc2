@@ -1,11 +1,11 @@
-r bdc data\logo.bdc 1
-m setcolorkey 0 0 0 1
-w png logo.png 1
+m create 142 25 2
 
-;r bdc data\resurrected.bdc 1
-;m setcolorkey 0 0 0 1
-;w png resurrected.png 1
+r png data\logo.png 1
+m copyto 0 0 142 19 0 0 1 2
 
 r png data\refurbished.png 1
-m setcolorkey 0 0 0 1
-w png refurbished.png 1
+m copyto 0 0 41 5 100 20 1 2
+
+m setcolorkey 0 0 0 2
+m addanimation Logo 142 25 1 0 0 0 4  0 0  2
+w png logo.png 2
