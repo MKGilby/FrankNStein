@@ -35,6 +35,7 @@ const   _to=' [=]\></J1234567^|v:!(){#}-------';
 var t:text;s,tiles:string;i,j,l:integer;
     map:TMap;
     dtype:TDecorationType;
+
 begin
   write('Processing ',ifn,'...');
   map:=TMap.Create;
@@ -66,19 +67,35 @@ begin
   map.MapType:=maptype;
   write(3);
 
+  // Walls
+  s:=tiles;
+  for i:=1 to length(s) do
+    if s[i] in ['1'..'7',':','^','|','v','!','(',')','{','}','#'] then s[i]:='-';
+  for j:=0 to 21 do
+    for i:=0 to 31 do
+      if s[j*32+i+1]='-' then begin
+        s[j*32+i+1]:=' ';
+        l:=1;
+        while (i+l<32) and (s[j*32+i+1+l]='-') do begin
+          if s[j*32+i+1+l]='-' then s[j*32+i+1+l]:=' ';
+          inc(l);
+        end;
+        map.AddWall(i,j,l);
+      end;
+
   // Blocks
   for j:=0 to 21 do begin
     for i:=0 to 31 do begin
       case tiles[j*32+i+1] of
         '-':begin
           tiles[j*32+i+1]:=' ';
-          l:=1;
-          while (i+l<32) and (tiles[j*32+i+1+l] in ['-','1'..'7',':','^','|','v','!','(',')','{','}','#']) do begin
-            if tiles[j*32+i+1+l]='-' then tiles[j*32+i+1+l]:=' ';
-            inc(l);
-          end;
+//          l:=1;
+//          while (i+l<32) and (tiles[j*32+i+1+l] in ['-','1'..'7',':','^','|','v','!','(',')','{','}','#']) do begin
+//            if tiles[j*32+i+1+l]='-' then tiles[j*32+i+1+l]:=' ';
+//            inc(l);
+//          end;
 //          Log.Trace(Format('Wall: %d,%d,%d',[i,j,l]));
-          map.AddWall(i,j,l);
+//          map.AddWall(i,j,l);
         end;
         ':':begin
           tiles[j*32+i+1]:=' ';

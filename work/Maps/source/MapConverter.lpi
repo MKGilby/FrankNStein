@@ -67,7 +67,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="..\..\..\source\units;..\..\..\source"/>
+            <OtherUnitFiles Value="..\..\..\source\units;..\..\..\source;..\..\..\source\units\SDL2"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
