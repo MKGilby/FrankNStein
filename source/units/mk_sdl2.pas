@@ -46,6 +46,10 @@
 //      + Added FindController.
 //   V1.13 - 2023.07.26
 //      + Added ControllerButtons array. It works like Keys array.
+//   V1.14 - 2023.11.16
+//      + Added Bar with Texture instead of color. (Draws bar tiled with texture.)
+//   V1.14a - 2023.11.17
+//      * Fixed Bar with Texture. Sometimes it missed the last column.
 
 
 {$ifdef fpc}
@@ -147,15 +151,34 @@ var
   procedure RegisterEventHandler(EventHandlerProc:TEventHandlerProc);
   procedure UnRegisterEventHandler(EventHandlerProc:TEventHandlerProc);
 
-  procedure Bar(x,y,w,h,r,g,b:integer;a:integer=255);
+  // Draws a filled rectangle with the given color
+  procedure Bar(x,y,w,h,r,g,b:integer;a:integer=255); overload;
+
+  // Draws a filled rectangle, filled with the given texture.
+  procedure Bar(x,y,w,h:integer;Texture:TTexture); overload;
+
+  // Draws a rectangle with the given color.
   procedure Rectangle(x,y,w,h,r,g,b:integer;a:integer=255);
+
+  // Draws a line with the given color.
   procedure Line(x1,y1,x2,y2,r,g,b:integer;a:integer=255);
+
+  // Draws a horizontal line with the given color.
   procedure HLine(x1,y1,w,r,g,b:integer;a:integer=255);
+
+  // Draws a vertical line with the given color.
   procedure VLine(x1,y1,h,r,g,b:integer;a:integer=255);
 
+  // Draws the given texture at x,y.
   procedure PutTexture(x,y:integer;Texture:TTexture); overload;
+
+  // Draws the given texture at x,y, resized to w*h logical pixels.
   procedure PutTexture(x,y,w,h:integer;Texture:TTexture); overload;
+
+  // Draws a part of the given texture at x,y.
   procedure PutTexturePart(x,y,sx,sy,w,h:integer;Texture:TTexture); overload;
+
+  // Draws a part of the given texture at tx,ty, resized to tw*th.
   procedure PutTexturePart(sx,sy,sw,sh,tx,ty,tw,th:integer;Texture:TTexture); overload;
 
   function FindController:PSDL_GameController;
@@ -166,7 +189,7 @@ uses SysUtils, Logger;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.13';
+  Version='1.14a';
 
 type
   TEventHandlers=array of TEventHandlerProc;
@@ -561,6 +584,30 @@ begin
   DestRect.h:=h;
   SDL_SetRenderDrawColor(PrimaryWindow.Renderer, r, g, b, a);
   SDL_RenderFillRect(PrimaryWindow.Renderer,@DestRect);
+end;
+
+procedure Bar(x,y,w,h:integer; Texture:TTexture);
+var i,j:integer;
+begin
+  for j:=0 to (h div Texture.Height)-1 do begin
+    i:=0;
+    while i<(w div Texture.Width) do begin
+      PutTexture(x+i*Texture.Width,y+j*Texture.Height,Texture);
+      inc(i);
+    end;
+    if w mod Texture.Width>0 then
+      PutTexturePart(x+i*Texture.Width,y+j*Texture.Height,0,0,w mod Texture.Width,Texture.Height,Texture);
+  end;
+  if h mod Texture.Height>0 then begin
+    j:=h div Texture.Height;
+    i:=0;
+    while i<(w div Texture.Width) do begin
+      PutTexturePart(x+i*Texture.Width,y+j*Texture.Height,0,0,Texture.Width,h mod Texture.Height,Texture);
+      inc(i);
+    end;
+    if w mod Texture.Width>0 then
+      PutTexturePart(x+i*Texture.Width,y+j*Texture.Height,0,0,w mod Texture.Width,h mod Texture.Height,Texture);
+  end;
 end;
 
 procedure Rectangle(x,y,w,h,r,g,b:integer;a:integer=255);
