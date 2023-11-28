@@ -25,7 +25,7 @@ unit FNSMapStatic;
 interface
 
 uses
-  mk_sdl2, ARGBImageUnit;
+  mk_sdl2, ARGBImageUnit, FNSMap, TileMapUnit;
 
 type
 
@@ -37,7 +37,9 @@ type
     procedure Draw;
   private
     fTexture:TTexture;
+    fTileMap:TTileMap;
     procedure FillBackWithStones(pImage:TARGBImage);
+    procedure AddBlocks(pMap:TMap;pImage:TARGBImage);
   end;
 
 implementation
@@ -62,13 +64,17 @@ begin
   end;
   with MM.Images.ItemByName['Device'] do
     CopyTo(0,0,Width,Height,26*8,8,tmp,true);
+
+  AddBlocks(Maps[iMapNo],tmp);
+
   fTexture:=TStaticTexture.Create(tmp);
   tmp.Free;
 end;
 
 destructor TMapStatic.Destroy;
 begin
-  if assigned(fTexture) then fTexture.Free;
+  if Assigned(fTexture) then fTexture.Free;
+  if Assigned(fTileMap) then fTileMap.Free;
   inherited Destroy;
 end;
 
@@ -148,6 +154,81 @@ begin
         end;
       end;
   for i:=0 to 3 do Stones[i].Free;
+end;
+
+procedure TMapStatic.AddBlocks(pMap:TMap; pImage:TARGBImage);
+var i,j,pc:integer;tiles,tmp:TARGBImage;
+begin
+  fTileMap:=TTileMap.Create(32,24);
+  tiles:=MM.Images.ItemByName['Tiles'];
+  tmp:=TARGBImage.Create(LOGICALWINDOWWIDTH,LOGICALWINDOWHEIGHT);
+  pc:=0;
+  try
+    tmp.Clear(0);
+    // Walls
+    for i:=0 to pMap.BlockCount-1 do
+      if pMap.BlockData[i]._type=btWall then with pMap.BlockData[i] do
+        for j:=0 to _length-1 do begin
+          fTileMap.Tiles[_x+j,_y]:=TILE_WALL;
+          tiles.CopyTo(0,0,8,8,(_x+j)*8,_y*8,tmp,true);
+        end;
+
+  //  if (fBlocks[i]._type in [btPole, btStairsR, btStairsL]) then begin
+    // Other objects
+    for i:=0 to pMap.BlockCount-1 do with pMap.BlockData[i] do
+      case _type of
+        btSpring:begin
+          fTileMap.Tiles[_x,_y]:=TILE_SPRING;
+          tiles.CopyTo(8,0,8,8,_x*8,_y*8,tmp);
+        end;
+        btIce:begin
+          fTileMap.Tiles[_x,_y]:=TILE_ICE;
+          fTileMap.Tiles[_x+1,_y]:=TILE_ICE;
+          tiles.CopyTo(16,0,16,8,_x*8,_y*8,tmp);
+        end;
+        btZapper:begin
+          fTileMap.Tiles[_x,_y]:=TILE_ZAPPER;
+          tiles.CopyTo(88,0,8,8,_x*8,_y*8,tmp);
+        end;
+        btMud:begin
+          fTileMap.Tiles[_x,_y]:=TILE_MUD;
+          fTileMap.Tiles[_x+1,_y]:=TILE_MUD;
+          fTileMap.Tiles[_x+2,_y]:=TILE_MUD;
+        end;
+        btJumper:begin
+          fTileMap.Tiles[_x,_y]:=TILE_JUMPER;
+        end;
+        btPole:begin
+          for j:=0 to _length-1 do begin
+            fTileMap.Tiles[_x,_y+j]:=TILE_POLE;
+            if j=0 then tiles.CopyTo(64,0,8,8,_x*8,_y*8,tmp)
+            else if j=_length-1 then tiles.CopyTo(80,0,8,8,_x*8,(_y+j)*8,tmp)
+            else tiles.CopyTo(72,0,8,8,_x*8,(_y+j)*8,tmp);
+          end;
+        end;
+        btStairsL:begin
+          for j:=0 to _length-1 do begin
+            fTileMap.Tiles[_x-j,_y+j]:=TILE_WALL;
+            fTileMap.Tiles[_x+1-j,_y+j]:=TILE_WALL;
+            tiles.CopyTo(48,0,16,8,(_x-j)*8,(_y+j)*8,tmp);
+          end;
+        end;
+        btStairsR:begin
+          for j:=0 to _length-1 do begin
+            fTileMap.Tiles[_x+j,_y+j]:=TILE_WALL;
+            fTileMap.Tiles[_x+1+j,_y+j]:=TILE_WALL;
+            tiles.CopyTo(32,0,16,8,(_x+j)*8,(_y+j)*8,tmp);
+          end;
+        end;
+        btPiece:begin
+          fTileMap.Tiles[_x,_y]:=TILE_PIECE+pc;
+          inc(pc);
+        end;
+      end;
+    tmp.CopyTo(0,0,LOGICALWINDOWWIDTH,LOGICALWINDOWHEIGHT,0,0,pImage,true);
+  finally
+    tmp.Free;
+  end;
 end;
 
 end.

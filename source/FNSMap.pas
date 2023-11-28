@@ -156,11 +156,15 @@ type
     function fGetMonsterCount:integer;
     function fGetDecorationData(index:integer):TDecorationData;
     function fGetDecorationCount:integer;
+    function fGetBlockData(index:integer):TBlockData;
+    function fGetBlockCount:integer;
   public
     property Name:string read fName write fName;
     property Author:string read fAuthor write fAuthor;
     property Wall:integer read fWall write fWall;
     property MapType:integer read fType write fType;
+    property BlockData[index:integer]:TBlockData read fGetBlockData;
+    property BlockCount:integer read fGetBlockCount;
     property MonsterData[index:integer]:TMonsterData read fGetMonsterData;
     property MonsterCount:integer read fGetMonsterCount;
     property DecorationData[index:integer]:TDecorationData read fGetDecorationData;
@@ -175,7 +179,7 @@ type
 
 implementation
 
-uses SysUtils, MKStream, MKToolBox, Logger;
+uses SysUtils, MKStream, MKToolBox, Logger, FNSShared;
 
 const
   HEAD='FNSR';
@@ -343,7 +347,7 @@ begin
   if pY>21 then begin pY:=19;pLength:=3;end;
   if (pY+pLength)>22 then pLength:=22-pY;
   SetLength(fBlocks,length(fBlocks)+1);
-  fBlocks[length(fBlocks)-1]:=TBlockData.Init(btStairsR,pX,pY,pLength);
+  fBlocks[length(fBlocks)-1]:=TBlockData.Init(btPole,pX,pY,pLength);
 end;
 
 procedure TMap.AddStairsRight(pX,pY,pLength:integer);
@@ -662,6 +666,19 @@ end;
 function TMap.fGetDecorationCount:integer;
 begin
   Result:=length(fDecorations);
+end;
+
+function TMap.fGetBlockData(index:integer):TBlockData;
+begin
+  if (index>=0) and (index<length(fBlocks)) then
+    Result:=fBlocks[index]
+  else
+    Result:=TBlockData.Init(btWall,0,0,1);
+end;
+
+function TMap.fGetBlockCount:integer;
+begin
+  Result:=length(fBlocks);
 end;
 
 procedure TMap.fWriteString(pStream:TStream;s:String;head:boolean);

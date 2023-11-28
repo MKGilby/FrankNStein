@@ -42,6 +42,16 @@ const
   MAPTYPEINTERIMREBOOTED=2;
   MAPTYPECONGRATULATIONS=3;
 
+  TILE_EMPTY=0;
+  TILE_WALL=1;
+  TILE_SPRING=2;
+  TILE_ICE=3;
+  TILE_ZAPPER=4;
+  TILE_MUD=5;
+  TILE_JUMPER=6;
+  TILE_POLE=7;
+  TILE_PIECE=128;
+
 var
   MM:TMediaManager;
   Controller:PSDL_GameController;
@@ -57,7 +67,7 @@ uses Logger;
 
 procedure LoadFont(name:string;r,g,b:integer);
 begin
-  MM.Load('cs_font.png',Name);
+  MM.Load('cs_font.png',Name,MM_DONTKEEPIMAGE);
   MM.Fonts[Name].SpaceSpace:=7;
   MM.Fonts[Name].SetColor(r,g,b);
 end;
@@ -75,7 +85,7 @@ begin
   LoadFont('Purple',128,40,240);
   LoadFont('Lime',128,240,40);
   Log.LogStatus('  Logo...');
-  MM.Load('logo.png','Logo');
+  MM.Load('logo.png','Logo',MM_DONTKEEPIMAGE);
   Log.LogStatus('  Sprites...');
   MM.Load('sprites.png','Sprites');
   Log.LogStatus('  Decorations...');
@@ -83,6 +93,7 @@ begin
   MM.Load('decorations.png','Decorations');
   MM.Load('device.png','Device');
   MM.Load('meter.png','Meter');
+  MM.Load('tiles.png','Tiles');
   Log.LogStatus('  Music...');
   MM.LoadMusic('music\rb_theme.mo3','Main');
   Log.LogStatus('  Maps...');
