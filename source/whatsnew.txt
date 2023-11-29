@@ -1,3 +1,18 @@
+2023.11.30 - Build 3
+- Skeleton pieces appears on first map.
+- Slightly rearranged SlotSelector.
+- Added helping text to SlotSelector. (Different when a controller is detected)
+- Added different text to StartScreen when a controller is detected.
+- Skeleton piece now have a 8x8 darkening box behind it (in addition to the red outline)
+- ICE tiles are 7 pixel height instead of 8.
+- Skeleton's spine is now 2 pixels width to be symmetric. The skull seems too big now, but I can live with it.
+
+2023.11.29 - Build 2
+- The first map appears.
+
+2023.11.14
+- Name changed to Frank'N'Stein Refurbished.
+
 2023.10.29
 - Top platform is changed to metal as in original.
 
