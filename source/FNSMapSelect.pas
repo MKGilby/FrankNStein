@@ -25,7 +25,7 @@ unit FNSMapSelect;
 
 interface
 
-uses FNSMapStatic;
+uses FNSMapStatic, FNSDevice;
 
 type
 
@@ -38,6 +38,7 @@ type
   private
     fCurrentMapNo:integer;
     fMapStatic:TMapStatic;
+    fDevice:TDevice;
   end;
 
 implementation
@@ -50,10 +51,12 @@ constructor TMapSelect.Create(iStartMapNo:integer);
 begin
   fCurrentMapNo:=iStartMapNo;
   fMapStatic:=TMapStatic.Create(fCurrentMapNo);
+  fDevice:=TDevice.Create(fCurrentMapNo);
 end;
 
 destructor TMapSelect.Destroy;
 begin
+  if Assigned(fDevice) then fDevice.Free;
   if Assigned(fMapStatic) then fMapStatic.Free;
   inherited Destroy;
 end;
@@ -64,6 +67,7 @@ begin
   ClearKeys;
   repeat
     fMapStatic.Draw;
+    fDevice.Draw;
 
     {$ifndef LimitFPS} FlipNoLimit; {$else} Flip; {$endif}
     HandleMessages;

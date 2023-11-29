@@ -53,7 +53,10 @@ begin
 
     PutTexture(57,8,MM.Textures.ItemByName['Logo']);
     if GetTickCount64 mod 1000<500 then
-      MM.Fonts['White'].OutText('PRESS START',LOGICALWINDOWWIDTH div 2,64,1);
+      if Assigned(Controller) then
+        MM.Fonts['White'].OutText('PRESS '#128' TO START',LOGICALWINDOWWIDTH div 2,64,1)
+      else
+        MM.Fonts['White'].OutText('PRESS SPACE TO START',LOGICALWINDOWWIDTH div 2,64,1);
     MM.Fonts['Blue'].OutText('FRANK N. STEIN RE-BOOTED',LOGICALWINDOWWIDTH div 2,TEXTTOP,1);
     MM.Fonts['Blue'].OutText('@1984-2011 COLIN STEWART',LOGICALWINDOWWIDTH div 2,TEXTTOP+10,1);
     MM.Fonts['Pink'].OutText('THIS REMAKE @2023 MKSZTSZ',LOGICALWINDOWWIDTH div 2,TEXTTOP+22,1);
@@ -68,8 +71,6 @@ begin
     if keys[SDL_SCANCODE_RETURN] or keys[SDL_SCANCODE_SPACE] then Result:=1;
     if controllerbuttons[SDL_CONTROLLER_BUTTON_A] then Result:=1;
     if controllerbuttons[SDL_CONTROLLER_BUTTON_B] then Result:=-1;
-//    if SDL_GameControllerGetButton(Controller, SDL_CONTROLLER_BUTTON_A)<>0 then Result:=1;
-//    if SDL_GameControllerGetButton(Controller, SDL_CONTROLLER_BUTTON_B)<>0 then Result:=-1;
     if Terminate then Result:=-1;
   until Result<>0;
   ClearControllerButtons;

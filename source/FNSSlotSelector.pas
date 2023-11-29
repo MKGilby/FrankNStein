@@ -64,8 +64,8 @@ uses FNSShared, mk_sdl2, sdl2;
 const
   SLOTWIDTH=76;
   SLOTSPACE=(LOGICALWINDOWWIDTH-(SLOTWIDTH*3)) div 4;
-  SLOTTOP=44+16;
-  SLOTHEIGHT=128;
+  SLOTTOP=42+16;
+  SLOTHEIGHT=112;
   SLOTLINEHEIGHT=8;
   SLOTMARGIN=6;
 
@@ -151,7 +151,14 @@ begin
     SDL_SetRenderDrawColor(PrimaryWindow.Renderer,DEFAULTCOLORS[0,0],DEFAULTCOLORS[0,1],DEFAULTCOLORS[0,2],255);
     SDL_RenderClear(PrimaryWindow.Renderer);
 
-    MM.Fonts['White'].OutText('SELECT SAVE SLOT',LOGICALWINDOWWIDTH div 2,44,1);
+    MM.Fonts['White'].OutText('SELECT SAVE SLOT',LOGICALWINDOWWIDTH div 2,42,1);
+    if Assigned(Controller) then begin
+      MM.Fonts['White'].OutText('USE '#130' AND '#131' TO SELECT SLOT',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-20,1);
+      MM.Fonts['White'].OutText('PRESS '#128' TO CONTINUE',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-10,1);
+    end else begin
+      MM.Fonts['White'].OutText('USE ARROWS TO SELECT SLOT',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-20,1);
+      MM.Fonts['White'].OutText('PRESS SPACE TO CONTINUE',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-10,1);
+    end;
     PutTexture(57,8,MM.Textures.ItemByName['Logo']);
     for i:=0 to 2 do fSlots[i].Draw;
     Flip;

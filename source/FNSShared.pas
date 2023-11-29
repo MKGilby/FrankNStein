@@ -69,6 +69,7 @@ procedure LoadFont(name:string;r,g,b:integer);
 begin
   MM.Load('cs_font.png',Name,MM_DONTKEEPIMAGE);
   MM.Fonts[Name].SpaceSpace:=7;
+  MM.Fonts[Name].SetRecolorExcludeChars(#128#129#130#131);
   MM.Fonts[Name].SetColor(r,g,b);
 end;
 
