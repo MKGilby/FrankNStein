@@ -17,25 +17,29 @@ procedure TMain.Run;
 var big:TARGBImage;atl:TTextureAtlasGenerator;
 
   procedure CreatePiece(x,y,order:integer);
+  const SKBACK=$60000000;
   var tmp:TARGBImage;i,j:integer;tmpa:TAnimationData;
   begin
     tmp:=TARGBImage.Create(10,8);
     tmp.Clear(0);
+    tmp.bar(1,0,8,8,SKBACK);
     big.CopyTo(x,y,8,8,1,0,tmp,true);
     for j:=0 to 7 do
       for i:=0 to 9 do
-        if tmp.GetPixel(i,j)=0 then begin
+        if (tmp.GetPixel(i,j)=SKBACK) or (tmp.GetPixel(i,j)=0) then begin
           if ((i>1) and (big.GetPixel(x+i-2,y+j)<>0)) or
              ((i<8) and (big.GetPixel(x+i,y+j)<>0)) then tmp.putpixel(i,j,$ff400404);
         end;
     tmpa:=TAnimationData.Create(10,8);
     tmpa.AddFrame(0,0);
     tmpa.Paused:=true;
+    tmpa.Name:=Format('Piece%d',[order]);
     tmp.Animations.AddObject(Format('Piece%d',[order]),tmpa);
     atl.AddImage(tmp);
     tmpa:=TAnimationData.Create(8,8);
     tmpa.AddFrame(x,y);
     tmpa.Paused:=true;
+    tmpa.Name:=Format('Skeleton%d',[order]);
     big.Animations.AddObject(Format('Skeleton%d',[order]),tmpa);
     tmp.Free;
   end;

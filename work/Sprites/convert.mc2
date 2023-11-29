@@ -10,6 +10,12 @@ m addall 1 2
 r png skeletonsprite.png 1
 m addall 1 2
 
+r png data\deviceoverlay.png 1
+m create 16 8 3
+m copyto 0 0 16 8 0 0 1 3
+m addanimation DeviceOverlay 16 8 1 0 0 0 3  0 0  3
+m addall 3 2
+
 w png sprites.png 2
 
 r png data\tiles.png 1
