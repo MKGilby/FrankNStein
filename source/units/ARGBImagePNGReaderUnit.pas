@@ -25,6 +25,8 @@
 //     * Following changes in AnimationDataUnit
 //   1.06: Gilby - 2022.07.19
 //     + Reading ReverseAnim flag
+//   1.07: Gilby - 2023.11.29
+//     * Fix in reading unnamed animations.
 
 unit ARGBImagePNGReaderUnit;
 
@@ -42,7 +44,7 @@ uses Classes, SysUtils, ARGBImageUnit, CRC32Unit, MyZStreamUnit, Logger,
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.06';
+  Version='1.07';
 
   HEADER=#137#80#78#71#13#10#26#10;
 
@@ -238,7 +240,7 @@ begin
     w:=0;h:=0;fc:=0;
     pSource.Read(w,1);
     SetLength(s,w);
-    pSource.Read(s[1],w);
+    if w>0 then pSource.Read(s[1],w);
     pSource.Read(w,2);
     pSource.Read(h,2);
     pSource.Read(fc,2);
