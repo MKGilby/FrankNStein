@@ -160,7 +160,7 @@ begin
     for l:=49 to 55 do
       for i:=0 to 22*32-1 do
         if tiles[i+1]=chr(l) then begin
-          map.AddPiece(i mod 32,i mod 22);
+          map.AddPiece(i mod 32,i div 32);
           break;
         end;
   end;
