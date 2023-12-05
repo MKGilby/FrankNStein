@@ -1,3 +1,9 @@
+2023.12.05 - Build 4
+- You can move left-right.
+- You can fall down.
+- You can jump when standing exactly on the springs.
+- You can pick up skeleton pieces.
+
 2023.11.30 - Build 3
 - Skeleton pieces appears on first map.
 - Slightly rearranged SlotSelector.

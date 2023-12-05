@@ -20,7 +20,7 @@
 
 unit FNSMapStatic;
 
-{$mode ObjFPC}{$H+}
+{$mode Delphi}{$H+}
 
 interface
 
@@ -39,7 +39,10 @@ type
     fTexture:TTexture;
     fTileMap:TTileMap;
     procedure FillBackWithStones(pImage:TARGBImage);
+    procedure CreateTileMap;
     procedure AddBlocks(pMap:TMap;pImage:TARGBImage);
+  public
+    property TileMap:TTileMap read fTileMap;
   end;
 
 implementation
@@ -58,9 +61,12 @@ begin
   MM.Images.ItemByName['Decorations'].CopyTo(0,0,8,16,48,0,tmp,true);  // Bulb
   MM.Images.ItemByName['Decorations'].CopyTo(8,0,48,16,112,0,tmp,true);  // Shelf
   MM.Images.ItemByName['Decorations'].CopyTo(56,0,24,16,8,0,tmp,true);  // Lives
+  CreateTileMap;
   if Maps[iMapNo].MapType=MAPTYPECONSTRUCTING then begin
-    for i:=0 to 25 do
+    for i:=0 to 25 do begin
+      if platf[i+1]<>' ' then fTileMap[i,4]:=TILE_WALL;
       MM.Images.ItemByName['Decorations'].CopyTo(80+(ord(platf[i+1])-49)*8,0,8,8,i*8,32,tmp,true)  // Top platform
+    end;
   end;
   with MM.Images.ItemByName['Device'] do
     CopyTo(0,0,Width,Height,26*8,8,tmp,true);
@@ -156,16 +162,35 @@ begin
   for i:=0 to 3 do Stones[i].Free;
 end;
 
+procedure TMapStatic.CreateTileMap;
+var i:integer;
+begin
+  // Create slightly bigger tilemap to cover one tile outside of play area
+  fTileMap:=TTileMap.Create(32+2,22+2);
+  // Set origin so we can still access play area as Tiles[0..31,0..21]
+  fTileMap.OriginX:=-1;
+  fTileMap.OriginY:=-1;
+  // Add invisible walls to the left and right sides to the map.
+  for i:=-1 to 22 do begin
+    fTileMap[-1,i]:=TILE_WALL;
+    fTileMap[32,i]:=TILE_WALL;
+  end;
+end;
+
 procedure TMapStatic.AddBlocks(pMap:TMap; pImage:TARGBImage);
 var i,j,pc:integer;tiles,tmp:TARGBImage;
 begin
-  fTileMap:=TTileMap.Create(32,24);
+  // Get Tileset image
   tiles:=MM.Images.ItemByName['Tiles'];
-  tmp:=TARGBImage.Create(LOGICALWINDOWWIDTH,LOGICALWINDOWHEIGHT);
+  // Piece count
   pc:=0;
+  // Create a temporary image to draw tiles to. This is needed beacuse on some
+  // tiles there are multiple blocks (wall+spring for example), but we need
+  // only the last one.
+  tmp:=TARGBImage.Create(LOGICALWINDOWWIDTH,LOGICALWINDOWHEIGHT);
   try
-    tmp.Clear(0);
-    // Walls
+    tmp.Clear(0);  // Fully transparent
+    // Draw wall tiles
     for i:=0 to pMap.BlockCount-1 do
       if pMap.BlockData[i]._type=btWall then with pMap.BlockData[i] do
         for j:=0 to _length-1 do begin
@@ -173,13 +198,13 @@ begin
           tiles.CopyTo(0,0,8,8,(_x+j)*8,_y*8,tmp,true);
         end;
 
-  //  if (fBlocks[i]._type in [btPole, btStairsR, btStairsL]) then begin
-    // Other objects
+    // Draw remaining objects. These will overwrite wall tiles!
     for i:=0 to pMap.BlockCount-1 do with pMap.BlockData[i] do
       case _type of
         btSpring:begin
           fTileMap.Tiles[_x,_y]:=TILE_SPRING;
           tiles.CopyTo(8,0,8,8,_x*8,_y*8,tmp);
+//          tmp.bar(_x*8,_y*8,8,8,0);
         end;
         btIce:begin
           fTileMap.Tiles[_x,_y]:=TILE_ICE;
@@ -225,6 +250,7 @@ begin
           inc(pc);
         end;
       end;
+    // Copy the temporary image to the static image.
     tmp.CopyTo(0,0,LOGICALWINDOWWIDTH,LOGICALWINDOWHEIGHT,0,0,pImage,true);
   finally
     tmp.Free;

@@ -66,6 +66,7 @@ begin
   MKStreamOpener.AddOtherSource(MAD4,100);
 {$ENDIF}
   SDL_Init(SDL_INIT_VIDEO or SDL_INIT_GAMECONTROLLER);
+  SDL_SetHint(SDL_HINT_RENDER_VSYNC,'1');
 
   fMainWindow:=TWindow.CreateCustomSized(
     SDL_WINDOWPOS_CENTERED,

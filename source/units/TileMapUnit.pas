@@ -35,6 +35,10 @@
       - Removed unused MKINIFiles unit
    1.05: Gilby - 2023.11.28
       + Added Create(width,height)
+   1.06: Gilby - 2023.12.05
+      * Getmems and freemems changed to new version.
+      + Added pMessage parameter to LogContent.
+      * BUGFix in Move.
 }
 
 {$ifdef fpc}
@@ -73,7 +77,12 @@ type
     procedure Resize(neww,newh:integer); virtual;
     procedure Move(dx,dy:integer); virtual;
 
-    procedure LogContent;
+    procedure LogContent(pMessage:string='');
+  private
+    function GetTile(x,y:integer):integer;
+    function GetOrigTile(x,y:integer):integer;
+    procedure SetTile(x,y:integer;value:integer);
+    procedure SetOrigTile(x,y:integer;value:integer);
   protected
     fWidth, fHeight : integer;
     fMapData, fOrigMapData : pointer;
@@ -81,10 +90,6 @@ type
     fExtras : TStringList;
     fLogicalWrap : array of TLogicalWrap;
     fOriginX,fOriginY:integer;
-    function GetTile(x,y:integer):integer;
-    function GetOrigTile(x,y:integer):integer;
-    procedure SetTile(x,y,value:integer);
-    procedure SetOrigTile(x,y,value:integer);
   public
     MapName, Author, Game: string;
     property OriginX:integer read fOriginX write fOriginX;
@@ -103,7 +108,7 @@ uses SysUtils, Logger, MKToolBox;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.05';
+  Version='1.06';
 
 constructor TTileMap.Create;
 begin
@@ -135,8 +140,8 @@ end;
 procedure TTileMap.Clear;
 begin
   if (fWidth>0) and (fHeight>0) then begin
-    freemem(fMapData,fWidth*fHeight<<2);
-    freemem(fOrigMapData,fWidth*fHeight<<2);
+    freemem(fMapData);
+    freemem(fOrigMapData);
     fWidth:=0;
     fHeight:=0;
   end;
@@ -156,10 +161,10 @@ begin
   fHeight:=iHeight;
   fOriginX:=0;
   fOriginY:=0;
-  getmem(fOrigMapData,fWidth*fHeight<<2);
-  fillchar(fOrigMapData^,fWidth*fHeight<<2,0);
-  getmem(fMapData,fWidth*fHeight<<2);
-  fillchar(fMapData^,fWidth*fHeight<<2,0);
+  fOrigMapData:=getmem(fWidth*fHeight*4);
+  fillchar(fOrigMapData^,fWidth*fHeight*4,0);
+  fMapData:=getmem(fWidth*fHeight*4);
+  fillchar(fMapData^,fWidth*fHeight*4,0);
 end;
 
 procedure TTileMap.ApplyLogicalWrap;
@@ -168,11 +173,11 @@ begin
 //  Log.DumpMemory(fMapData^,0,fHeight*fWidth*4,'Before','ApplyLogicalWrap');
   for y:=0 to fHeight-1 do
     for x:=0 to fWidth-1 do begin
-      w2:=integer((fOrigMapData+(x+y*fWidth)<<2)^);
-      integer((fMapData+(x+y*fWidth)<<2)^):=w2;
+      w2:=integer((fOrigMapData+(x+y*fWidth)*4)^);
+      integer((fMapData+(x+y*fWidth)*4)^):=w2;
       for z:=0 to length(fLogicalWrap)-1 do begin
         if fLogicalWrap[z]._OriginalValue=w2 then begin
-          integer((fMapData+(x+y*fWidth)<<2)^):=fLogicalWrap[z]._NewValue;
+          integer((fMapData+(x+y*fWidth)*4)^):=fLogicalWrap[z]._NewValue;
           break;
         end;
       end;
@@ -194,22 +199,23 @@ end;
 
 function TTileMap.GetTile(x,y:integer):integer;
 begin
-  Result:=integer((fMapData+((y-OriginY)*fWidth+x-OriginX)<<2)^);
+  Result:=integer((fMapData+((y-OriginY)*fWidth+x-OriginX)*4)^);
 end;
 
 function TTileMap.GetOrigTile(x,y:integer):integer;
 begin
-  Result:=integer((fOrigMapData+((y-OriginY)*fWidth+x-OriginX)<<2)^);
+  Result:=integer((fOrigMapData+((y-OriginY)*fWidth+x-OriginX)*4)^);
 end;
+
 
 procedure TTileMap.SetTile(x,y,value:integer);
 begin
-  integer((fMapData+((y-OriginY)*fWidth+x-OriginX)<<2)^):=value;
+  integer((fMapData+((y-OriginY)*fWidth+x-OriginX)*4)^):=value;
 end;
 
 procedure TTileMap.SetOrigTile(x,y,value:integer);
 begin
-  integer((fOrigMapData+((y-OriginY)*fWidth+x-OriginX)<<2)^):=value;
+  integer((fOrigMapData+((y-OriginY)*fWidth+x-OriginX)*4)^):=value;
 end;
 
 function TTileMap.SizeIs(x,y:integer):boolean;
@@ -223,20 +229,20 @@ var atm:pointer;y:integer;
 begin
   atm:=fMapData;
 //  Log.DumpMemory(atm^,0,fWidth*fHeight,'Logical map data before resize',Istr);
-  getmem(fMapData,neww*newh<<2);
-  fillchar(fMapData^,neww*newh<<2,0);
+  fMapData:=getmem(neww*newh*4);
+  fillchar(fMapData^,neww*newh*4,0);
   for y:=0 to fHeight-1 do
-    system.move((atm+(y*fWidth)<<2)^,(fMapData+(y*neww)<<2)^,fWidth<<2);
-  freemem(atm,fWidth*fHeight<<2);
+    system.move((atm+(y*fWidth)*4)^,(fMapData+(y*neww)*4)^,fWidth*4);
+  freemem(atm);
 //  Log.DumpMemory(fMapData^,0,neww*newh,'Logical map data after resize',Istr);
 
   atm:=fOrigMapData;
 //  Log.DumpMemory(atm^,0,fWidth*fHeight,'Original map data before resize',Istr);
-  getmem(fOrigMapData,neww*newh<<2);
-  fillchar(fOrigMapData^,neww*newh<<2,0);
+  fOrigMapData:=getmem(neww*newh*4);
+  fillchar(fOrigMapData^,neww*newh*4,0);
   for y:=0 to fHeight-1 do
-    system.move((atm+(y*fWidth)<<2)^,(fOrigMapData+(y*neww<<2))^,fWidth<<2);
-  freemem(atm,fWidth*fHeight<<2);
+    system.move((atm+(y*fWidth)*4)^,(fOrigMapData+(y*neww*4))^,fWidth*4);
+  freemem(atm);
 //  Log.DumpMemory(fOrigMapData^,0,neww*newh,'Original map data after resize',Istr);
 
   fWidth:=neww;
@@ -247,13 +253,12 @@ procedure TTileMap.Move(dx,dy:integer);
 var atm:pointer;x,y,px,py:integer;
 begin
   atm:=fMapData;
-  getmem(fMapData,fWidth*fHeight<<2);
-  fillchar(fMapData^,fWidth*fHeight<<2,0);
+  fMapData:=getmem(fWidth*fHeight*4);
   px:=dx;
   py:=dy;
   for y:=0 to fHeight-1 do
     for x:=0 to fWidth-1 do begin
-      integer((fMapData+(py*fWidth+px)<<2)^):=integer((atm+(y*fWidth+x)<<2)^);
+      integer((fMapData+(py*fWidth+px)*4)^):=integer((atm+(y*fWidth+x)*4)^);
       inc(px);
       if px=fWidth then begin
         px:=0;
@@ -261,16 +266,15 @@ begin
         if py=fHeight then py:=0;
       end;
     end;
-  freemem(atm,fWidth*fHeight<<2);
+  freemem(atm);
 
   atm:=fOrigMapData;
-  getmem(fOrigMapData,fWidth*fHeight<<2);
-  fillchar(fMapData^,fWidth*fHeight<<2,0);
+  fOrigMapData:=getmem(fWidth*fHeight*4);
   px:=dx;
   py:=dy;
   for y:=0 to fHeight-1 do
     for x:=0 to fWidth-1 do begin
-      integer((fOrigMapData+(py*fWidth+px)<<2)^):=integer((atm+(y*fWidth+x)<<2)^);
+      integer((fOrigMapData+(py*fWidth+px)*4)^):=integer((atm+(y*fWidth+x)*4)^);
       inc(px);
       if px=fWidth then begin
         px:=0;
@@ -278,13 +282,14 @@ begin
         if py=fHeight then py:=0;
       end;
     end;
-  freemem(atm,fWidth*fHeight<<2);
+  freemem(atm);
 end;
 
-procedure TTileMap.LogContent;
+procedure TTileMap.LogContent(pMessage:string);
 var i,j:integer;s:String;
 begin
   if (fWidth>0) and (fHeight>0) then begin
+    if pMessage<>'' then Log.Trace('Message: '+pMessage);
     Log.Trace('Size: '+inttostr(fWidth)+'x'+inttostr(fHeight));
     Log.Trace('Origin: '+inttostr(fOriginX)+','+inttostr(fOriginY));
     Log.Trace('Origtiles:');

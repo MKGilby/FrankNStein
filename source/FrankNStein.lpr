@@ -28,7 +28,7 @@ uses
   FNSMain,
   FileInfo,
   winpeimagereader,
-  MKToolbox;
+  MKToolbox, FNSPlay1Map, FNSProf;
 
 const
   BDATE={$i %DATE%};

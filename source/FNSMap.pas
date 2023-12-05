@@ -422,7 +422,7 @@ begin
   cnt:=fReadByte(pStream);
   while cnt>0 do begin
     fReadCoordLen(pStream,x,y,len);
-    Log.LogDebug(Format('Loadwall: %d,%d,%d',[x,y,len]));
+//    Log.LogDebug(Format('Loadwall: %d,%d,%d',[x,y,len]));
     SetLength(fBlocks,length(fBlocks)+1);
     fBlocks[length(fBlocks)-1]:=TBlockData.Init(btWall,x,y,len);
     dec(cnt);
@@ -437,7 +437,7 @@ begin
   while cnt>0 do begin
     b:=fReadByte(pStream);
     fReadCoord(pStream,x,y);
-    Log.LogDebug(Format('Loadblock: %d,%d,%d',[b,x,y]));
+//    Log.LogDebug(Format('Loadblock: %d,%d,%d',[b,x,y]));
     SetLength(fBlocks,length(fBlocks)+1);
     case b of
         // Spring
@@ -459,7 +459,7 @@ begin
   while cnt>0 do begin
     b:=fReadByte(pStream);
     fReadCoordLen(pStream,x,y,len);
-    Log.LogDebug(Format('Loadblock: %d,%d,%d,%d',[b,x,y,len]));
+//    Log.LogDebug(Format('Loadblock: %d,%d,%d,%d',[b,x,y,len]));
     SetLength(fBlocks,length(fBlocks)+1);
     case b of
         // Sliding pole
@@ -479,7 +479,7 @@ var i,x,y:integer;
 begin
   for i:=0 to 6 do begin
     fReadCoord(pStream,x,y);
-    Log.LogDebug(Format('LoadPiece: %d,%d',[x,y]));
+//    Log.LogDebug(Format('LoadPiece: %d,%d',[x,y]));
     SetLength(fBlocks,length(fBlocks)+1);
     fBlocks[length(fBlocks)-1]:=TBlockData.Init(btPiece,x,y);
   end;
@@ -501,7 +501,7 @@ begin
       _left:=fReadByte(pStream);
       _right:=fReadByte(pStream);
       _imageindex:=fReadByte(pStream);
-      Log.LogDebug(Format('LoadMonster: %d (%d),%d,%d,%d,%d,%d',[_speed,i,_start,_row,_left,_right,_imageindex]));
+//      Log.LogDebug(Format('LoadMonster: %d (%d),%d,%d,%d,%d,%d',[_speed,i,_start,_row,_left,_right,_imageindex]));
     end;
     dec(cnt);
   end;
@@ -517,7 +517,7 @@ begin
     else if b=1 then dtype:=dtDoor
     else raise Exception.Create(Format('Invalid decoration ID! (%d)',[b]));
     fReadCoord(pStream,x,y);
-    Log.LogDebug(Format('LoadDecoration: %d,%d,%d',[b,x,y]));
+//    Log.LogDebug(Format('LoadDecoration: %d,%d,%d',[b,x,y]));
     SetLength(fDecorations,length(fDecorations)+1);
     fDecorations[length(fDecorations)-1]:=TDecorationData.Init(dtype,x,y);
     dec(cnt);
@@ -533,7 +533,7 @@ begin
   for i:=0 to length(fBlocks)-1 do
     if fBlocks[i]._type=btWall then begin
       fWriteCoordLen(pStream,fBlocks[i]._x,fBlocks[i]._y,fBlocks[i]._length);
-      Log.LogDebug(Format('Savewall: %d,%d,%d',[fBlocks[i]._x,fBlocks[i]._y,fBlocks[i]._length]));
+//      Log.LogDebug(Format('Savewall: %d,%d,%d',[fBlocks[i]._x,fBlocks[i]._y,fBlocks[i]._length]));
       inc(cnt);
     end;
   pStream.Position:=spos;
@@ -553,7 +553,7 @@ begin
       fWriteByte(pStream,ord(fBlocks[i]._type));
       fWriteCoord(pStream,fBlocks[i]._x,fBlocks[i]._y);
       inc(cnt);
-      Log.LogDebug(Format('SaveSimpleBlock: %d,%d,%d',[ord(fBlocks[i]._type),fBlocks[i]._x,fBlocks[i]._y]));
+//      Log.LogDebug(Format('SaveSimpleBlock: %d,%d,%d',[ord(fBlocks[i]._type),fBlocks[i]._x,fBlocks[i]._y]));
     end;
   pStream.Position:=spos;
   fWriteByte(pStream,cnt);
@@ -568,7 +568,7 @@ begin
       fWriteByte(pStream,ord(fBlocks[i]._type));
       fWriteCoordLen(pStream,fBlocks[i]._x,fBlocks[i]._y,fBlocks[i]._length);
       inc(cnt);
-      Log.LogDebug(Format('SaveAdvancedBlock: %d,%d,%d,%d',[ord(fBlocks[i]._type),fBlocks[i]._x,fBlocks[i]._y,fBlocks[i]._length]));
+//      Log.LogDebug(Format('SaveAdvancedBlock: %d,%d,%d,%d',[ord(fBlocks[i]._type),fBlocks[i]._x,fBlocks[i]._y,fBlocks[i]._length]));
     end;
   pStream.Position:=spos;
   fWriteByte(pStream,cnt);
@@ -583,7 +583,7 @@ begin
   for i:=0 to length(fBlocks)-1 do
     if (fBlocks[i]._type=btPiece) and (cnt<7) then begin
       fWriteCoord(pStream,fBlocks[i]._x,fBlocks[i]._y);
-      Log.LogDebug(Format('SavePiece: %d,%d',[fBlocks[i]._x,fBlocks[i]._y]));
+//      Log.LogDebug(Format('SavePiece: %d,%d',[fBlocks[i]._x,fBlocks[i]._y]));
       inc(cnt);
     end;
   if cnt<7 then raise Exception.Create('Not enough skeleton pieces!');
@@ -603,7 +603,7 @@ begin
     fWriteByte(pStream,_left);
     fWriteByte(pStream,_right);
     fWriteByte(pStream,_imageindex);
-    Log.LogDebug(Format('SaveMonster: %d (%d),%d,%d,%d,%d,%d',[_speed,b,_start,_row,_left,_right,_imageindex]));
+//    Log.LogDebug(Format('SaveMonster: %d (%d),%d,%d,%d,%d,%d',[_speed,b,_start,_row,_left,_right,_imageindex]));
   end;
 end;
 
@@ -612,7 +612,7 @@ var i:integer;
 begin
   fWriteByte(pStream,length(fDecorations));
   for i:=0 to length(fDecorations)-1 do begin
-    Log.LogDebug(Format('SaveDecoration: %d,%d,%d',[ord(fDecorations[i]._type),fDecorations[i]._x,fDecorations[i]._y]));
+//    Log.LogDebug(Format('SaveDecoration: %d,%d,%d',[ord(fDecorations[i]._type),fDecorations[i]._x,fDecorations[i]._y]));
     fWriteByte(pStream,ord(fDecorations[i]._type));
     fWriteCoord(pStream,fDecorations[i]._x,fDecorations[i]._y);
   end;

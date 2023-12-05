@@ -6,3 +6,4 @@ SkeletonPrep
 del skeletonsprite.png
 for %%i in (*.png) do ..\..\tools\pngout %%i ..\..\data\%%i /y /kanMZ,fnTZ,anIM /f0
 del *.png
+del *.log
