@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="9"/>
-      <BuildNr Value="4"/>
+      <BuildNr Value="5"/>
       <StringTable CompanyName="MKSZTSZ"/>
     </VersionInfo>
     <BuildModes>
@@ -37,6 +37,7 @@
           </SearchPaths>
           <Parsing>
             <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
               <IncludeAssertionCode Value="True"/>
             </SyntaxOptions>
           </Parsing>
@@ -145,6 +146,10 @@
       </Unit>
       <Unit>
         <Filename Value="FNSProf.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="FNSSpring.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>

@@ -1,30 +1,15 @@
 {
-  Frank N Stein Refurbished - Copyright 2023 MKSZTSZ
-  Written by Szabó "Gilby" Zsolt / MKSZTSZ
-
   This file is part of the source code of Frank N Stein Refurbished.
-
-  Frank N Stein Refurbished is free software: you can redistribute it
-  and/or modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation, either version 3 of the License,
-  or (at your option) any later version.
-
-  Frank N Stein Refurbished is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License along with
-  Frank N Stein Refurbished. If not, see <https://www.gnu.org/licenses/>.
+  See "copyright.txt" for details.
 }
 
 unit FNSShared;
 
-{$mode ObjFPC}{$H+}
+{$mode Delphi}{$H+}
 
 interface
 
-uses MediaManagerUnit, sdl2, FNSVMU, FNSMap;
+uses MediaManagerUnit, sdl2, FNSVMU, FNSMap, FNSSpring;
 
 const
   LOGICALWINDOWWIDTH=256;
@@ -52,11 +37,19 @@ const
   TILE_POLE=7;
   TILE_PIECE=128;
 
+  // Split the game loop elapsed time into this tiny fragments (in seconds).
+  // Anything longer than this lets the player fall through walls.
+  MAXTIMESLICE=1/64;
+  // If one game loop uses more than this time, consider it lag and skip it.
+  MINLAG=1;
+
+
 var
   MM:TMediaManager;
   Controller:PSDL_GameController;
   VMU:TVMU;
   Maps:TMapList;
+  Springs:TSprings;
 
 procedure LoadAssets;
 procedure FreeAssets;
@@ -102,10 +95,14 @@ begin
   Log.LogStatus('Loading VMU...');
   VMU:=TVMU.Create;
   VMU.MapCount:=Maps.Count;
+  Log.LogStatus('Creating common classes...');
+  Springs:=TSprings.Create;
 end;
 
 procedure FreeAssets;
 begin
+  Log.LogStatus('Common classes...');
+  if Assigned(Springs) then Springs.Free;
   Log.LogStatus('Freeing VMU...');
   if Assigned(VMU) then VMU.Free;
   Log.LogStatus('Freeing assets...');

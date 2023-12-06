@@ -1,3 +1,8 @@
+{
+  This file is part of the source code of Frank N Stein Refurbished.
+  See "copyright.txt" for details.
+}
+
 unit FNSPlay1Map;
 
 {$mode Delphi}{$H+}
@@ -5,7 +10,7 @@ unit FNSPlay1Map;
 interface
 
 uses
-  SysUtils, FNSMapStatic, FNSDevice, FNSProf;
+  SysUtils, FNSMapStatic, FNSDevice, FNSProf, FNSSpring;
 
 type
 
@@ -21,9 +26,12 @@ type
     fMapStatic:TMapStatic;
     fDevice:TDevice;
     fProf:TProf;
+    procedure MoveEx(pTimeUsed:double);
   end;
 
 implementation
+
+uses FNSShared;
 
 { TPlay1Map }
 
@@ -46,11 +54,24 @@ procedure TPlay1Map.Draw;
 begin
   fMapStatic.Draw;
   fDevice.Draw;
+  Springs.Draw;
   fProf.Draw;
 end;
 
 procedure TPlay1Map.Move(pTimeUsed: double);
 begin
+  if pTimeUsed<=MINLAG then begin  // Shorter than the lag threshold, so process.
+    while pTimeUsed>MAXTIMESLICE do begin
+      MoveEx(MAXTIMESLICE);
+      pTimeUsed-=MAXTIMESLICE;
+    end;
+    MoveEx(pTimeUsed);
+  end;
+end;
+
+procedure TPlay1Map.MoveEx(pTimeUsed:double);
+begin
+  Springs.Move(pTimeUsed);
   fProf.Move(pTimeUsed);
 end;
 

@@ -1,10 +1,15 @@
+{
+  This file is part of the source code of Frank N Stein Refurbished.
+  See "copyright.txt" for details.
+}
+
 unit FNSProf;
 
 {$mode delphi}{$H+}
 
 interface
 
-uses SysUtils, Animation2Unit, TileMapUnit, FNSDevice;
+uses SysUtils, Animation2Unit, TileMapUnit, FNSDevice, FNSSpring;
 
 type
 
@@ -17,28 +22,27 @@ type
     procedure Move(pTimeUsed:double);  // in secs.
   private
     fX,fY:double;
-    fDirX,fDirY:integer;
+    fDirX:integer;
     fRemainingDistance:double;
     fAnimLeft,fAnimRight:TAnimation;
     fMap:TTileMap;
     fState:(psIdle,psFalling,psJumping);
     fDevice:TDevice;
+    fTempSpring:TSpring;
     // This one is called in small steps
-    procedure MoveEx(pTimeUsed:double);
+//    procedure MoveEx(pTimeUsed:double);
   end;
 
 implementation
 
-uses FNSShared, mk_sdl2, sdl2, math, logger;
+uses FNSShared, mk_sdl2, sdl2, logger;
 
 const
   SPEEDX=32;  // pixel / sec
   SPEEDY=64;  // pixel / sec
   SPEEDNORMX=SPEEDX/256;  // normalized to screen
   SPEEDNORMY=SPEEDY/192;  // normalized to screen
-  LARGESTTIMESLICE:double=1/60;
   JUMPHEIGHT=32/192;
-//  RIGHTBORDER=248/256;
 
 { TProf }
 
@@ -52,7 +56,8 @@ begin
   fDirX:=1;
   fMap:=iMap;
   fDevice:=iDevice;
-  LARGESTTIMESLICE:=1/max(SPEEDX,SPEEDY);
+  fTempSpring:=nil;
+//  MAXTIMESLICE:=1/max(SPEEDX,SPEEDY);
 end;
 
 destructor TProf.Destroy;
@@ -67,22 +72,14 @@ var x,y:integer;
 begin
   x:=trunc(fX*256);
   y:=trunc(fy*192);
+  if Assigned(fTempSpring) then inc(y);
   if fDirX=1 then
     fAnimRight.PutFrame(x-1,y,(x div 2+2) mod 8)
   else
     fAnimLeft.PutFrame(x-1,y,(x div 2+2) mod 8);
 end;
 
-procedure TProf.Move(pTimeUsed: double);
-begin
-  while pTimeUsed>LARGESTTIMESLICE do begin
-    MoveEx(LARGESTTIMESLICE);
-    pTimeUsed-=LARGESTTIMESLICE;
-  end;
-  MoveEx(pTimeUsed);
-end;
-
-procedure TProf.MoveEx(pTimeUsed:double);
+procedure TProf.Move(pTimeUsed:double);
 var x,y,px,py:integer;
 begin
   x:=trunc(fX*256);
@@ -92,12 +89,14 @@ begin
 //  Log.Trace(Format('x (px)=%d (%d), y (py)=%d (%d)',[x,px,y,py]));
   case fState of
     psIdle:begin
-      if keys[SDL_SCANCODE_RIGHT] and ((x mod 8>0)
+      if (keys[SDL_SCANCODE_RIGHT] or controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT])
+         and ((x mod 8>0)
          or (((x mod 8)=0) and (fMap.Tiles[px+1,py]=TILE_EMPTY) and (fMap.Tiles[px+1,py+1]=TILE_EMPTY))) then begin
         fX+=SPEEDNORMX*pTimeUsed;
         fDirX:=1;
       end;
-      if keys[SDL_SCANCODE_LEFT] and ((x mod 8>0)
+      if (keys[SDL_SCANCODE_LEFT] or controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT])
+         and ((x mod 8>0)
          or (((x mod 8)=0) and (fMap.Tiles[px-1,py]=TILE_EMPTY) and (fMap.Tiles[px-1,py+1]=TILE_EMPTY))) then begin
         fX-=SPEEDNORMX*pTimeUsed;
         fDirX:=-1;
@@ -108,9 +107,20 @@ begin
           fMap.Tiles[px,py+2]:=TILE_WALL;
           fDevice.PickupPiece;
         end
-        else if keys[SDL_SCANCODE_SPACE] and (fMap.Tiles[px,py+2]=TILE_SPRING) then begin
-          fState:=psJumping;
-          fRemainingDistance:=JUMPHEIGHT;
+        else if fMap.Tiles[px,py+2]=TILE_SPRING then begin
+          fTempSpring:=Springs.SpringAt(pX,pY+2);
+          fTempSpring.PushedDown:=true;
+          if (keys[SDL_SCANCODE_SPACE] or controllerbuttons[SDL_CONTROLLER_BUTTON_A]) then begin
+            fState:=psJumping;
+            fRemainingDistance:=JUMPHEIGHT;
+            fTempSpring.Kick;
+            fTempSpring:=nil;
+          end;
+        end
+      end else begin
+        if Assigned(fTempSpring) then begin
+          fTempSpring.PushedDown:=false;
+          fTempSpring:=nil;
         end;
       end;
     end;

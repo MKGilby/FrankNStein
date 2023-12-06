@@ -1,21 +1,6 @@
 {
-  Frank N Stein Refurbished - Copyright 2023 MKSZTSZ
-  Written by Szabó "Gilby" Zsolt / MKSZTSZ
-
   This file is part of the source code of Frank N Stein Refurbished.
-
-  Frank N Stein Refurbished is free software: you can redistribute it
-  and/or modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation, either version 3 of the License,
-  or (at your option) any later version.
-
-  Frank N Stein Refurbished is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License along with
-  Frank N Stein Refurbished. If not, see <https://www.gnu.org/licenses/>.
+  See "copyright.txt" for details.
 }
 
 unit FNSMapStatic;
@@ -25,7 +10,7 @@ unit FNSMapStatic;
 interface
 
 uses
-  mk_sdl2, ARGBImageUnit, FNSMap, TileMapUnit;
+  mk_sdl2, ARGBImageUnit, FNSMap, TileMapUnit, FNSSpring;
 
 type
 
@@ -175,6 +160,8 @@ begin
     fTileMap[-1,i]:=TILE_WALL;
     fTileMap[32,i]:=TILE_WALL;
   end;
+  // Clear spring container.
+  Springs.Clear;
 end;
 
 procedure TMapStatic.AddBlocks(pMap:TMap; pImage:TARGBImage);
@@ -203,8 +190,9 @@ begin
       case _type of
         btSpring:begin
           fTileMap.Tiles[_x,_y]:=TILE_SPRING;
-          tiles.CopyTo(8,0,8,8,_x*8,_y*8,tmp);
-//          tmp.bar(_x*8,_y*8,8,8,0);
+//          tiles.CopyTo(8,0,8,8,_x*8,_y*8,tmp);
+          Springs.AddSpringAt(_x,_y);
+          tmp.bar(_x*8,_y*8,8,8,0);
         end;
         btIce:begin
           fTileMap.Tiles[_x,_y]:=TILE_ICE;
@@ -213,7 +201,7 @@ begin
         end;
         btZapper:begin
           fTileMap.Tiles[_x,_y]:=TILE_ZAPPER;
-          tiles.CopyTo(88,0,8,8,_x*8,_y*8,tmp);
+          tiles.CopyTo(8,0,8,8,_x*8,_y*8,tmp);
         end;
         btMud:begin
           fTileMap.Tiles[_x,_y]:=TILE_MUD;

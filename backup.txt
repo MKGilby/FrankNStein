@@ -8,3 +8,4 @@
 .\license.txt
 .\*.bpprj
 .\readme-sdl.txt
+.\copyright.txt

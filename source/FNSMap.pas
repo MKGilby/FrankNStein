@@ -1,27 +1,11 @@
 {
-  Frank N Stein Refurbished - Copyright 2023 MKSZTSZ
-  Written by Szabó "Gilby" Zsolt / MKSZTSZ
-
   This file is part of the source code of Frank N Stein Refurbished.
-
-  Frank N Stein Refurbished is free software: you can redistribute it
-  and/or modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation, either version 3 of the License,
-  or (at your option) any later version.
-
-  Frank N Stein Refurbished is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License along with
-  Frank N Stein Refurbished. If not, see <https://www.gnu.org/licenses/>.
+  See "copyright.txt" for details.
 }
 
 unit FNSMap;
 
-{$mode ObjFPC}{$H+}
-{$ModeSwitch advancedrecords}
+{$mode delphi}{$H+}
 
 interface
 
@@ -171,7 +155,7 @@ type
     property DecorationCount:integer read fGetDecorationCount;
   end;
 
-  TMapListSpec=specialize TFPGObjectList<TMap>;
+  TMapListSpec=TFPGObjectList<TMap>;
 
   TMapList=class(TMapListSpec)
     constructor Create(iFilename:String);
@@ -179,7 +163,7 @@ type
 
 implementation
 
-uses SysUtils, MKStream, MKToolBox, Logger, FNSShared;
+uses SysUtils, MKStream, MKToolBox, Logger;
 
 const
   HEAD='FNSR';

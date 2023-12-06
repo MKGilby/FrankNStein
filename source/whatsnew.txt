@@ -1,3 +1,8 @@
+2023.12.06 - Build 5
+- You can move and jump with controller.
+- Spring descends with the prof when you stay on it.
+- Spring kicks you up visually.
+
 2023.12.05 - Build 4
 - You can move left-right.
 - You can fall down.
