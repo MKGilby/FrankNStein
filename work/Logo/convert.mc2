@@ -7,5 +7,5 @@ r png data\refurbished.png 1
 m copyto 0 0 41 5 100 20 1 2
 
 m setcolorkey 0 0 0 2
-m addanimation Logo 142 25 1 0 0 0 4  0 0  2
+;m addanimation Logo 142 25 1 0 0 0 4  0 0  2
 w png logo.png 2

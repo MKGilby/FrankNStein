@@ -135,6 +135,8 @@ begin
     SDL_SetRenderDrawColor(PrimaryWindow.Renderer,DEFAULTCOLORS[0,0],DEFAULTCOLORS[0,1],DEFAULTCOLORS[0,2],255);
     SDL_RenderClear(PrimaryWindow.Renderer);
 
+    PutTexture(256-24,192-48,MM.Textures.ItemByName['Speccy']);
+
     MM.Fonts['White'].OutText('SELECT SAVE SLOT',LOGICALWINDOWWIDTH div 2,42,1);
     if Assigned(Controller) then begin
       MM.Fonts['White'].OutText('USE '#130' AND '#131' TO SELECT SLOT',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-20,1);

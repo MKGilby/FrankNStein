@@ -1,3 +1,8 @@
+2023.12.08 - Build 6
+- Ice is slippery, can't stop on that.
+- You can slide down poles.
+- Added a nice speccy color strip to the botton right corner of non-ingame screens.
+
 2023.12.06 - Build 5
 - You can move and jump with controller.
 - Spring descends with the prof when you stay on it.

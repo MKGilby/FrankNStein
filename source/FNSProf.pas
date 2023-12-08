@@ -24,9 +24,9 @@ type
     fX,fY:double;
     fDirX:integer;
     fRemainingDistance:double;
-    fAnimLeft,fAnimRight:TAnimation;
+    fAnimLeft,fAnimRight,fSlideLeft,fSlideRight,fSlideDown:TAnimation;
     fMap:TTileMap;
-    fState:(psIdle,psFalling,psJumping);
+    fState:(psIdle,psFalling,psJumping,psSliding,psSlidingDown);
     fDevice:TDevice;
     fTempSpring:TSpring;
     // This one is called in small steps
@@ -43,6 +43,8 @@ const
   SPEEDNORMX=SPEEDX/256;  // normalized to screen
   SPEEDNORMY=SPEEDY/192;  // normalized to screen
   JUMPHEIGHT=32/192;
+  ICESLIDEDISTANCE=8/256;
+  POLESLIDEDISTANCE=8/192;
 
 { TProf }
 
@@ -50,6 +52,9 @@ constructor TProf.Create(iMap:TTileMap; iDevice:TDevice);
 begin
   fAnimLeft:=MM.Animations.ItemByName['ProfLeft'].SpawnAnimation;
   fAnimRight:=MM.Animations.ItemByName['ProfRight'].SpawnAnimation;
+  fSlideLeft:=MM.Animations.ItemByName['ProfSlideLeft'].SpawnAnimation;
+  fSlideRight:=MM.Animations.ItemByName['ProfSlideRight'].SpawnAnimation;
+  fSlideDown:=MM.Animations.ItemByName['ProfSlideDown'].SpawnAnimation;
   fX:=3*8/256;
   fY:=2*8/192;
 //  fY:=11*8/192;
@@ -62,8 +67,11 @@ end;
 
 destructor TProf.Destroy;
 begin
-  if Assigned(fAnimLeft) then fAnimLeft.Free;
+  if Assigned(fSlideDown) then fSlideDown.Free;
+  if Assigned(fSlideRight) then fSlideRight.Free;
+  if Assigned(fSlideLeft) then fSlideLeft.Free;
   if Assigned(fAnimRight) then fAnimRight.Free;
+  if Assigned(fAnimLeft) then fAnimLeft.Free;
   inherited Destroy;
 end;
 
@@ -73,14 +81,27 @@ begin
   x:=trunc(fX*256);
   y:=trunc(fy*192);
   if Assigned(fTempSpring) then inc(y);
-  if fDirX=1 then
-    fAnimRight.PutFrame(x-1,y,(x div 2+2) mod 8)
-  else
-    fAnimLeft.PutFrame(x-1,y,(x div 2+2) mod 8);
+  case fState of
+    psSliding:begin
+      if fDirX=1 then
+        fSlideLeft.PutFrame(x-1,y,(x div 2) mod 8)
+      else
+        fSlideRight.PutFrame(x-1,y,(x div 2) mod 8);
+    end;
+    psSlidingDown:begin
+      fSlideDown.PutFrame(x-1,y,0);
+    end;
+    else begin
+      if fDirX=1 then
+        fAnimRight.PutFrame(x-1,y,(x div 2+2) mod 8)
+      else
+        fAnimLeft.PutFrame(x-1,y,(x div 2+2) mod 8);
+    end;
+  end;
 end;
 
 procedure TProf.Move(pTimeUsed:double);
-var x,y,px,py:integer;
+var x,y,px,py,i:integer;
 begin
   x:=trunc(fX*256);
   y:=trunc(fy*192);
@@ -117,6 +138,16 @@ begin
             fTempSpring:=nil;
           end;
         end
+        else if fMap.Tiles[px,py+2]=TILE_ICE then begin
+          fState:=psSliding;
+          fRemainingDistance:=ICESLIDEDISTANCE;
+        end
+        else if (fMap.Tiles[px,py+2]=TILE_POLE) and (keys[SDL_SCANCODE_SPACE] or controllerbuttons[SDL_CONTROLLER_BUTTON_A]) then begin
+          fState:=psSlidingDown;
+          i:=1;
+          while (fMap.Tiles[px,py+2+i]=TILE_POLE) do inc(i);
+          fRemainingDistance:=POLESLIDEDISTANCE*i;
+        end;
       end else begin
         if Assigned(fTempSpring) then begin
           fTempSpring.PushedDown:=false;
@@ -140,6 +171,29 @@ begin
         fRemainingDistance-=SPEEDNORMY*pTimeUsed;
       end else begin
         fY-=fRemainingDistance;
+        fState:=psIdle;
+      end;
+    end;
+    psSliding:begin
+      if (SPEEDNORMX*pTimeUsed)<=fRemainingDistance then begin
+        fX+=SPEEDNORMX*pTimeUsed*fDirX;
+        fRemainingDistance-=SPEEDNORMX*pTimeUsed;
+      end else begin
+        fX+=fRemainingDistance*fDirX;
+        x:=trunc(fX*256);
+        px:=x div 8;
+        if (x mod 8=0) and (fMap.Tiles[px,py+2]=TILE_ICE) then begin
+          fState:=psSliding;
+          fRemainingDistance:=ICESLIDEDISTANCE;
+        end else fState:=psIdle;
+      end;
+    end;
+    psSlidingDown:begin
+      if (SPEEDNORMY*pTimeUsed)<=fRemainingDistance then begin
+        fY+=SPEEDNORMY*pTimeUsed;
+        fRemainingDistance-=SPEEDNORMY*pTimeUsed;
+      end else begin
+        fY+=fRemainingDistance;
         fState:=psIdle;
       end;
     end;

@@ -32,7 +32,7 @@ type
 
 implementation
 
-uses FNSShared, FNSMap;
+uses FNSShared, FNSMap, Logger;
 
 const
   DEVICEINNERLEFT=28*8;
@@ -59,13 +59,15 @@ begin
   fSkeleton[6]:=TAnimatedSprite.Create(DEVICEINNERLEFT+8,DEVICEINNERTOP+24,
     MM.Animations.ItemByName['Skeleton7'].SpawnAnimation);
   pc:=0;
-  for i:=0 to Maps[iMapNo].BlockCount-1 do with Maps[iMapNo].BlockData[i] do
+  for i:=0 to Maps[iMapNo].BlockCount-1 do with Maps[iMapNo].BlockData[i] do begin
+    Log.Trace(Format('%d. %d',[i,ord(_type)]));
     if _type=btPiece then begin
       if pc=7 then raise Exception.Create('Too many skeleton pieces is map!');
       fPieces[pc]:=TAnimatedSprite.Create(_x*8-1,_y*8,
         MM.Animations.ItemByName[Format('Piece%d',[pc+1])].SpawnAnimation);
       inc(pc);
     end;
+  end;
   fOverlay:=MM.Animations.ItemByName['DeviceOverlay'].SpawnAnimation;
 end;
 

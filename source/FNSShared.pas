@@ -79,7 +79,8 @@ begin
   LoadFont('Purple',128,40,240);
   LoadFont('Lime',128,240,40);
   Log.LogStatus('  Logo...');
-  MM.Load('logo.png','Logo',MM_DONTKEEPIMAGE);
+  MM.Load('logo.png','Logo',MM_CREATETEXTUREONLY);
+  MM.Load('spectrum.png','Speccy',MM_CREATETEXTUREONLY);
   Log.LogStatus('  Sprites...');
   MM.Load('sprites.png','Sprites');
   Log.LogStatus('  Decorations...');

@@ -36,6 +36,7 @@ begin
     SDL_RenderClear(PrimaryWindow.Renderer);
 
     PutTexture(57,8,MM.Textures.ItemByName['Logo']);
+    PutTexture(256-24,192-48,MM.Textures.ItemByName['Speccy']);
     if GetTickCount64 mod 1000<500 then
       if Assigned(Controller) then
         MM.Fonts['White'].OutText('PRESS '#128' TO START',LOGICALWINDOWWIDTH div 2,64,1)

@@ -406,7 +406,7 @@ begin
   cnt:=fReadByte(pStream);
   while cnt>0 do begin
     fReadCoordLen(pStream,x,y,len);
-//    Log.LogDebug(Format('Loadwall: %d,%d,%d',[x,y,len]));
+    Log.LogDebug(Format('Loadwall: %d,%d,%d',[x,y,len]));
     SetLength(fBlocks,length(fBlocks)+1);
     fBlocks[length(fBlocks)-1]:=TBlockData.Init(btWall,x,y,len);
     dec(cnt);
@@ -421,7 +421,7 @@ begin
   while cnt>0 do begin
     b:=fReadByte(pStream);
     fReadCoord(pStream,x,y);
-//    Log.LogDebug(Format('Loadblock: %d,%d,%d',[b,x,y]));
+    Log.LogDebug(Format('Loadblock: %d,%d,%d',[b,x,y]));
     SetLength(fBlocks,length(fBlocks)+1);
     case b of
         // Spring
@@ -463,7 +463,7 @@ var i,x,y:integer;
 begin
   for i:=0 to 6 do begin
     fReadCoord(pStream,x,y);
-//    Log.LogDebug(Format('LoadPiece: %d,%d',[x,y]));
+    Log.LogDebug(Format('LoadPiece: %d,%d',[x,y]));
     SetLength(fBlocks,length(fBlocks)+1);
     fBlocks[length(fBlocks)-1]:=TBlockData.Init(btPiece,x,y);
   end;
