@@ -73,6 +73,7 @@ procedure TPlay1Map.MoveEx(pTimeUsed:double);
 begin
   Springs.Move(pTimeUsed);
   fProf.Move(pTimeUsed);
+  fDevice.Move(pTimeUsed);
 end;
 
 end.

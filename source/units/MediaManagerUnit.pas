@@ -4,9 +4,9 @@
 
   -[Disclaimer]-------------------------------------
 
-     You can freely distribute it.
+     See copyright.txt in project sources.
 
-     Written by Gilby/MKSZTSZ   Hungary, 2020-
+     Written by Gilby/MKSZTSZ   Hungary, 2020-2023
 
   -[Description]------------------------------------
 
@@ -58,6 +58,10 @@
 //     * Added MM_CREATETEXTUREONLY flag, which is a combination of
 //       MM_CREATETEXTUREWHENNOANIMATIONDATA and MM_DONTKEEPIMAGE.
 //     * Added MM_DONTCREATETEXTUREFROMFONT flag.
+//  V1.10: Gilby - 2023.12.13
+//     * Following changes in AnimationDataUnit and Animation2Unit.
+//     * Added Loadfont.
+//     * Added recognising MKR files.
 
 unit MediaManagerUnit;
 
@@ -87,14 +91,14 @@ type
   { TAnimationDataWithTexture }
 
   TAnimationDataWithTexture=class
-    constructor Create(iAnimationData:TAnimationData;iTexture:TTexture;iSourceImage:TARGBImage=nil);
+    constructor Create(iAnimationData:TBaseAnimationData;iTexture:TTexture;iSourceImage:TARGBImage=nil);
     function SpawnAnimation:TAnimation;
   private
-    fAnimationData:TAnimationData;
+    fAnimationData:TBaseAnimationData;
     fTexture:TTexture;
     fARGBImage:TARGBImage;
   public
-    property Animation:TAnimationData read fAnimationData;
+    property Animation:TBaseAnimationData read fAnimationData;
     property Image:TARGBImage read fARGBImage;
   end;
 
@@ -144,11 +148,11 @@ uses SysUtils, Logger, Font2Unit, MKToolbox;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.09';
+  Version='1.10';
 
 { TAnimationDataWithTexture }
 
-constructor TAnimationDataWithTexture.Create(iAnimationData: TAnimationData;
+constructor TAnimationDataWithTexture.Create(iAnimationData: TBaseAnimationData;
   iTexture: TTexture; iSourceImage: TARGBImage=nil);
 begin
   fAnimationData:=iAnimationData;
@@ -160,6 +164,9 @@ function TAnimationDataWithTexture.SpawnAnimation: TAnimation;
 begin
   Result:=TAnimation.Create(fTexture,fAnimationData);
 end;
+
+
+{ TMediaManager }
 
 constructor TMediaManager.Create;
 begin
@@ -198,6 +205,7 @@ end;
 procedure TMediaManager.Load(pFilename:string;pName:string='';pFlags:integer=0);
 var ext:string;i:integer;
 begin
+  if pName='' then pName:=pFilename;
   ext:=uppercase(ExtractFileExt(pFilename));
   if length(ext)>1 then delete(ext,1,1);
   if fTreatMP3AsMusic then i:=2 else i:=3;
@@ -247,7 +255,12 @@ begin
         for j:=0 to atmA.Animation.FrameCount-1 do begin
           fMasks.AddObject(
             Format('%s%d',[atmA.Animation.Name,j]),
-            TMask.CreateFromImagePart(pImage,atmA.Animation.Frames[j].x,atmA.Animation.Frames[j].y,atmA.Animation.Frames[j].w,atmA.Animation.Frames[j].h)
+            TMask.CreateFromImagePart(
+              pImage,
+              atmA.Animation.Frames[j].Left,
+              atmA.Animation.Frames[j].Top,
+              atmA.Animation.Frames[j].Width,
+              atmA.Animation.Frames[j].Height)
           );
 //          fMasks[fMasks.Count-1].DebugMask;
         end;

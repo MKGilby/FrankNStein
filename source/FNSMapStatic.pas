@@ -108,6 +108,7 @@ begin
     MM.Images.ItemByName['Stones'].Copy(0,0,48,24,stones[i]);
     Stones[i].RecolorRGB(150-i*20,150-i*20,150-i*20);
   end;
+  helper[0,0]:=0;
   fillchar(helper,wi*he,0);
   for i:=0 to 30 do begin
     x:=random(wi-2);

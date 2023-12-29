@@ -36,6 +36,8 @@
 //       Animation only advances when you call TAnimation.Animate! (not automatically)
 //  V1.05: Gilby - 2022.12.13
 //     * LogSprite doesn't fail when no animation is assigned yet.
+//  V1.06: Gilby - 2023.12.14
+//     * Following changes in Animation2Unit
 
 {$ifdef fpc}
   {$smartlink on}
@@ -72,11 +74,11 @@ uses Logger, SysUtils, MK_SDL2;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.05';
+  Version='1.06';
 
 constructor TAnimatedSprite.Create(iX,iY:integer;iAnimation:TAnimation);
 begin
-  inherited Create(iX,iY,iAnimation.Width,iAnimation.Height);
+  inherited Create(iX,iY,iAnimation.Timer.Width,iAnimation.Timer.Height);
   fAnimation:=iAnimation;
   fName:=iAnimation.Name;
 end;
@@ -85,9 +87,9 @@ procedure TAnimatedSprite.SetAnimation(pAnimation:TAnimation;pResetFrameIndex:bo
 begin
   if Assigned(pAnimation) then begin
     fAnimation:=pAnimation;
-    fWidth:=fAnimation.Width;
-    fHeight:=fAnimation.Height;
-    if pResetFrameIndex then fAnimation.ResetFrameIndex;
+    fWidth:=fAnimation.Timer.Width;
+    fHeight:=fAnimation.Timer.Height;
+    if pResetFrameIndex then fAnimation.Timer.ResetFrameIndex;
   end
 {$ifdef debug}
     else raise Exception.Create('NIL animation passed!');
@@ -96,9 +98,7 @@ end;
 
 procedure TAnimatedSprite.Draw;
 begin
-  if fDead or not fVisible then exit;
-  with fAnimation.Frames[fAnimation.CurrentFrameIndex] do
-    PutTexturePart(fX-fAnimation.HotPointX,fY-fAnimation.HotPointY,x,y,w,h,fAnimation.Texture);
+  if not(fDead or not fVisible) then fAnimation.PutFrame(fX,fY);
 end;
 
 procedure TAnimatedSprite.LogSpriteData;

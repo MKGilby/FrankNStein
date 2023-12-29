@@ -9,3 +9,4 @@
 .\*.bpprj
 .\readme-sdl.txt
 .\copyright.txt
+.\backup.txt

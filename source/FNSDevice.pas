@@ -20,6 +20,7 @@ type
     constructor Create(iMapNo:integer);
     destructor Destroy; override;
     procedure Draw;
+    procedure Move(pTimeUsed:double);
     procedure PickupPiece;
   private
     fPieces:array[0..6] of TAnimatedSprite;
@@ -68,6 +69,7 @@ begin
       inc(pc);
     end;
   end;
+  fPieces[0].Animation.Timer.Paused:=false;
   fOverlay:=MM.Animations.ItemByName['DeviceOverlay'].SpawnAnimation;
 end;
 
@@ -96,9 +98,22 @@ begin
   for i:=0 to 3 do fOverlay.PutFrame(DEVICEINNERLEFT,DEVICEINNERTOP+i*8);
 end;
 
+procedure TDevice.Move(pTimeUsed:double);
+var i:integer;
+begin
+  for i:=fNextPiece to 6 do
+    fPieces[i].Animation.Animate(pTimeUsed);
+end;
+
 procedure TDevice.PickupPiece;
 begin
-  if fNextPiece<7 then inc(fNextPiece);
+  if fNextPiece<7 then begin
+    fPieces[fNextPiece].Animation.Timer.CurrentFrameIndex:=0;
+    fPieces[fNextPiece].Animation.Timer.Paused:=true;
+    inc(fNextPiece);
+    if fNextPiece<7 then
+      fPieces[fNextPiece].Animation.Timer.Paused:=false;
+  end;
 end;
 
 end.

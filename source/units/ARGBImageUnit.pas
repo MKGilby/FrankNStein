@@ -112,6 +112,9 @@
 //     * Added clipping to PutPixel.
 //     * The split color Line now calls the uint32 color version.
 //     * Simplified FilledCircle.
+//   1.27 - Gilby - 2023.12.05
+//     + Added Resize, it changes changes the image resolution but keeps the image
+//       either cut to size (shrinking) or padded with empty space (enlarging).
 
 
 {$ifdef fpc}
@@ -273,6 +276,9 @@ type
     // not equal the given color.
     procedure Crop(r,g,b,a:integer);
 
+    // Resizes the image to the given size. Data outside the new dimensions is lost.
+    procedure Resize(pNewWidth,pNewHeight:integer);
+
     // Grayscales the image
     procedure Grayscale;
 
@@ -366,7 +372,7 @@ uses SysUtils, MKToolBox, Logger, MKStream;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.26';
+  Version='1.27';
   POSTPROCESSCOLOR=$00FF00FF;  // Fully transparent magenta is the magic color!
 
 var
@@ -1184,6 +1190,19 @@ begin
   // 5. Adjust size
   fWidth:=w;
   fHeight:=h;
+end;
+
+procedure TARGBImage.Resize(pNewWidth,pNewHeight:integer);
+var tmp:pointer;i:integer;
+begin
+  tmp:=Getmem(pNewWidth*pNewHeight*4);
+  fillchar(tmp^,pNewWidth*pNewHeight*4,0);
+  for i:=0 to min(fHeight,pNewHeight)-1 do
+    Move((fRawdata+i*Width*4)^,(tmp+i*pNewWidth*4)^,min(Width,pNewWidth)*4);
+  Freemem(fRawdata);
+  fWidth:=pNewWidth;
+  fHeight:=pNewHeight;
+  fRawdata:=tmp;
 end;
 
 procedure TARGBImage.Grayscale;

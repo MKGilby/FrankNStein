@@ -150,7 +150,7 @@ var
   pp:pointer;b:byte;
   pal:TARGBPalette;
   buf:pointer;
-  atm:TAnimationData;
+  atm:TFrameBasedAnimationData;
 
   function DecodePixel(source:integer):uint32;
   begin
@@ -356,7 +356,7 @@ begin
     1:begin  // ATGA
         i:=(extra[1] and 15)*256+extra[0];   // FrameCount
         if i=0 then i:=1;
-        atm:=TAnimationData.Create(Width div i,Height);
+        atm:=TFrameBasedAnimationData.Create(Width div i,Height);
         atm.Paused:=(extra[1] and 128)=128;
         atm.RandomStart:=(extra[1] and 32)=32;
         atm.Looped:=(extra[1] and 16)=16;
@@ -373,7 +373,7 @@ begin
           Width:=Width*i;
           Height:=Height div i;
         end;
-        atm:=TAnimationData.Create(Width div i,Height);
+        atm:=TFrameBasedAnimationData.Create(Width div i,Height);
         atm.Paused:=(extra[1] and 128)=128;
         atm.RandomStart:=(extra[1] and 32)=32;
         atm.Looped:=(extra[1] and 16)=16;

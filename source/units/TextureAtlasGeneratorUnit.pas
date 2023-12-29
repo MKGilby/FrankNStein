@@ -1,12 +1,12 @@
 { -[Name]-------------------------------------------
 
-            TextureAtlasGenerator class
+              TextureAtlasGenerator class
 
   -[Disclaimer]-------------------------------------
 
-     You can freely distribute it.
+    See copyright.txt in project sources.
 
-     Written by Gilby/MKSZTSZ   Hungary, 2020-
+    Written by Gilby/MKSZTSZ   Hungary, 2020-2023
 
   -[Description]------------------------------------
 
@@ -37,10 +37,17 @@
 //     * Leaving out duplicate frames within one image.
 //  V1.04: Gilby - 2023.05.12
 //     * Changing Lists.TGenericList to fgl.TFPGObjectList.
+//  V1.05: Gilby - 2023.12.05
+//     * Added Crop method to crop image to the minimum size required.
+//  V1.06: Gilby - 2023.12.14
+//     * Following changes in AnimationDataUnit.
+//  V1.06a: Gilby - 2023.12.14
+//     * Bugfix in Addimage.
 
 unit TextureAtlasGeneratorUnit;
 
 {$mode delphi}
+{$WARN 6058 off : Call to subroutine "$1" marked as inline is not inlined}
 
 interface
 
@@ -81,6 +88,7 @@ type
     destructor Destroy; override;
     procedure AddImage(pImage:TARGBImage;pAnimationName:string='');
     procedure LoadImage(pFilename:string);
+    procedure Crop;
   private
     fTextureAtlas:TARGBImage;
     fLines:TTextureLines;
@@ -98,7 +106,7 @@ uses sysutils, AnimationDataUnit, Logger, MKToolbox;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.04';
+  Version='1.06a';
 
 constructor TTextureLine.Create(iTop,iHeight,iMaxWidth,iPadding:integer);
 begin
@@ -144,7 +152,7 @@ end;
 constructor TTextureAtlasGenerator.Create(iWidth,iHeight,iPadding:integer);
 begin
   fTextureAtlas:=TARGBImage.Create(iWidth,iHeight);
-  fTextureAtlas.Bar(0,0,iWidth,iHeight,0,0,0,0);
+  fTextureAtlas.Clear(0);
   fLines:=TTextureLines.Create;
   fPadding:=iPadding;
   fFreeTextureAtlas:=true;
@@ -164,26 +172,20 @@ begin
 end;
 
 procedure TTextureAtlasGenerator.AddImage(pImage: TARGBImage; pAnimationName: string);
-var anim,frame:integer;atm:TAnimationData;Line:TTextureLine;
+var anim,frame:integer;atm:TBaseAnimationData;Line:TTextureLine;
   PrevFrames:TStringList;key:string;
 begin
   PrevFrames:=TStringList.Create;
   try
     for anim:=0 to pImage.Animations.Count-1 do begin
       if (pAnimationName='') or (pImage.Animations[anim].Name=pAnimationName) then begin
-        atm:=TAnimationData.Create(pImage.Animations[anim].Width,pImage.Animations[anim].Height);
-        atm.Name:=pImage.Animations[anim].Name;
-        atm.FrameDelay:=pImage.Animations[anim].FrameDelay;
-        atm.StartFrame:=pImage.Animations[anim].StartFrame;
-        atm.LoopDelay:=pImage.Animations[anim].LoopDelay;
-        atm.Looped:=pImage.Animations[anim].Looped;
-        atm.RandomStart:=pImage.Animations[anim].RandomStart;
-        atm.Paused:=pImage.Animations[anim].Paused;
-        atm.PingPong:=pImage.Animations[anim].PingPong;
-        atm.ReverseAnim:=pImage.Animations[anim].ReverseAnim;
+        if pImage.Animations[anim] is TFrameBasedAnimationData then
+          atm:=TFrameBasedAnimationData(pImage.Animations[anim]).Clone(true)
+        else if pImage.Animations[anim] is TTimeBasedAnimationData then
+          atm:=TTimeBasedAnimationData(pImage.Animations[anim]).Clone(true);
 
         for frame:=0 to pImage.Animations[anim].FrameCount-1 do begin
-          key:=Format('%d,%d',[pImage.Animations[anim].Frames[frame].x,pImage.Animations[anim].Frames[frame].y]);
+          key:=Format('%d,%d',[pImage.Animations[anim].Frames[frame].Left,pImage.Animations[anim].Frames[frame].Top]);
           if PrevFrames.Values[key]='' then begin
             Line:=fLines.SearchLine(atm.Width,atm.Height);
             if Line=nil then begin
@@ -192,7 +194,7 @@ begin
             end;
             atm.AddFrame(Line.CurrentLeft,Line.Top);
             with pImage.Animations[anim] do
-              pImage.CopyTo(Frames[frame].x,Frames[frame].y,atm.Width,atm.Height,Line.CurrentLeft,Line.Top,fTextureAtlas);
+              pImage.CopyTo(Frames[frame].Left,Frames[frame].Top,atm.Width,atm.Height,Line.CurrentLeft,Line.Top,fTextureAtlas);
             PrevFrames.Add(Format('%s=%d,%d',[key,Line.CurrentLeft,Line.Top]));
             Line.AddImage(atm.Width);
           end else begin
@@ -215,6 +217,19 @@ begin
   image:=TARGBImage.Create(pFilename);
   AddImage(image);
   FreeAndNil(image);
+end;
+
+procedure TTextureAtlasGenerator.Crop;
+var tmp:TARGBImage;
+begin
+  fTextureAtlas.Crop(0,0,0,0);
+  tmp:=TARGBImage.Create(fTextureAtlas.Width+fPadding*2,fTextureAtlas.Height+fPadding*2);
+  tmp.Clear(0);
+  fTextureAtlas.CopyTo(0,0,fTextureAtlas.Width,fTextureAtlas.Height,fPadding,fPadding,tmp);
+
+  fTextureAtlas.Resize(tmp.Width,tmp.Height);
+  tmp.CopyTo(0,0,tmp.Width,tmp.Height,0,0,fTextureAtlas);
+  tmp.Free;
 end;
 
 initialization
