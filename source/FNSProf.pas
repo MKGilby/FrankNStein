@@ -84,9 +84,9 @@ begin
   case fState of
     psSliding:begin
       if fDirX=1 then
-        fSlideLeft.PutFrame(x-1,y,(x div 2) mod 8)
+        fSlideRight.PutFrame(x-1,y,(x div 2) mod 8)
       else
-        fSlideRight.PutFrame(x-1,y,(x div 2) mod 8);
+        fSlideLeft.PutFrame(x-1,y,(x div 2) mod 8);
     end;
     psSlidingDown:begin
       fSlideDown.PutFrame(x-1,y,0);

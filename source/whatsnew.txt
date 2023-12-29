@@ -1,3 +1,9 @@
+2023.12.29 - Build 8
+- Added '(' and ')' characters to font.
+- Changed Lazarus version on opening screen.
+- "Remake" word is changed to "Refurbication" on opening screen.
+- Prof slides facing forward, not backwards.
+
 2023.12.29 - Build 7
 - Animation is time based now, not frame based.
 - The next skeleton piece flashes.
