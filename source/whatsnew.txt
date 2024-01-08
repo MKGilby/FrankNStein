@@ -1,3 +1,6 @@
+2024.01.08 - Build 9
+- Added first monster: syringe.
+
 2023.12.29 - Build 8
 - Added '(' and ')' characters to font.
 - Changed Lazarus version on opening screen.

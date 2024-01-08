@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="9"/>
-      <BuildNr Value="8"/>
+      <BuildNr Value="9"/>
       <StringTable CompanyName="MKSZTSZ"/>
     </VersionInfo>
     <BuildModes>
@@ -150,6 +150,10 @@
       </Unit>
       <Unit>
         <Filename Value="FNSSpring.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="FNSMonster.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
