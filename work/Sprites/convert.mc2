@@ -29,6 +29,12 @@ m addtimebasedanim Mons01Right 18 8 6 3 0 0 3  0 0 18 0 36 0 54 0 72 0 90 0  1
 m addtimebasedanim Mons01Left 18 8 6 3 0 0 3  198 0 180 0 162 0 144 0 126 0 108 0  1
 m addall 1 2
 
+r png data\mons02.png 1
+m setcolorkey 0 0 0 1
+m addtimebasedanim Mons02Right 18 8 6 3 0 0 3  0 0 18 0 36 0 54 0 72 0 90 0  1
+m addtimebasedanim Mons02Left 18 8 6 3 0 0 3  198 0 180 0 162 0 144 0 126 0 108 0  1
+m addall 1 2
+
 m crop2 2
 w png sprites.png 2
 

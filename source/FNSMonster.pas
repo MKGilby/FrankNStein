@@ -5,7 +5,7 @@ unit FNSMonster;
 interface
 
 uses
-  SysUtils, FNSMap, Animation2Unit;
+  SysUtils, FNSMap, Animation2Unit, fgl;
 
 type
 
@@ -16,6 +16,7 @@ type
     destructor Destroy; override;
     procedure Move(pTimeUsed:double);
     procedure Draw;
+    procedure RestartAtRight;
   var
     fX:double;
     fY:integer;
@@ -23,6 +24,14 @@ type
     fDir:integer;       // direction -1 / +1
     fSpeed:double;      // pixel / sec
     fAnimLeft,fAnimRight:TAnimation;
+  end;
+
+  { TMonsters }
+
+  TMonsters=class(TFPGObjectList<TMonster>)
+    procedure AddMonster(iMonsterData:TMonsterData);
+    procedure Move(pTimeUsed:double);
+    procedure Draw;
   end;
 
 implementation
@@ -40,7 +49,8 @@ begin
   fSpeed:=abs(iMonsterData._speed);
   if fSpeed>0 then fDir:=1
   else if fSpeed<0 then fDir:=-1
-  else fSpeed:=0;
+  else fDir:=0;
+  fSpeed:=8;
   fAnimLeft:=MM.Animations.ItemByName[Format('Mons%.2dLeft',[iMonsterData._imageindex])].SpawnAnimation;
   fAnimRight:=MM.Animations.ItemByName[Format('Mons%.2dRight',[iMonsterData._imageindex])].SpawnAnimation;
 end;
@@ -90,6 +100,33 @@ begin
     fAnimRight.PutFrame(trunc(fX),fY)
   else
     fAnimLeft.PutFrame(trunc(fX),fY);
+end;
+
+procedure TMonster.RestartAtRight;
+begin
+  fX:=fMax;
+  fDir:=-1;
+end;
+
+{ TMonsters }
+
+procedure TMonsters.AddMonster(iMonsterData: TMonsterData);
+begin
+  Add(TMonster.Create(iMonsterData));
+end;
+
+procedure TMonsters.Move(pTimeUsed: double);
+var i:integer;
+begin
+  for i:=0 to Count-1 do
+    Items[i].Move(pTimeUsed);
+end;
+
+procedure TMonsters.Draw;
+var i:integer;
+begin
+  for i:=0 to Count-1 do
+    Items[i].Draw;
 end;
 
 end.

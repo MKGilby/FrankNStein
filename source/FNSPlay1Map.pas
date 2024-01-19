@@ -26,7 +26,7 @@ type
     fMapStatic:TMapStatic;
     fDevice:TDevice;
     fProf:TProf;
-    fMonster:TMonster;
+    fMonsters:TMonsters;
     procedure MoveEx(pTimeUsed:double);
   end;
 
@@ -41,12 +41,14 @@ begin
   fMapStatic:=TMapStatic.Create(iMapNo);
   fDevice:=TDevice.Create(iMapNo);
   fProf:=TProf.Create(fMapStatic.TileMap,fDevice);
-  fMonster:=TMonster.Create(Maps[iMapNo].MonsterData[0]);
+  fMonsters:=TMonsters.Create;
+  fMonsters.AddMonster(Maps[iMapNo].MonsterData[0]);
+  fMonsters.AddMonster(Maps[iMapNo].MonsterData[1]);
 end;
 
 destructor TPlay1Map.Destroy;
 begin
-  if Assigned(fMonster) then fMonster.Free;
+  if Assigned(fMonsters) then fMonsters.Free;
   if Assigned(fProf) then fProf.Free;
   if Assigned(fDevice) then fDevice.Free;
   if Assigned(fMapStatic) then fMapStatic.Free;
@@ -58,12 +60,13 @@ begin
   fMapStatic.Draw;
   fDevice.Draw;
   Springs.Draw;
-  fMonster.Draw;
+  fMonsters.Draw;
   fProf.Draw;
 end;
 
 procedure TPlay1Map.Move(pTimeUsed: double);
 begin
+//  if keys[SDL_SCANCODE_A] then fMonster.RestartAtRight;
   if pTimeUsed<=MINLAG then begin  // Shorter than the lag threshold, so process.
     while pTimeUsed>MAXTIMESLICE do begin
       MoveEx(MAXTIMESLICE);
@@ -78,7 +81,7 @@ begin
   Springs.Move(pTimeUsed);
   fProf.Move(pTimeUsed);
   fDevice.Move(pTimeUsed);
-  fMonster.Move(pTimeUsed);
+  fMonsters.Move(pTimeUsed);
 end;
 
 end.

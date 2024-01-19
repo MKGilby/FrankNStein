@@ -1,3 +1,7 @@
+2024.01.13
+- Adjusted monster speed.
+- Added second monster: snake. Needs a small adjustment with the head.
+
 2024.01.08 - Build 9
 - Added first monster: syringe.
 
