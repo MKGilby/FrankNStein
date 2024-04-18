@@ -1,7 +1,7 @@
 Remake of Frank'N'Stein and Frank'N'Stein Rebooted
 (from ZX Spectum 48K by Colin Stewart)
 
-Programming language: Pascal (Lazarus 3.0.0rc2 with FPC 3.2.2)
+Programming language: Pascal (Lazarus 3.0.0 with FPC 3.2.2)
 https://www.lazarus-ide.org/
 
 Music and sound effects made by: Mike Fraley (rockfistus)

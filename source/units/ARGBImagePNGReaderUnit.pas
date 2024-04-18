@@ -41,6 +41,8 @@
 //   1.08: Gilby - 2023.12.13
 //     * Following changes in AnimationDataUnit.
 //     * Ability to read time-based animation data.
+//   1.09: Gilby - 2024.03.14
+//     * Added loading V3 and V4 animation data.
 
 unit ARGBImagePNGReaderUnit;
 
@@ -255,6 +257,8 @@ begin
     case b of
       1:atm:=TFrameBasedAnimationData.CreateFromStreamLegacy(pSource);
       2:atm:=TTimeBasedAnimationData.CreateFromStreamV2(pSource);
+      3:atm:=TFrameBasedAnimationData.CreateFromStreamV3(pSource);
+      4:atm:=TTimeBasedAnimationData.CreateFromStreamV4(pSource);
       else raise Exception.Create(Format('Unknown animation data version! (%d)',[b]));
     end;
     pAnimations.AddObject(atm.name,atm);

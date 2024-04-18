@@ -52,6 +52,8 @@
 //  V1.10: Gilby - 2023.12.29
 //     + Added LogData to base class.
 //     + Added SkipFrames parameter to Clone.
+//  V1.11: Gilby - 2024.03.14
+//     + Added saving HotPoint data into stream.
 
 {$mode delphi}
 
@@ -106,6 +108,7 @@ type
   TFrameBasedAnimationData=class(TBaseAnimationData)
     constructor Create(iWidth,iHeight:integer);  override;
     constructor CreateFromStreamLegacy(iStream:TStream);
+    constructor CreateFromStreamV3(iStream:TStream);
     procedure SavetoStream(pStream:TStream); override;
     procedure LogData; override;
     function Clone(pSkipFrames:boolean=false):TFrameBasedAnimationData;
@@ -119,6 +122,7 @@ type
   TTimeBasedAnimationData=class(TBaseAnimationData)
     constructor Create(iWidth,iHeight:integer);  override;
     constructor CreateFromStreamV2(iStream:TStream);
+    constructor CreateFromStreamV4(iStream:TStream);
     procedure SavetoStream(pStream:TStream); override;
     procedure LogData; override;
     function Clone(pSkipFrames:boolean=false):TTimeBasedAnimationData;
@@ -135,7 +139,7 @@ uses SysUtils, Logger;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.10';
+  Version='1.11';
 
 // -------------------------------------------------------[ TBaseAnimationData ]---
 
@@ -232,12 +236,56 @@ begin
     AddFrame(w,h);
     dec(i);
   end;
+  HotPointX:=0;
+  HotPointY:=0;
+end;
+
+constructor TFrameBasedAnimationData.CreateFromStreamV3(iStream:TStream);
+var i,w,h:integer;flags:byte;
+begin
+  i:=0;
+  iStream.Read(i,1);
+  SetLength(Name,i);
+  if i>0 then iStream.Read(Name[1],i);
+  fWidth:=0;
+  iStream.Read(fWidth,2);
+  fHeight:=0;
+  iStream.Read(fHeight,2);
+  i:=0;
+  iStream.Read(i,2);
+  HotPointX:=0;
+  iStream.Read(HotPointX,2);
+  HotPointY:=0;
+  iStream.Read(HotPointY,2);
+
+  FrameDelay:=0;
+  iStream.Read(FrameDelay,2);
+  LoopDelay:=0;
+  iStream.Read(LoopDelay,2);
+  StartFrame:=0;
+  iStream.Read(StartFrame,2);
+
+  flags:=0;
+  iStream.Read(flags,1);
+  Looped:=(flags and AF_LOOPED)>0;
+  RandomStart:=(flags and AF_RANDOMSTART)>0;
+  Paused:=(flags and AF_PAUSED)>0;
+  PingPong:=(flags and AF_PINGPONG)>0;
+  ReverseAnim:=(flags and AF_REVERSEANIM)>0;
+
+  w:=0;h:=0;
+  while i>0 do begin
+    iStream.Read(w,2);
+    iStream.Read(h,2);
+    AddFrame(w,h);
+    dec(i);
+  end;
 end;
 
 procedure TFrameBasedAnimationData.SavetoStream(pStream:TStream);
 var b:Byte;i:integer;
 begin
-  b:=1;
+  b:=3;
   pStream.Write(b,1);  // Version, indicates Frame-basedness too
   b:=length(Name);
   pStream.Write(b,1);
@@ -246,6 +294,8 @@ begin
   pStream.Write(Width,2);
   pStream.Write(Height,2);
   pStream.Write(FrameCount,2);
+  pStream.Write(HotPointX,2);
+  pStream.Write(HotPointY,2);
   pStream.Write(FrameDelay,2);
   pStream.Write(LoopDelay,2);
   pStream.Write(StartFrame,2);
@@ -298,6 +348,8 @@ begin
   Result.Paused:=Paused;
   Result.PingPong:=PingPong;
   Result.ReverseAnim:=ReverseAnim;
+  Result.HotPointX:=HotPointX;
+  Result.HotPointY:=HotPointY;
   if not pSkipFrames then
     for i:=0 to FrameCount-1 do Result.AddFrame(Frames[i].Left,Frames[i].Top);
 end;
@@ -313,6 +365,7 @@ end;
 constructor TTimeBasedAnimationData.CreateFromStreamV2(iStream:TStream);
 var i,w,h:integer;flags:byte;
 begin
+  // Version already consumed by caller
   i:=0;
   iStream.Read(i,1);
   SetLength(Name,i);
@@ -348,10 +401,53 @@ begin
   end;
 end;
 
+constructor TTimeBasedAnimationData.CreateFromStreamV4(iStream:TStream);
+var i,w,h:integer;flags:byte;
+begin
+  // Version already consumed by caller
+  i:=0;
+  iStream.Read(i,1);
+  SetLength(Name,i);
+  if i>0 then iStream.Read(Name[1],i);
+  fWidth:=0;
+  iStream.Read(fWidth,2);
+  fHeight:=0;
+  iStream.Read(fHeight,2);
+  i:=0;
+  iStream.Read(i,2);
+  HotPointX:=0;
+  iStream.Read(HotPointX,2);
+  HotPointY:=0;
+  iStream.Read(HotPointY,2);
+
+  FPS:=0;
+  iStream.Read(FPS,sizeof(FPS));
+  LoopDelay:=0;
+  iStream.Read(LoopDelay,sizeof(LoopDelay));
+  StartFrame:=0;
+  iStream.Read(StartFrame,2);
+
+  flags:=0;
+  iStream.Read(flags,1);
+  Looped:=(flags and AF_LOOPED)>0;
+  RandomStart:=(flags and AF_RANDOMSTART)>0;
+  Paused:=(flags and AF_PAUSED)>0;
+  PingPong:=(flags and AF_PINGPONG)>0;
+  ReverseAnim:=(flags and AF_REVERSEANIM)>0;
+
+  w:=0;h:=0;
+  while i>0 do begin
+    iStream.Read(w,2);
+    iStream.Read(h,2);
+    AddFrame(w,h);
+    dec(i);
+  end;
+end;
+
 procedure TTimeBasedAnimationData.SavetoStream(pStream:TStream);
 var b:Byte;i:integer;
 begin
-  b:=2;
+  b:=4;
   pStream.Write(b,1);  // Version, indicates Time-basedness too
   b:=length(Name);
   pStream.Write(b,1);
@@ -360,6 +456,8 @@ begin
   pStream.Write(Width,2);
   pStream.Write(Height,2);
   pStream.Write(FrameCount,2);
+  pStream.Write(HotPointX,2);
+  pStream.Write(HotPointY,2);
   pStream.Write(FPS,sizeof(double));
   pStream.Write(LoopDelay,sizeof(double));
   pStream.Write(StartFrame,2);
@@ -413,6 +511,8 @@ begin
   Result.Paused:=Paused;
   Result.PingPong:=PingPong;
   Result.ReverseAnim:=ReverseAnim;
+  Result.HotPointX:=HotPointX;
+  Result.HotPointY:=HotPointY;
   if not pSkipFrames then
     for i:=0 to FrameCount-1 do Result.AddFrame(Frames[i].Left,Frames[i].Top);
 end;

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Animation data -->
+<Animations>
+  <Animation type="FrameBased">
+    <Name>Spring</Name>
+    <Width>8</Width>
+    <Height>16</Height>
+    <HotPoint x="0" y="0"/>
+    <FrameDelay>0</FrameDelay>
+    <LoopDelay>0</LoopDelay>
+    <StartFrame>0</StartFrame>
+    <Paused/>
+    <Frames>
+      <Frame x="8" y="0" />
+      <Frame x="16" y="0" />
+      <Frame x="24" y="0" />
+      <Frame x="32" y="0" />
+      <Frame x="40" y="0" />
+      <Frame x="48" y="0" />
+      <Frame x="56" y="0" />
+      <Frame x="64" y="0" />
+    </Frames>
+  </Animation>
+</Animations>

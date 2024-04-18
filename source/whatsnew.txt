@@ -1,4 +1,10 @@
-2024.01.13
+2024.04.18 - Build 11
+- Fixed snake animation.
+- Updated mkconv2 tool.
+- Updated used units.
+- Animations are added from XML files during preparation.
+
+2024.01.13 - Build 10
 - Adjusted monster speed.
 - Added second monster: snake. Needs a small adjustment with the head.
 

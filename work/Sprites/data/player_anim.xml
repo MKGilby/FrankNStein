@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Animation data -->
+<Animations>
+  <Animation type="FrameBased">
+    <Name>ProfLeft</Name>
+    <Width>10</Width>
+    <Height>16</Height>
+    <HotPoint x="0" y="0"/>
+    <FrameDelay>0</FrameDelay>
+    <LoopDelay>0</LoopDelay>
+    <StartFrame>0</StartFrame>
+    <Paused/>
+    <Frames>
+      <Frame x="0" y="0" />
+      <Frame x="10" y="0" />
+      <Frame x="20" y="0" />
+      <Frame x="30" y="0" />
+      <Frame x="40" y="0" />
+      <Frame x="30" y="0" />
+      <Frame x="20" y="0" />
+      <Frame x="10" y="0" />
+    </Frames>
+  </Animation>
+  <Animation type="FrameBased">
+    <Name>ProfRight</Name>
+    <Width>10</Width>
+    <Height>16</Height>
+    <HotPoint x="0" y="0"/>
+    <FrameDelay>0</FrameDelay>
+    <LoopDelay>0</LoopDelay>
+    <StartFrame>0</StartFrame>
+    <Paused/>
+    <Frames>
+      <Frame x="50" y="0" />
+      <Frame x="60" y="0" />
+      <Frame x="70" y="0" />
+      <Frame x="80" y="0" />
+      <Frame x="90" y="0" />
+      <Frame x="80" y="0" />
+      <Frame x="70" y="0" />
+      <Frame x="60" y="0" />
+    </Frames>
+  </Animation>
+  <Animation type="FrameBased">
+    <Name>ProfSlideLeft</Name>
+    <Width>10</Width>
+    <Height>16</Height>
+    <HotPoint x="0" y="0"/>
+    <FrameDelay>0</FrameDelay>
+    <LoopDelay>0</LoopDelay>
+    <StartFrame>0</StartFrame>
+    <Paused/>
+    <Frames>
+      <Frame x="130" y="0" />
+      <Frame x="140" y="0" />
+      <Frame x="150" y="0" />
+      <Frame x="160" y="0" />
+      <Frame x="170" y="0" />
+      <Frame x="180" y="0" />
+      <Frame x="190" y="0" />
+      <Frame x="200" y="0" />
+    </Frames>
+  </Animation>
+  <Animation type="FrameBased">
+    <Name>ProfSlideRight</Name>
+    <Width>10</Width>
+    <Height>16</Height>
+    <HotPoint x="0" y="0"/>
+    <FrameDelay>0</FrameDelay>
+    <LoopDelay>0</LoopDelay>
+    <StartFrame>0</StartFrame>
+    <Paused/>
+    <Frames>
+      <Frame x="210" y="0" />
+      <Frame x="220" y="0" />
+      <Frame x="230" y="0" />
+      <Frame x="240" y="0" />
+      <Frame x="250" y="0" />
+      <Frame x="260" y="0" />
+      <Frame x="270" y="0" />
+      <Frame x="280" y="0" />
+    </Frames>
+  </Animation>
+  <Animation type="FrameBased">
+    <Name>ProfSlideDown</Name>
+    <Width>10</Width>
+    <Height>16</Height>
+    <HotPoint x="0" y="0"/>
+    <FrameDelay>0</FrameDelay>
+    <LoopDelay>0</LoopDelay>
+    <StartFrame>0</StartFrame>
+    <Paused/>
+    <Frames>
+      <Frame x="110" y="0" />
+    </Frames>
+  </Animation>
+</Animations>
