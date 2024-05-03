@@ -143,6 +143,15 @@
 // V3.47 - 2021.12.18
 //   - cp852_unicode.inc and win1250_unicode.inc files are embedded into pas file
 //     to make my life easier when adding units to projects.
+// V3.48 - 2023.09.01-04
+//   - Removed RGB16, RGB15, c16i, c15i, c16c and c16to15.
+//   - Removed RecCount.
+//   + Added HSLtoRGB and RGBtoHSL
+// V3.48a - 2023.09.05
+//   - Fix in HSLtoRGB
+// V3.49 - 2024.04.23
+//   + Added ExchangeSegments
+//   * Replace is deprecated, use StringReplace in SysUtils instead.
 
 unit MKToolbox;
 
@@ -166,7 +175,7 @@ uses Windows, SysUtils, Classes;
          function Ltrim(s:String):string;
 {V1.10}  function Win2Dos(s:String):string;
          function Dos2Win(s:String):string;
-{V1.12}  function Replace(s,src,trg:string):string;
+{V1.12}  function Replace(s,src,trg:string):string; deprecated; // Use StringReplace in SysUtils instead!
 {V1.15}  function CountChar(c:char;s:String):byte;
 {V1.18}  function TrimBrackets(var s:string;brackets:string):boolean;
 {V2.01}  function IsNumeric(s:string;DecSep:char=#0):boolean;
@@ -178,7 +187,6 @@ uses Windows, SysUtils, Classes;
 {V3.04}  function EvalStringToBoolean(s:string):boolean;
 {V3.07}  function CountBitsInByte(b:byte):integer;
 {V3.09}  function DecimalSeparate(i:integer;separator:char=' '):string;
-{V3.11}  procedure ReadStreamStringUNIX(source:TStream;var s:String);
 {V3.12}  function BinToInt(s:string):integer;
 {V3.16}  function ToUTF8(s:String):string; deprecated;
 {V3.17}  function GetNthSegment(s:String;sep:char;n:integer):string;
@@ -192,17 +200,16 @@ uses Windows, SysUtils, Classes;
 {V3.41}  function Cp852ToUTF8(s:string):string;
          function Win1250ToUTF8(s:string):string;
 {V3.43}  function GetPassword(const InputMask: Char = '*'): string;
+{V3.49}  function ExchangeSegments(s:String;sep:char;n1,n2:integer):string;
 
 // -------------------------------------
 // File related functions and procedures
 // -------------------------------------
 
-{V1.01}  function RecCount(FileName:string;OneRecSize:longint):longint;
 {V3.30}  procedure CopyFile(srcfn,trgfn:string;start,size:integer); overload;
          procedure CopyFile(srcfn,trgfn:string;size:integer=0); overload;
-{V1.03}  //procedure CopyFile(s1,s2:string;size:longint=0); overload;
-         //procedure CopyFile(s1,s2:string;start,size:longint); overload;
 {V1.08}  procedure ReadStreamString(source:TStream;var s:String);
+{V3.11}  procedure ReadStreamStringUNIX(source:TStream;var s:String);
 {V1.11}  function SizeOfFile(fname:string):longint;  // You don't need to open it
 
 // --------------------------
@@ -210,17 +217,16 @@ uses Windows, SysUtils, Classes;
 // --------------------------
 
 {V1.04}  function RGB32(r,g,b:cardinal):cardinal;
-         function RGB16(r,g,b:word):cardinal;
-         function RGB15(r,g,b:word):cardinal;
          function C32i(col,intensity:cardinal):cardinal;
-         function C16i(col,intensity:cardinal):cardinal;
-         function C15i(col,intensity:cardinal):cardinal;
-         function C16c(col:word;r,g,b,intensity:integer):word;
-         function C16to15(col:word):word;
 {V1.06}  function HSV2RGB(h,s,v:byte):longint; overload;
          procedure HSV2RGB(h,s,v:integer;var r,g,b:integer); overload;
 {V1.16}  procedure ExtractHTMLRGB(s:String;var r,g,b:integer);
 {V3.08}  function IsRGB(s:string):boolean;
+         // These functions use the following value ranges:
+         //   h:0..359   s:0..100   l:0..100
+{V3.48}  procedure HSLtoRGB(h:word;s,l:integer;out r,g,b:byte); overload;
+         function HSLtoRGB(h:word;s,l:integer):uint32; overload;
+         procedure RGBtoHSL(r,g,b:byte;out h:word;out s,l:integer);
 
 // -----------------------
 // Miscalleanous functions
@@ -247,7 +253,7 @@ uses Logger;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='3.47';
+  Version='3.49';
 
   HexChars='0123456789ABCDEF';
   DOSChars=#$a0#$b5#$82#$90#$a1#$d6#$a2#$e0#$94#$99#$8b#$8a#$a3#$e9#$81#$9a#$fb#$eb#$8e;
@@ -359,20 +365,6 @@ begin
   while length(Result)<b do Result:=c+Result;
 end;
 
-function RecCount(FileName:string;OneRecSize:longint):longint;
-var f:file;
-begin
-  Assign(f,FileName);
-  {$I-}
-  Reset(f,1);
-  {$I+}
-  if ioresult<>0 then Result:=0
-  else begin
-    Result:=FileSize(f) div OneRecSize;
-    close(f);
-  end;
-end;
-
 procedure CopyFile(srcfn,trgfn:string;start,size:integer);
 var src,trg:TStream;
 begin
@@ -397,16 +389,6 @@ begin
   Result:=(r and $ff) shl 16+(g and $ff) shl 8+b and $ff;
 end;
 
-function RGB16(r,g,b:word):cardinal;
-begin
-  Result:=(r shr 1) shl 11+g shl 5+b shr 1;
-end;
-
-function RGB15(r,g,b:word):cardinal;
-begin
-  Result:=(r shr 1) shl 11+(g shr 1) shl 6+b shr 1;
-end;
-
 function C32i(col,intensity:cardinal):cardinal;
 var r,g,b:word;
 begin
@@ -417,49 +399,6 @@ begin
   g:=(g*intensity) shr 8;
   b:=(b*intensity) shr 8;
   Result:=rgb32(r,g,b);
-end;
-
-function C16i(col,intensity:cardinal):cardinal;
-var r,g,b:word;
-begin
-  r:=(col and $f800) shr 10;
-  g:=(col and $07e0) shr 5;
-  b:=(col and $1f) shl 1;
-  r:=(r*intensity) shr 6;
-  g:=(g*intensity) shr 6;
-  b:=(b*intensity) shr 6;
-  Result:=rgb16(r,g,b);
-end;
-
-function C15i(col,intensity:cardinal):cardinal;
-var r,g,b:word;
-begin
-  r:=(col and $7c00) shr 10;
-  g:=(col and $03e0) shr 5;
-  b:=(col and $1f);
-  r:=(r*intensity) shr 5;
-  g:=(g*intensity) shr 5;
-  b:=(b*intensity) shr 5;
-  Result:=rgb15(r,g,b);
-end;
-
-function C16c(col:word;r,g,b,intensity:integer):word;
-var rx,gx,bx:integer;
-begin
-  rx:=(col div 2048)*2;
-  gx:=(col div 32) mod 64;
-  bx:=(col mod 32)*2;
-
-  rx:=rx+(r-rx)*intensity div 64;
-  gx:=gx+(g-gx)*intensity div 64;
-  bx:=bx+(b-bx)*intensity div 64;
-
-  Result:=rgb16(rx,gx,bx);
-end;
-
-function C16to15(col:word):word;
-begin
-  Result:=word(col and $1f)+word((col and $ffc0) shr 1);
 end;
 
 function AddStr(s:String;b:Byte):string;
@@ -937,6 +876,65 @@ begin
   else for i:=1 to length(s) do if pos(s[i],HexChars)=0 then Result:=false;
 end;
 
+// Method taken from rapidtables.com/convert/color/hsl-to-rgb.html
+procedure HSLtoRGB(h:word; s,l:integer; out r,g,b:byte);
+var c,x,m,ss,ll:double;
+
+  function RealMod(x,y:double):double;
+  begin
+    Result:=x-y*trunc(x/y);
+  end;
+
+begin
+  if h>360 then h:=h mod 360;
+  if s>100 then s:=100;
+  if l>100 then l:=100;
+  ss:=s/100;
+  ll:=l/100;
+  c:=(1-abs(2*ll-1))*ss;
+  x:=c*(1-abs(RealMod(h/60,2)-1));
+  m:=ll-c/2;
+  if (h<60) then begin r:=trunc((c+m)*255);g:=trunc((x+m)*255);b:=trunc(m*255);end
+  else if (h<120) then begin r:=trunc((x+m)*255);g:=trunc((c+m)*255);b:=trunc(m*255);end
+  else if (h<180) then begin r:=trunc(m*255);g:=trunc((c+m)*255);b:=trunc((x+m)*255);end
+  else if (h<240) then begin r:=trunc(m*255);g:=trunc((x+m)*255);b:=trunc((c+m)*255);end
+  else if (h<300) then begin r:=trunc((x+m)*255);g:=trunc(m*255);b:=trunc((c+m)*255);end
+  else begin r:=trunc((c+m)*255);g:=trunc(m*255);b:=trunc((x+m)*255);end;
+end;
+
+function HSLtoRGB(h:word; s,l:integer):uint32;
+var r,g,b:byte;
+begin
+  HSLtoRGB(h,s,l,r,g,b);
+  Result:=$FF000000+r<<16+g<<8+b;
+end;
+
+// Method taken from rapidtables.com/convert/color/rgb-to-hsl.html
+procedure RGBtoHSL(r,g,b:byte; out h:word; out s,l:integer);
+var rr,gg,bb,d,cmin,cmax,ll:double;
+begin
+  rr:=r/255;
+  gg:=g/255;
+  bb:=b/255;
+  if (rr<gg) then begin
+    if (rr<bb) then cmin:=rr else cmin:=bb;
+    if (gg>bb) then cmax:=gg else cmax:=bb;
+  end else begin
+    if (gg<bb) then cmin:=gg else cmin:=bb;
+    if (rr>bb) then cmax:=rr else cmax:=bb;
+  end;
+  d:=cmax-cmin;
+  ll:=(cmax+cmin)/2;
+  if d=0 then begin h:=0;s:=0;end
+  else begin
+    if cmax=rr then h:=trunc(60*(gg-bb)/d+360) mod 360
+    else if cmax=gg then h:=trunc(60*((bb-rr)/d+2))
+    else if cmax=bb then h:=trunc(60*((rr-gg)/d+4));
+    s:=trunc(d/(1-abs(2*ll-1))*100);
+  end;
+  l:=trunc(ll*100);
+end;
+
 function DecimalSeparate(i:integer;separator:char=' '):string;
 var s:string;
 begin
@@ -1148,6 +1146,14 @@ begin
   finally
     SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), OldMode);
   end;
+end;
+
+function ExchangeSegments(s:String; sep:char; n1,n2:integer):string;
+var s2:string;
+begin
+  s2:=GetNthSegment(s,sep,n1);
+  Result:=ReplaceNthSegment(s,sep,n1,GetNthSegment(s,sep,n2));
+  Result:=ReplaceNthSegment(Result,sep,n2,s2);
 end;
 
 function CreateTimeStamp:string;

@@ -37,13 +37,14 @@ uses FNSShared;
 { TPlay1Map }
 
 constructor TPlay1Map.Create(iMapNo: integer);
+var i:integer;
 begin
   fMapStatic:=TMapStatic.Create(iMapNo);
   fDevice:=TDevice.Create(iMapNo);
   fProf:=TProf.Create(fMapStatic.TileMap,fDevice);
   fMonsters:=TMonsters.Create;
-  fMonsters.AddMonster(Maps[iMapNo].MonsterData[0]);
-  fMonsters.AddMonster(Maps[iMapNo].MonsterData[1]);
+  for i:=0 to Maps[iMapNo].MonsterCount-1 do
+    fMonsters.AddMonster(Maps[iMapNo].MonsterData[i]);
 end;
 
 destructor TPlay1Map.Destroy;

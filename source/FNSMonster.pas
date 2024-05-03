@@ -46,11 +46,11 @@ begin
   fY:=iMonsterData._row*8;
   fMin:=iMonsterData._left*8+4;
   fMax:=iMonsterData._right*8-4;
-  fSpeed:=abs(iMonsterData._speed);
+  fSpeed:=iMonsterData._speed;
   if fSpeed>0 then fDir:=1
   else if fSpeed<0 then fDir:=-1
   else fDir:=0;
-  fSpeed:=8;
+  fSpeed:=abs(fSpeed);
   fAnimLeft:=MM.Animations.ItemByName[Format('Mons%.2dLeft',[iMonsterData._imageindex])].SpawnAnimation;
   fAnimRight:=MM.Animations.ItemByName[Format('Mons%.2dRight',[iMonsterData._imageindex])].SpawnAnimation;
 end;

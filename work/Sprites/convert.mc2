@@ -2,12 +2,7 @@ m createatlas 320 200 1 2
 
 r png data\prof.png 1
 m setcolorkey 0 0 0 1
-r animxml data\player_anim.xml 1
-;m addframebasedanim ProfLeft 10 16 8 5 0 0 3  0 0 10 0 20 0 30 0 40 0 30 0 20 0 10 0  1
-;m addframebasedanim ProfRight 10 16 8 5 0 0 3  50 0 60 0 70 0 80 0 90 0 80 0 70 0 60 0  1
-;m addframebasedanim ProfSlideLeft 10 16 8 5 0 0 3  130 0 140 0 150 0 160 0 170 0 180 0 190 0 200 0  1
-;m addframebasedanim ProfSlideRight 10 16 8 5 0 0 3  210 0 220 0 230 0 240 0 250 0 260 0 270 0 280 0  1
-;m addframebasedanim ProfSlideDown 10 16 1 5 0 0 3  110 0  1
+r json data\player.json 1
 m addall 1 2
 
 r png skeletonsprite.png 1
@@ -15,8 +10,7 @@ m addall 1 2
 
 r png data\spring.png 1
 m setcolorkey 0 0 0 1
-r animxml data\spring_anim.xml 1
-;m addframebasedanim Spring 8 16 8 0 0 0 4  8 0 16 0 24 0 32 0 40 0 48 0 56 0 64 0  1
+r json data\spring.json 1
 m addall 1 2
 
 r png data\deviceoverlay.png 1
@@ -27,16 +21,17 @@ m addall 3 2
 
 r png data\mons01.png 1
 m setcolorkey 0 0 0 1
-r animxml data\mons01_anim.xml 1
-;m addtimebasedanim Mons01Right 18 8 6 3 0 0 3  0 0 18 0 36 0 54 0 72 0 90 0  1
-;m addtimebasedanim Mons01Left 18 8 6 3 0 0 3  198 0 180 0 162 0 144 0 126 0 108 0  1
+r json data\mons01.json 1
 m addall 1 2
 
 r png data\mons02.png 1
 m setcolorkey 0 0 0 1
-r animxml data\mons02_anim.xml 1
-;m addtimebasedanim Mons02Right 18 8 6 3 0 0 3  0 0 18 0 36 0 54 0 72 0 90 0  1
-;m addtimebasedanim Mons02Left 18 8 6 3 0 0 3  198 0 180 0 162 0 144 0 126 0 108 0  1
+r json data\mons02.json 1
+m addall 1 2
+
+r png data\mons03.png 1
+m setcolorkey 0 0 0 1
+r json data\mons03.json 1
 m addall 1 2
 
 m crop2 2

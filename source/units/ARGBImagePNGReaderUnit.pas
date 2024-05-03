@@ -6,7 +6,7 @@
 
     See copyright.txt in project sources.
 
-    Written by Gilby/MKSZTSZ     Hungary, 2020-2023
+    Written by Gilby/MKSZTSZ     Hungary, 2020-2024
 
   -[Description]------------------------------------
 
@@ -43,6 +43,8 @@
 //     * Ability to read time-based animation data.
 //   1.09: Gilby - 2024.03.14
 //     * Added loading V3 and V4 animation data.
+//   1.10: Gilby - 2024.05.03
+//     * Added loading V5 animation data.
 
 unit ARGBImagePNGReaderUnit;
 
@@ -60,7 +62,7 @@ uses Classes, SysUtils, ARGBImageUnit, CRC32Unit, MyZStreamUnit, Logger,
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.08';
+  Version='1.10';
 
   HEADER=#137#80#78#71#13#10#26#10;
 
@@ -197,9 +199,6 @@ begin
         byte(Target^):=(byte((ScanLine)^)+(byte(PreScanLine^)) div 2) and $ff;
         byte((Target+1)^):=(byte((ScanLine+1)^)+(byte((PreScanLine+1)^)) div 2) and $ff;
         byte((Target+2)^):=(byte((ScanLine+2)^)+(byte((PreScanLine+2)^)) div 2) and $ff;
-//        byte(Target^):=((byte((ScanLine)^)+byte(PreScanLine^)) div 2) and $ff;
-//        byte((Target+1)^):=((byte((ScanLine+1)^)+byte((PreScanLine+1)^)) div 2) and $ff;
-//        byte((Target+2)^):=((byte((ScanLine+2)^)+byte((PreScanLine+2)^)) div 2) and $ff;
         for i:=3 to ScanLineSize-1 do
           byte((Target+i)^):=(byte((ScanLine+i)^)+(byte((Target+i-3)^)+byte((PreScanLine+i)^)) div 2) and $ff;
       end;
@@ -247,11 +246,11 @@ begin
 end;
 
 procedure ReadANIMV1(pSource:TStream;pAnimations:TAnimationDatas);
-var cnt:integer;b:byte;atm:TBaseAnimationData;
+var cnt:integer;b,b2:byte;atm:TBaseAnimationData;
 begin
   cnt:=0;
   pSource.Read(cnt,2);
-  b:=0;
+  b:=0;b2:=0;
   while cnt>0 do begin
     pSource.Read(b,1);
     case b of
@@ -259,6 +258,14 @@ begin
       2:atm:=TTimeBasedAnimationData.CreateFromStreamV2(pSource);
       3:atm:=TFrameBasedAnimationData.CreateFromStreamV3(pSource);
       4:atm:=TTimeBasedAnimationData.CreateFromStreamV4(pSource);
+      5:begin
+          pSource.Read(b2,1);
+          pSource.Seek(-1,soFromCurrent);
+          if b2 and AF_TIMEBASED=0 then
+            atm:=TFrameBasedAnimationData.CreateFromStreamV5(pSource)
+          else
+            atm:=TTimeBasedAnimationData.CreateFromStreamV5(pSource);
+        end
       else raise Exception.Create(Format('Unknown animation data version! (%d)',[b]));
     end;
     pAnimations.AddObject(atm.name,atm);
@@ -292,8 +299,6 @@ begin
   try
     pSource.Position:=0;
     UnCompressStream(pSource,Xs);
-//    Xs.Position:=0;
-//    Xs.SaveToFile('anmz.dat');
     Xs.Position:=0;
     ReadAnim(Xs,pAnimations);
   finally

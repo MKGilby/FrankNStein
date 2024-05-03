@@ -54,6 +54,9 @@
 //     + Added SkipFrames parameter to Clone.
 //  V1.11: Gilby - 2024.03.14
 //     + Added saving HotPoint data into stream.
+//  V1.12: Gilby - 2024.05.03
+//     + New combined format as version 5.
+//     + Added saving PPS (pixels/second)
 
 {$mode delphi}
 
@@ -109,6 +112,7 @@ type
     constructor Create(iWidth,iHeight:integer);  override;
     constructor CreateFromStreamLegacy(iStream:TStream);
     constructor CreateFromStreamV3(iStream:TStream);
+    constructor CreateFromStreamV5(iStream:TStream);
     procedure SavetoStream(pStream:TStream); override;
     procedure LogData; override;
     function Clone(pSkipFrames:boolean=false):TFrameBasedAnimationData;
@@ -123,12 +127,17 @@ type
     constructor Create(iWidth,iHeight:integer);  override;
     constructor CreateFromStreamV2(iStream:TStream);
     constructor CreateFromStreamV4(iStream:TStream);
+    constructor CreateFromStreamV5(iStream:TStream);
     procedure SavetoStream(pStream:TStream); override;
     procedure LogData; override;
     function Clone(pSkipFrames:boolean=false):TTimeBasedAnimationData;
+  private
+    fDefaultFPS:double;
   public
     FPS:double;  // to allow 1.5 frames per sec = 3 frames/2 sec
+    PPS:double;
     LoopDelay:double;  // in seconds
+    property DefaultFPS:double read fDefaultFPS;
   end;
 
   TAnimationDatas=TNamedList<TBaseAnimationData>;
@@ -139,7 +148,17 @@ uses SysUtils, Logger;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.11';
+  Version='1.12';
+
+  NMD_STARTFRAME=1;
+  NMD_FRAMEDELAY=2;
+  NMD_FPS=2;
+  NMD_LOOPDELAYT=4;
+  NMD_LOOPDELAYF=4;
+  NMD_HOTPOINT=8;
+  NMD_PPS=16;
+
+
 
 // -------------------------------------------------------[ TBaseAnimationData ]---
 
@@ -282,23 +301,66 @@ begin
   end;
 end;
 
+constructor TFrameBasedAnimationData.CreateFromStreamV5(iStream:TStream);
+var i,w,h,flags:integer;streampos:int64;
+begin
+  // To set default values, since not everything is loaded now.
+  Create(0,0);
+  // Version already consumed by caller
+  flags:=0;
+  iStream.Read(flags,1);
+  Looped:=(flags and AF_LOOPED)>0;
+  RandomStart:=(flags and AF_RANDOMSTART)>0;
+  Paused:=(flags and AF_PAUSED)>0;
+  PingPong:=(flags and AF_PINGPONG)>0;
+  ReverseAnim:=(flags and AF_REVERSEANIM)>0;
+  // No need to check AF_TIMEBASED, it was checked by caller.
+
+  // Name, width, height
+  i:=0;
+  iStream.Read(i,1);
+  SetLength(Name,i);
+  if i>0 then iStream.Read(Name[1],i);
+  fWidth:=0;
+  iStream.Read(fWidth,2);
+  fHeight:=0;
+  iStream.Read(fHeight,2);
+
+  // Framecount and frames
+  i:=0;
+  iStream.Read(i,2);
+  w:=0;h:=0;
+  while i>0 do begin
+    iStream.Read(w,2);
+    iStream.Read(h,2);
+    AddFrame(w,h);
+    dec(i);
+  end;
+
+  // Non-mandatory data
+  w:=0;
+  iStream.Read(w,1);
+  i:=0;
+  iStream.Read(i,2);
+  streampos:=iStream.Position;
+
+  if (i and NMD_STARTFRAME<>0) then iStream.Read(StartFrame,2);
+  if (i and NMD_FRAMEDELAY<>0) then iStream.Read(FrameDelay,2);
+  if (i and NMD_LOOPDELAYF<>0) then iStream.Read(LoopDelay,2);
+  if (i and NMD_HOTPOINT<>0) then begin
+    iStream.Read(HotPointX,2);
+    iStream.Read(HotPointY,2);
+  end;
+  iStream.Position:=streampos+w;
+end;
+
 procedure TFrameBasedAnimationData.SavetoStream(pStream:TStream);
 var b:Byte;i:integer;
 begin
-  b:=3;
-  pStream.Write(b,1);  // Version, indicates Frame-basedness too
-  b:=length(Name);
-  pStream.Write(b,1);
-  if b>0 then pStream.Write(Name[1],b);
+  b:=5;
+  pStream.Write(b,1);  // Version
 
-  pStream.Write(Width,2);
-  pStream.Write(Height,2);
-  pStream.Write(FrameCount,2);
-  pStream.Write(HotPointX,2);
-  pStream.Write(HotPointY,2);
-  pStream.Write(FrameDelay,2);
-  pStream.Write(LoopDelay,2);
-  pStream.Write(StartFrame,2);
+  // Flags
   b:=0;
   if Looped then b:=b or AF_LOOPED;
   if RandomStart then b:=b or AF_RANDOMSTART;
@@ -306,9 +368,36 @@ begin
   if PingPong then b:=b or AF_PINGPONG;
   if ReverseAnim then b:=b or AF_REVERSEANIM;
   pStream.Write(b,1);
+
+  // Name, width, height
+  b:=length(Name);
+  pStream.Write(b,1);
+  if b>0 then pStream.Write(Name[1],b);
+  pStream.Write(Width,2);
+  pStream.Write(Height,2);
+
+  // Framecount, frames
+  pStream.Write(FrameCount,2);
   for i:=0 to FrameCount-1 do begin
     pStream.Write(Frames[i].Left,2);
     pStream.Write(Frames[i].Top,2);
+  end;
+
+  i:=0;b:=0;
+  // Non-mandatory data
+  if (StartFrame<>0) then begin i:=i or NMD_STARTFRAME;inc(b,2);end;
+  if (FrameDelay<>0) then begin i:=i or NMD_FRAMEDELAY;inc(b,2);end;
+  if (LoopDelay<>0) then begin i:=i or NMD_LOOPDELAYF;inc(b,2);end;
+  if (HotPointX<>0) or (HotPointY<>0) then begin i:=i or NMD_HOTPOINT;inc(b,4);end;
+  pStream.Write(b,1);
+  pStream.Write(i,2);
+
+  if (i and NMD_STARTFRAME<>0) then pStream.Write(StartFrame,2);
+  if (i and NMD_FRAMEDELAY<>0) then pStream.Write(FrameDelay,2);
+  if (i and NMD_LOOPDELAYF<>0) then pStream.Write(LoopDelay,2);
+  if (i and NMD_HOTPOINT<>0) then begin
+    pStream.Write(HotPointX,2);
+    pStream.Write(HotPointY,2);
   end;
 end;
 
@@ -360,11 +449,16 @@ constructor TTimeBasedAnimationData.Create(iWidth,iHeight:integer);
 begin
   inherited Create(iWidth,iHeight);
   FPS:=1;
+  PPS:=1;
+  fDefaultFPS:=FPS;
+  LoopDelay:=0;
 end;
 
 constructor TTimeBasedAnimationData.CreateFromStreamV2(iStream:TStream);
 var i,w,h:integer;flags:byte;
 begin
+  // To set default values, since not everything is loaded now.
+  Create(0,0);
   // Version already consumed by caller
   i:=0;
   iStream.Read(i,1);
@@ -404,6 +498,8 @@ end;
 constructor TTimeBasedAnimationData.CreateFromStreamV4(iStream:TStream);
 var i,w,h:integer;flags:byte;
 begin
+  // To set default values, since not everything is loaded now.
+  Create(0,0);
   // Version already consumed by caller
   i:=0;
   iStream.Read(i,1);
@@ -444,34 +540,102 @@ begin
   end;
 end;
 
+constructor TTimeBasedAnimationData.CreateFromStreamV5(iStream:TStream);
+var i,w,h,flags:integer;streampos:int64;
+begin
+  // To set default values, since not everything is loaded now.
+  Create(0,0);
+  // Version already consumed by caller
+  flags:=0;
+  iStream.Read(flags,1);
+  Looped:=(flags and AF_LOOPED)>0;
+  RandomStart:=(flags and AF_RANDOMSTART)>0;
+  Paused:=(flags and AF_PAUSED)>0;
+  PingPong:=(flags and AF_PINGPONG)>0;
+  ReverseAnim:=(flags and AF_REVERSEANIM)>0;
+  // No need to check AF_TIMEBASED, it was checked by caller.
+
+  // Name, width, height
+  i:=0;
+  iStream.Read(i,1);
+  SetLength(Name,i);
+  if i>0 then iStream.Read(Name[1],i);
+  fWidth:=0;
+  iStream.Read(fWidth,2);
+  fHeight:=0;
+  iStream.Read(fHeight,2);
+
+  // Framecount and frames
+  i:=0;
+  iStream.Read(i,2);
+  w:=0;h:=0;
+  while i>0 do begin
+    iStream.Read(w,2);
+    iStream.Read(h,2);
+    AddFrame(w,h);
+    dec(i);
+  end;
+
+  // Non-mandatory data
+  w:=0;
+  iStream.Read(w,1);
+  i:=0;
+  iStream.Read(i,2);
+  streampos:=iStream.Position;
+
+  if (i and NMD_STARTFRAME<>0) then iStream.Read(StartFrame,2);
+  if (i and NMD_FPS<>0) then iStream.Read(FPS,sizeof(FPS));
+  if (i and NMD_LOOPDELAYT<>0) then iStream.Read(LoopDelay,sizeof(LoopDelay));
+  if (i and NMD_HOTPOINT<>0) then begin
+    iStream.Read(HotPointX,2);
+    iStream.Read(HotPointY,2);
+  end;
+  if (i and NMD_PPS<>0) then iStream.Read(PPS,sizeof(PPS));
+  iStream.Position:=streampos+w;
+end;
+
 procedure TTimeBasedAnimationData.SavetoStream(pStream:TStream);
 var b:Byte;i:integer;
 begin
-  b:=4;
-  pStream.Write(b,1);  // Version, indicates Time-basedness too
-  b:=length(Name);
-  pStream.Write(b,1);
-  if b>0 then pStream.Write(Name[1],b);
-
-  pStream.Write(Width,2);
-  pStream.Write(Height,2);
-  pStream.Write(FrameCount,2);
-  pStream.Write(HotPointX,2);
-  pStream.Write(HotPointY,2);
-  pStream.Write(FPS,sizeof(double));
-  pStream.Write(LoopDelay,sizeof(double));
-  pStream.Write(StartFrame,2);
-  b:=0;
+  b:=5;
+  pStream.Write(b,1);  // Version
+  b:=AF_TIMEBASED;
   if Looped then b:=b or AF_LOOPED;
   if RandomStart then b:=b or AF_RANDOMSTART;
   if Paused then b:=b or AF_PAUSED;
   if PingPong then b:=b or AF_PINGPONG;
   if ReverseAnim then b:=b or AF_REVERSEANIM;
+  pStream.Write(b,1);  // Flags
+
+  b:=length(Name);
   pStream.Write(b,1);
+  if b>0 then pStream.Write(Name[1],b);  // Name
+
+  pStream.Write(Width,2);
+  pStream.Write(Height,2);
+  pStream.Write(FrameCount,2);
   for i:=0 to FrameCount-1 do begin
     pStream.Write(Frames[i].Left,2);
     pStream.Write(Frames[i].Top,2);
   end;
+
+  i:=0;b:=0;
+  if (StartFrame<>0) then begin i:=i or NMD_STARTFRAME;inc(b,2);end;
+  if (FPS<>1) then begin i:=i or NMD_FPS;inc(b,sizeof(FPS));end;
+  if (LoopDelay<>0) then begin i:=i or NMD_LOOPDELAYT;inc(b,sizeof(LoopDelay));end;
+  if (HotPointX<>0) or (HotPointY<>0) then begin i:=i or NMD_HOTPOINT;inc(b,4);end;
+  if (PPS<>1) then begin i:=i or NMD_PPS;inc(b,sizeof(PPS));end;
+  pStream.Write(b,1);
+  pStream.Write(i,2);
+
+  if i and NMD_STARTFRAME<>0 then pStream.Write(StartFrame,2);
+  if i and NMD_FPS<>0 then pStream.Write(FPS,sizeof(FPS));
+  if i and NMD_LOOPDELAYT<>0 then pStream.Write(LoopDelay,sizeof(LoopDelay));
+  if i and NMD_HOTPOINT<>0 then begin
+    pStream.Write(HotPointX,2);
+    pStream.Write(HotPointY,2);
+  end;
+  if i and NMD_PPS<>0 then pStream.Write(PPS,sizeof(PPS));
 end;
 
 procedure TTimeBasedAnimationData.LogData;
@@ -483,6 +647,7 @@ begin
   Log.LogDebug('Type: Time-based');
   Log.LogDebug(Format('Hotpoint: %d, %d',[HotPointX,HotPointY]));
   Log.LogDebug(Format('Frame/sec: %.2f',[FPS]));
+  Log.LogDebug(Format('Pixel/sec: %.2f',[PPS]));
   Log.LogDebug(Format('Loopdelay: %.2f secs',[LoopDelay]));
   Log.LogDebug(Format('Framecount: %d',[length(fFrames)]));
   Log.LogDebug(Format('StartFrame: %d',[StartFrame]));
@@ -513,6 +678,7 @@ begin
   Result.ReverseAnim:=ReverseAnim;
   Result.HotPointX:=HotPointX;
   Result.HotPointY:=HotPointY;
+  Result.PPS:=PPS;
   if not pSkipFrames then
     for i:=0 to FrameCount-1 do Result.AddFrame(Frames[i].Left,Frames[i].Top);
 end;
@@ -522,3 +688,62 @@ initialization
 
 end.
 
+{
+
+  Stream format V5
+  ----------------
+
+    Size     Description
+    byte     Version (5)
+    byte     Animation flags as added up AF_ constants:
+               1 - AF_LOOPED - Animation starts over when played all frames
+               2 - AF_RANDOMSTART - Animation starts at a random frame instead of StartFrame
+               4 - AF_PAUSED - Animation doesn't animate by default.
+               8 - AF_PINGPONG - When reaching last frame, animation played backwards too.
+              16 - AF_REVERSEANIM - Animation starts playing backwards.
+              32 - AF_TIMEBASED - Animation is time based (instead of frame based).
+                                  This means that some values has no meaning and
+                                  cannot be included in the next part.
+             (This is put to the beginning to help loader decide animation type!)
+    string   Name
+    word     Width
+    word     Height
+    word     FrameCount
+    FrameCount*dword Frames
+      (One frame is two words, specifying x and y coordinates on the textureatlas).
+    byte     Non-mandatory data size without the index.
+    word     Non-mandatory data index as added up NMD_ constants (see table below)
+    ?        Non-mandatory data (only that has the corresponding bit set in index above)
+
+    NMD_STARTFRAME    word
+    NMD_FRAMEDELAY    word
+    NMD_FPS           double
+    NMD_LOOPDELAYT    double
+    NMD_LOOPDELAYF    word
+    NMD_HOTPOINT      2x word (x,y)
+    NMD_PPS           double
+
+  NMD_ constants and their meaning
+  --------------------------------
+      T*  F*   Value - Constant -     Default value when not included
+      X   X    1 - NMD_STARTFRAME - 0
+                   Start frame of the animation
+          X    2 - NMD_FRAMEDELAY - 0
+                   Wait this count of game loops before advancing animation one frame.
+      X        2 - NMD_FPS - 1
+                   Frame/second.
+      X        4 - NMD_LOOPDELAYT - 0
+                   Seconds to wait before looping animation.
+          X    4 - NMD_LOOPDELAYF - 0
+                   Wait this count of game loops before looping animation.
+      X   X    8 - NMD_HOTPOINT - (0,0)
+                   Hotpoint of the animation.
+      X       16 - NMD_PPS - 1
+                   Moving speed of the animation (pixel/second) which it seems
+                   to move naturally (using the loaded FPS).
+                   You can use this to adjust fps if sprite moves slower of faster.
+
+  * The X marks if the value is valid for the animation type
+    (T - Time based, F - Frame based)
+
+}

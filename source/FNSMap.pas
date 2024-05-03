@@ -374,8 +374,8 @@ end;
 procedure TMap.AddMonster(pRow,pLeft,pRight,pStart,pSpeed,pImageIndex:integer);
 begin
   SetLength(fMonsters,length(fMonsters)+1);
-  if pSpeed>4 then pSpeed:=4
-  else if pSpeed<-4 then pSpeed:=-4;
+  if pSpeed>127 then pSpeed:=127
+  else if pSpeed<-127 then pSpeed:=-127;
   fMonsters[length(fMonsters)-1]:=TMonsterData.Init(pRow,pLeft,pRight,pStart,pSpeed,pImageIndex);
 end;
 
@@ -477,10 +477,10 @@ begin
     SetLength(fMonsters,length(fMonsters)+1);
     with fMonsters[length(fMonsters)-1] do begin
       i:=fReadByte(pStream);
-      if i and 8=0 then
-        _speed:=0-(i and 7)
+      if i and 128=0 then
+        _speed:=0-(i and 127)
       else
-        _speed:=i and 7;
+        _speed:=i and 127;
       fReadCoord(pStream,_start,_row);
       _left:=fReadByte(pStream);
       _right:=fReadByte(pStream);
@@ -581,7 +581,7 @@ begin
     if _speed<0 then
       b:=abs(_speed)
     else
-      b:=8+_speed;
+      b:=128+_speed;
     fWriteByte(pStream,b);
     fWriteCoord(pStream,_start,_row);
     fWriteByte(pStream,_left);
@@ -606,6 +606,7 @@ function TMap.fReadString(pStream:TStream):string;
 var i:integer;
 begin
   i:=fReadByte(pStream);
+  Result:=#0;
   SetLength(Result,i);
   pStream.Read(Result[1],i);
 end;

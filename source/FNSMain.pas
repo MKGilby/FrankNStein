@@ -59,7 +59,7 @@ begin
     WINDOWHEIGHT,
     LOGICALWINDOWWIDTH,
     LOGICALWINDOWHEIGHT,
-    Format('Frank N Stein Refurbished V%s (%s)',[iVersion,replace(iBuildDate,'/','.')]));
+    Format('Frank N Stein Refurbished V%s (%s)',[iVersion,StringReplace(iBuildDate,'/','.',[rfReplaceAll])]));
 
   Controller:=FindController;
 

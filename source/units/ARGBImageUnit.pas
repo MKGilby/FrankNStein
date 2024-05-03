@@ -5,7 +5,7 @@
 // You can freely distribute the sources.
 //
 // Written by Gilby/MKSZTSZ
-// Hungary, 2017-2023
+// Hungary, 2017-2024
 // ------------------------------------------------------------------
 
 // Version info:
@@ -115,6 +115,8 @@
 //   1.27 - Gilby - 2023.12.05
 //     + Added Resize, it changes changes the image resolution but keeps the image
 //       either cut to size (shrinking) or padded with empty space (enlarging).
+//   1.28 - Gilby - 2024.04.24
+//     * Changed MKToolBox.Replace to SysUtils.StringReplace.
 
 
 {$ifdef fpc}
@@ -372,7 +374,7 @@ uses SysUtils, MKToolBox, Logger, MKStream;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.27';
+  Version='1.28';
   POSTPROCESSCOLOR=$00FF00FF;  // Fully transparent magenta is the magic color!
 
 var
@@ -1403,7 +1405,7 @@ begin
   Log.LogDebug('Starting...',Istr);
   Log.LogDebug('Transformation string: '+iTransform,Istr);
   d:=CountChar('D',iTransform);
-  iTransform:=replace(iTransform,'D','');
+  iTransform:=StringReplace(iTransform,'D','',[rfReplaceAll]);
   Log.LogDebug('Size: '+inttostr(fWidth)+'x'+inttostr(fHeight),Istr);
   if fAnimations.Count>0 then begin
     Log.LogWarning('Transforming animated images no longer supported.',Istr);

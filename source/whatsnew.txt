@@ -1,3 +1,9 @@
+2024.05.03 - Build 12
+- Added third monster animation. (Double wheel at bottom of the first map.)
+- Updated mkconv2 tool.
+- Updated used units.
+- Animations are added from JSON files during preparation.
+
 2024.04.18 - Build 11
 - Fixed snake animation.
 - Updated mkconv2 tool.
