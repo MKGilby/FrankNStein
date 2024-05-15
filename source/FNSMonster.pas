@@ -5,7 +5,7 @@ unit FNSMonster;
 interface
 
 uses
-  SysUtils, FNSMap, Animation2Unit, fgl;
+  SysUtils, FNSJsonMap, Animation2Unit, fgl;
 
 type
 
@@ -42,17 +42,17 @@ uses FNSShared;
 
 constructor TMonster.Create(iMonsterData:TMonsterData);
 begin
-  fX:=iMonsterData._start*8;
+  fX:=iMonsterData._start;
   fY:=iMonsterData._row*8;
-  fMin:=iMonsterData._left*8+4;
-  fMax:=iMonsterData._right*8-4;
+  fMin:=iMonsterData._left;
+  fMax:=iMonsterData._right;
   fSpeed:=iMonsterData._speed;
   if fSpeed>0 then fDir:=1
   else if fSpeed<0 then fDir:=-1
   else fDir:=0;
   fSpeed:=abs(fSpeed);
-  fAnimLeft:=MM.Animations.ItemByName[Format('Mons%.2dLeft',[iMonsterData._imageindex])].SpawnAnimation;
-  fAnimRight:=MM.Animations.ItemByName[Format('Mons%.2dRight',[iMonsterData._imageindex])].SpawnAnimation;
+  fAnimLeft:=MM.Animations.ItemByName[Format('Mons%.2dLeft',[iMonsterData._animationindex])].SpawnAnimation;
+  fAnimRight:=MM.Animations.ItemByName[Format('Mons%.2dRight',[iMonsterData._animationindex])].SpawnAnimation;
 end;
 
 destructor TMonster.Destroy;

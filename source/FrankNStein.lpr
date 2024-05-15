@@ -16,7 +16,7 @@ uses
   // For reading PNG files in TARGBImage
   ARGBImagePNGReaderUnit,
   // The game itself.
-  FNSMain;
+  FNSMain, FNSJsonMap;
 
 const
   BDATE={$i %DATE%};

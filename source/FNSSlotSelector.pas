@@ -97,7 +97,7 @@ begin
   if fIsUsed then begin
     Print('Purple','MAPS:',SLOTMARGIN,2,0);
     // We write mapcount-1 because the congratulations map is not counted.
-    Print('Yellow',Format('%d/%d',[fCompletedMapCount,Maps.Count-1]),SLOTWIDTH-SLOTMARGIN,3,2);
+    Print('Yellow',Format('%d/%d',[fCompletedMapCount,1{Maps.Count-1}]),SLOTWIDTH-SLOTMARGIN,3,2);
     Print('Purple','LAST',SLOTMARGIN,5,0);
     Print('Purple','PLAYED:',SLOTWIDTH-SLOTMARGIN,6,2);
     Print('Yellow',fLastDate,SLOTWIDTH div 2,7,1);

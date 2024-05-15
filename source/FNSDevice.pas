@@ -10,14 +10,14 @@ unit FNSDevice;
 interface
 
 uses
-  SysUtils, AnimatedSprite2Unit, mk_sdl2, Animation2Unit;
+  SysUtils, AnimatedSprite2Unit, mk_sdl2, Animation2Unit, FNSJsonMap;
 
 type
 
   { TDevice }
 
   TDevice=class
-    constructor Create(iMapNo:integer);
+    constructor Create(iMap:TJSONMap);
     destructor Destroy; override;
     procedure Draw;
     procedure Move(pTimeUsed:double);
@@ -33,7 +33,7 @@ type
 
 implementation
 
-uses FNSShared, FNSMap, Logger;
+uses FNSShared, Logger;
 
 const
   DEVICEINNERLEFT=28*8;
@@ -41,8 +41,8 @@ const
 
 { TDevice }
 
-constructor TDevice.Create(iMapNo:integer);
-var i,pc:integer;
+constructor TDevice.Create(iMap:TJSONMap);
+var i,j,pc:integer;
 begin
   fNextPiece:=0;
   fSkeleton[0]:=TAnimatedSprite.Create(DEVICEINNERLEFT+4,DEVICEINNERTOP,
@@ -60,15 +60,13 @@ begin
   fSkeleton[6]:=TAnimatedSprite.Create(DEVICEINNERLEFT+8,DEVICEINNERTOP+24,
     MM.Animations.ItemByName['Skeleton7'].SpawnAnimation);
   pc:=0;
-  for i:=0 to Maps[iMapNo].BlockCount-1 do with Maps[iMapNo].BlockData[i] do begin
-    Log.Trace(Format('%d. %d',[i,ord(_type)]));
-    if _type=btPiece then begin
-      if pc=7 then raise Exception.Create('Too many skeleton pieces is map!');
-      fPieces[pc]:=TAnimatedSprite.Create(_x*8-1,_y*8,
-        MM.Animations.ItemByName[Format('Piece%d',[pc+1])].SpawnAnimation);
-      inc(pc);
-    end;
-  end;
+  for pc:=0 to 6 do
+    for j:=0 to MAPHEIGHTINBLOCKS-1 do
+      for i:=0 to MAPWIDTHINBLOCKS-1 do
+        if iMap.TileMap.Tiles[i,j]=TILE_PIECE+pc then begin
+          fPieces[pc]:=TAnimatedSprite.Create(i*8-1,j*8,
+            MM.Animations.ItemByName[Format('Piece%d',[pc+1])].SpawnAnimation);
+        end;
   fPieces[0].Animation.Timer.Paused:=false;
   fOverlay:=MM.Animations.ItemByName['DeviceOverlay'].SpawnAnimation;
 end;

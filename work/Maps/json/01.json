@@ -1,0 +1,67 @@
+{
+  "Type" : "Construction",
+  "Author" : "Colin Stewart",
+  "Name" : "Original Map 01",
+  "TileRows" : [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "    L>",
+    "     L>",
+    "       ---1---:",
+    "",
+    "",
+    "          --:---2-",
+    "         </",
+    "        </",
+    "   6----        7:------------^3",
+    "                              |",
+    "                              |",
+    " -()--------!----4----:       |",
+    "                              v",
+    "",
+    "",
+    "5------:----------:------!-----:",
+    ""
+  ],
+  "WallTileNo" : 2,
+  "Monsters" : [
+    { "Row" : 12,
+      "Left" : 120,
+      "Right" : 240,
+      "Start" : 120,
+      "PPS" : 20,
+      "AnimationNo" : 2
+    },
+    { "Row" : 15,
+      "Left" : 8,
+      "Right" : 168,
+      "Start" : 8,
+      "PPS" : 5,
+      "AnimationNo" : 1
+    },
+    { "Row" : 19,
+      "Left" : 0,
+      "Right" : 238,
+      "Start" : 0,
+      "PPS" : 8,
+      "AnimationNo" : 3
+    }
+  ],
+  "Decorations" : [
+    { "Type" : "window",
+      "Left" : 3,
+      "Top" : 8
+    },
+    { "Type" : "window",
+      "Left" : 20,
+      "Top" : 8
+    },
+    { "Type" : "window",
+      "Left" : 26,
+      "Top" : 8
+    }
+  ]
+}

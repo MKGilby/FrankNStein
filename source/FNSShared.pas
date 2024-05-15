@@ -9,7 +9,7 @@ unit FNSShared;
 
 interface
 
-uses MediaManagerUnit, sdl2, FNSVMU, FNSMap, FNSSpring;
+uses MediaManagerUnit, sdl2, FNSVMU, FNSSpring;
 
 const
   LOGICALWINDOWWIDTH=256;
@@ -22,6 +22,8 @@ const
      (64,36,54)    // Active slot background color
   );
   MAXSLOTS=3;
+  MAPWIDTHINBLOCKS=32;
+  MAPHEIGHTINBLOCKS=22;
   MAPTYPECONSTRUCTING=0;
   MAPTYPEINTERIMORIGINAL=1;
   MAPTYPEINTERIMREBOOTED=2;
@@ -48,7 +50,7 @@ var
   MM:TMediaManager;
   Controller:PSDL_GameController;
   VMU:TVMU;
-  Maps:TMapList;
+//  Maps:TMapList;
   Springs:TSprings;
 
 procedure LoadAssets;
@@ -91,11 +93,11 @@ begin
   MM.Load('tiles.png','Tiles');
   Log.LogStatus('  Music...');
   MM.LoadMusic('music\rb_theme.mo3','Main');
-  Log.LogStatus('  Maps...');
-  Maps:=TMapList.Create('maps.bin');
+//  Log.LogStatus('  Maps...');
+//  Maps:=TMapList.Create('maps.bin');
   Log.LogStatus('Loading VMU...');
   VMU:=TVMU.Create;
-  VMU.MapCount:=Maps.Count;
+  VMU.MapCount:=1 {Maps.Count};
   Log.LogStatus('Creating common classes...');
   Springs:=TSprings.Create;
 end;
@@ -107,7 +109,7 @@ begin
   Log.LogStatus('Freeing VMU...');
   if Assigned(VMU) then VMU.Free;
   Log.LogStatus('Freeing assets...');
-  if Assigned(Maps) then Maps.Free;
+//  if Assigned(Maps) then Maps.Free;
   if Assigned(MM) then MM.Free;
 end;
 

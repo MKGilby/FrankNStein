@@ -1,3 +1,8 @@
+2024.05.15 - Build 13
+- Map data is stored in JSON format, so no preprocessing needed for them.
+- Monster data is now stores speed in pixels/sec, and horizontal coordinates are
+  in pixels instead of blocks.
+
 2024.05.03 - Build 12
 - Added third monster animation. (Double wheel at bottom of the first map.)
 - Updated mkconv2 tool.

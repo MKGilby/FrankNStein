@@ -71,7 +71,7 @@ begin
 
   fStartScreen:=TStartScreen.Create;
   fSlotSelector:=TSlotSelector.Create;
-  fMapSelect:=TMapSelect.Create(0);
+  fMapSelect:=TMapSelect.Create(1);
 end;
 
 destructor TMain.Destroy;

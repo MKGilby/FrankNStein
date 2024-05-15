@@ -10,7 +10,7 @@ unit FNSPlay1Map;
 interface
 
 uses
-  SysUtils, FNSMapStatic, FNSDevice, FNSProf, FNSSpring, FNSMonster;
+  SysUtils, FNSDevice, FNSProf, FNSSpring, FNSMonster, FNSJsonMap;
 
 type
 
@@ -23,7 +23,7 @@ type
     procedure Move(pTimeUsed:double);
   private
 //    fCurrentMapNo:integer;
-    fMapStatic:TMapStatic;
+    fMap:TJSONMap;
     fDevice:TDevice;
     fProf:TProf;
     fMonsters:TMonsters;
@@ -39,12 +39,12 @@ uses FNSShared;
 constructor TPlay1Map.Create(iMapNo: integer);
 var i:integer;
 begin
-  fMapStatic:=TMapStatic.Create(iMapNo);
-  fDevice:=TDevice.Create(iMapNo);
-  fProf:=TProf.Create(fMapStatic.TileMap,fDevice);
+  fMap:=TJSONMap.Create(iMapNo,false);
+  fDevice:=TDevice.Create(fMap);
+  fProf:=TProf.Create(fMap.TileMap,fDevice);
   fMonsters:=TMonsters.Create;
-  for i:=0 to Maps[iMapNo].MonsterCount-1 do
-    fMonsters.AddMonster(Maps[iMapNo].MonsterData[i]);
+  for i:=0 to fMap.MonsterCount-1 do
+    fMonsters.AddMonster(fMap.MonsterData[i]);
 end;
 
 destructor TPlay1Map.Destroy;
@@ -52,13 +52,13 @@ begin
   if Assigned(fMonsters) then fMonsters.Free;
   if Assigned(fProf) then fProf.Free;
   if Assigned(fDevice) then fDevice.Free;
-  if Assigned(fMapStatic) then fMapStatic.Free;
+  if Assigned(fMap) then fMap.Free;
   inherited Destroy;
 end;
 
 procedure TPlay1Map.Draw;
 begin
-  fMapStatic.Draw;
+  fMap.Draw;
   fDevice.Draw;
   Springs.Draw;
   fMonsters.Draw;

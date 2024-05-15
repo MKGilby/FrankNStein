@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="9"/>
-      <BuildNr Value="12"/>
+      <BuildNr Value="13"/>
       <StringTable CompanyName="MKSZTSZ"/>
     </VersionInfo>
     <BuildModes>
@@ -125,15 +125,7 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="FNSMapStatic.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
         <Filename Value="FNSMapSelect.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSMap.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
@@ -154,6 +146,10 @@
       </Unit>
       <Unit>
         <Filename Value="FNSMonster.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="FNSJsonMap.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
