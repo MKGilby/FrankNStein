@@ -5,10 +5,11 @@
       "Width" : 10,
       "Height" : 16,
       "HotPoint" : { "x" : 0, "y" : 0 },
-      "FrameDelay" : 0,
+      "FrameDelay" : 4,
       "LoopDelay" : 0,
       "StartFrame" : 0,
-      "Paused" : true,
+      "Paused" : false,
+      "Looped" : true,
       "Frames" :
         [
           { "x" : 0, "y" : 0 },
@@ -26,10 +27,11 @@
       "Width" : 10,
       "Height" : 16,
       "HotPoint" : { "x" : 0, "y" : 0 },
-      "FrameDelay" : 0,
+      "FrameDelay" : 4,
       "LoopDelay" : 0,
       "StartFrame" : 0,
-      "Paused" : true,
+      "Paused" : false,
+      "Looped" : true,
       "Frames" :
         [
           { "x" : 50, "y" : 0 },

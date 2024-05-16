@@ -1,3 +1,7 @@
+2024.05.16 - Build 14
+- Prof is animated again in SlotSelector.
+- Picked up pieces are floating to their place.
+
 2024.05.15 - Build 13
 - Map data is stored in JSON format, so no preprocessing needed for them.
 - Monster data is now stores speed in pixels/sec, and horizontal coordinates are

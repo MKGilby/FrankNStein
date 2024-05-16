@@ -1,7 +1,7 @@
 { "Animations" : [
   { "Type" : "TimeBased",
     "Name" : "Mons03Right",
-    "Width" : 18,
+    "Width" : 16,
     "Height" : 8,
     "HotPoint" : { "x" : 0, "y" : 0 },
     "FPS" : 4,
@@ -11,15 +11,15 @@
     "RandomStart" : true,
     "Frames" : [
       { "x" : 0, "y" : 0 },
-      { "x" : 18, "y" : 0 },
-      { "x" : 36, "y" : 0 },
-      { "x" : 54, "y" : 0 },
-      { "x" : 72, "y" : 0 },
-      { "x" : 90, "y" : 0 }
+      { "x" : 16, "y" : 0 },
+      { "x" : 32, "y" : 0 },
+      { "x" : 48, "y" : 0 },
+      { "x" : 64, "y" : 0 },
+      { "x" : 80, "y" : 0 }
     ] },
   { "Type" : "TimeBased",
     "Name" : "Mons03Left",
-    "Width" : 18,
+    "Width" : 16,
     "Height" : 8,
     "HotPoint" : { "x" : 0, "y" : 0 },
     "FPS" : 4,
@@ -28,11 +28,11 @@
     "Looped" : true,
     "RandomStart" : true,
     "Frames" : [
-      { "x" : 90, "y" : 0 },
-      { "x" : 72, "y" : 0 },
-      { "x" : 54, "y" : 0 },
-      { "x" : 36, "y" : 0 },
-      { "x" : 18, "y" : 0 },
+      { "x" : 80, "y" : 0 },
+      { "x" : 64, "y" : 0 },
+      { "x" : 48, "y" : 0 },
+      { "x" : 32, "y" : 0 },
+      { "x" : 16, "y" : 0 },
       { "x" : 0, "y" : 0 }
     ] }
 ] }

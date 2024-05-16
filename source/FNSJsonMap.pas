@@ -78,6 +78,18 @@ type
     property DecorationCount:integer read fGetDecorationCount;
   end;
 
+  { TMapList }
+
+  TMapList=class(TStringList)
+    procedure Load;
+  private
+    function fGetMapName(index:integer):string;
+    function fGetAuthor(index:integer):string;
+  public
+    property MapNames[index:integer]:string read fGetMapName;
+    property Authors[index:integer]:string read fGetAuthor;
+  end;
+
 implementation
 
 uses MKStream, FNSShared, MKToolbox;
@@ -404,6 +416,38 @@ end;
 function TJSONMap.fGetDecorationCount:integer;
 begin
   Result:=length(fDecorations);
+end;
+
+{ TMapList }
+
+procedure TMapList.Load;
+var i:integer;map:TJSONMap;
+begin
+  i:=1;
+  while MKStreamOpener.FileExists(Format('maps\%.2d.json',[i])) do begin
+    map:=TJSONMap.Create(i);
+    Add(Format('%s=%s',[map.Name,map.Author]));
+    map.Free;
+    inc(i);
+  end;
+end;
+
+function TMapList.fGetMapName(index:integer):string;
+begin
+  dec(index);  // Maps go 1..n, list goes 0..n-1
+  if (index>=0) and (index<Count) then
+    Result:=Names[index]
+  else
+    Result:='N/A';
+end;
+
+function TMapList.fGetAuthor(index:integer):string;
+begin
+  dec(index);  // Maps go 1..n, list goes 0..n-1
+  if (index>=0) and (index<Count) then
+    Result:=ValueFromIndex[index]
+  else
+    Result:='N/A';
 end;
 
 end.

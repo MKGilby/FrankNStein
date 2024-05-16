@@ -9,7 +9,7 @@ unit FNSShared;
 
 interface
 
-uses MediaManagerUnit, sdl2, FNSVMU, FNSSpring;
+uses MediaManagerUnit, sdl2, FNSVMU, FNSSpring, FNSJsonMap;
 
 const
   LOGICALWINDOWWIDTH=256;
@@ -50,7 +50,7 @@ var
   MM:TMediaManager;
   Controller:PSDL_GameController;
   VMU:TVMU;
-//  Maps:TMapList;
+  MapList:TMapList;
   Springs:TSprings;
 
 procedure LoadAssets;
@@ -85,6 +85,7 @@ begin
   MM.Load('spectrum.png','Speccy',MM_CREATETEXTUREONLY);
   Log.LogStatus('  Sprites...');
   MM.Load('sprites.png','Sprites');
+  MM.Load('msprites.png','MaskedSprites',MM_CREATEMASKFORANIMATIONFRAMES);
   Log.LogStatus('  Decorations...');
   MM.Load('backwall.png','Stones');
   MM.Load('decorations.png','Decorations');
@@ -93,11 +94,12 @@ begin
   MM.Load('tiles.png','Tiles');
   Log.LogStatus('  Music...');
   MM.LoadMusic('music\rb_theme.mo3','Main');
-//  Log.LogStatus('  Maps...');
-//  Maps:=TMapList.Create('maps.bin');
+  Log.LogStatus('  Maps metadata...');
+  MapList:=TMapList.Create;
+  MapList.Load;
   Log.LogStatus('Loading VMU...');
   VMU:=TVMU.Create;
-  VMU.MapCount:=1 {Maps.Count};
+  VMU.MapCount:=MapList.Count;
   Log.LogStatus('Creating common classes...');
   Springs:=TSprings.Create;
 end;
@@ -109,7 +111,7 @@ begin
   Log.LogStatus('Freeing VMU...');
   if Assigned(VMU) then VMU.Free;
   Log.LogStatus('Freeing assets...');
-//  if Assigned(Maps) then Maps.Free;
+  if Assigned(MapList) then MapList.Free;
   if Assigned(MM) then MM.Free;
 end;
 

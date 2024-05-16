@@ -1,4 +1,7 @@
+; masked sprites
 m createatlas 320 200 1 2
+; non masked sprites
+m createatlas 320 200 1 4
 
 r png data\prof.png 1
 m setcolorkey 0 0 0 1
@@ -6,18 +9,18 @@ r json data\player.json 1
 m addall 1 2
 
 r png skeletonsprite.png 1
-m addall 1 2
+m addall 1 4
 
 r png data\spring.png 1
 m setcolorkey 0 0 0 1
 r json data\spring.json 1
-m addall 1 2
+m addall 1 4
 
 r png data\deviceoverlay.png 1
 m create 16 8 3
 m copyto 0 0 16 8 0 0 1 3
 m addframebasedanim DeviceOverlay 16 8 1 0 0 0 4  0 0  3
-m addall 3 2
+m addall 3 4
 
 r png data\mons01.png 1
 m setcolorkey 0 0 0 1
@@ -35,7 +38,9 @@ r json data\mons03.json 1
 m addall 1 2
 
 m crop2 2
-w png sprites.png 2
+w png msprites.png 2
+m crop2 4
+w png sprites.png 4
 
 r png data\tiles.png 1
 m setcolorkey 0 0 0 1
