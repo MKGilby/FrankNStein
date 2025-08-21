@@ -1,3 +1,10 @@
+2025.08.21 - Build 15
+- Added electro-meter gfx. No needle yet.
+- Updated used units.
+- "Press .. to start" flashing is synced to music. (At least on my machine.)
+- Slot selector "remembers" last used slot.
+- Small reworks here and there.
+
 2024.05.16 - Build 14
 - Prof is animated again in SlotSelector.
 - Picked up pieces are floating to their place.

@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="9"/>
-      <BuildNr Value="14"/>
+      <BuildNr Value="15"/>
       <StringTable CompanyName="MKSZTSZ"/>
     </VersionInfo>
     <BuildModes>
@@ -150,6 +150,10 @@
       </Unit>
       <Unit>
         <Filename Value="FNSJsonMap.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="FNSMeter.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>

@@ -13,12 +13,14 @@ const
                                                    rendering to texture *}
 
 type
+  PPSDL_RendererFlags = ^PSDL_RendererFlags;
   PSDL_RendererFlags = ^TSDL_RendererFlags;
   TSDL_RendererFlags = Word;
 
   {**
    *  Information on the capabilities of a render driver or context.
    *}
+  PPSDL_RendererInfo = ^PSDL_RendererInfo;
   PSDL_RendererInfo = ^TSDL_RendererInfo;
   TSDL_RendererInfo = record  
     name: PAnsiChar;                         {**< The name of the renderer *}
@@ -29,6 +31,7 @@ type
     max_texture_height: cint32;              {**< The maximimum texture height *}
   end;
 
+  PPSDL_Vertex = ^PSDL_Vertex;
   PSDL_Vertex = ^TSDL_Vertex;
   TSDL_Vertex = record
     position: TSDL_FPoint;
@@ -39,6 +42,7 @@ type
 {**
  * The scaling mode for a texture.
  *}
+  PPSDL_ScaleMode = ^PSDL_ScaleMode;
   PSDL_ScaleMode = ^TSDL_ScaleMode;
   TSDL_ScaleMode = type cint;
 
@@ -51,6 +55,7 @@ const
    *  The access pattern allowed for a texture.
    *}
 type
+  PPSDL_TextureAccess = ^PSDL_TextureAccess;
   PSDL_TextureAccess = ^TSDL_TextureAccess;
   TSDL_TextureAccess = type cint;
 
@@ -63,6 +68,7 @@ type
   {**
    *  The texture channel modulation used in SDL_RenderCopy().
    *}
+  PPSDL_TextureModulate = ^PSDL_TextureModulate;
   PSDL_TextureModulate = ^TSDL_TextureModulate;
   TSDL_TextureModulate = type cint;
 
@@ -71,13 +77,18 @@ const
   SDL_TEXTUREMODULATE_COLOR = TSDL_TextureModulate(1); {**< srcC = srcC * color *}
   SDL_TEXTUREMODULATE_ALPHA = TSDL_TextureModulate(2); {**< srcA = srcA * alpha *}
 
+type
   {**
    *  Flip constants for SDL_RenderCopyEx
    *}
+  PPSDL_RenderFlip = ^PSDL_RenderFlip;
+  PSDL_RenderFlip = ^TSDL_RenderFlip;
+  TSDL_RenderFlip = type cint;
+
 const
-  SDL_FLIP_NONE       = $0; {**< Do not flip *}
-  SDL_FLIP_HORIZONTAL = $1; {**< flip horizontally *}
-  SDL_FLIP_VERTICAL   = $2; {**< flip vertically *}
+  SDL_FLIP_NONE       = TSDL_RenderFlip($0); {**< Do not flip *}
+  SDL_FLIP_HORIZONTAL = TSDL_RenderFlip($1); {**< flip horizontally *}
+  SDL_FLIP_VERTICAL   = TSDL_RenderFlip($2); {**< flip vertically *}
 
 type
   {**
@@ -85,16 +96,13 @@ type
    *}
 
   PPSDL_Renderer = ^PSDL_Renderer;
-  PSDL_Renderer = ^TSDL_Renderer;
-  TSDL_Renderer = record
-    end;
+  PSDL_Renderer = type Pointer;
 
   {**
    *  An efficient driver-specific representation of pixel data
    *}
-  PSDL_Texture = ^TSDL_Texture;
-  TSDL_Texture = record
-    end;
+  PPSDL_Texture = ^PSDL_Texture;
+  PSDL_Texture = type Pointer;
 
   {* Function prototypes *}
 
@@ -373,9 +381,7 @@ function SDL_UpdateTexture(texture: PSDL_Texture; rect: PSDL_Rect; pixels: Point
    *
    *   SDL_UnlockTexture()
    *}
-//function SDL_LockTexture(texture: PSDL_Texture; const rect: PSDL_Rect; pixels: PPointer; pitch: pcint): cint; cdecl;
-//     external SDL_LibName {$IFDEF DELPHI} {$IFDEF MACOS} name '_SDL_LockTexture' {$ENDIF} {$ENDIF};
-function SDL_LockTexture(texture: PSDL_Texture; const rect: PSDL_Rect; out pixels: Pointer; out pitch: cint): cint; cdecl;
+function SDL_LockTexture(texture: PSDL_Texture; const rect: PSDL_Rect; pixels: PPointer; pitch: pcint): cint; cdecl;
      external SDL_LibName {$IFDEF DELPHI} {$IFDEF MACOS} name '_SDL_LockTexture' {$ENDIF} {$ENDIF};
 
 {**
@@ -888,7 +894,7 @@ function SDL_RenderCopyF(renderer: PSDL_Renderer; texture: PSDL_Texture; srcrect
    *
    *   0 on success, or -1 on error
    *}
-function SDL_RenderCopyEx(renderer: PSDL_Renderer; texture: PSDL_Texture; const srcrect: PSDL_Rect; dstrect: PSDL_Rect; angle: Double; center: PSDL_Point; flip: cint): cint32 cdecl; external SDL_LibName {$IFDEF DELPHI} {$IFDEF MACOS} name '_SDL_RenderCopyEx' {$ENDIF} {$ENDIF};
+function SDL_RenderCopyEx(renderer: PSDL_Renderer; texture: PSDL_Texture; const srcrect: PSDL_Rect; dstrect: PSDL_Rect; angle: cdouble; center: PSDL_Point; flip: TSDL_RenderFlip): cint32 cdecl; external SDL_LibName {$IFDEF DELPHI} {$IFDEF MACOS} name '_SDL_RenderCopyEx' {$ENDIF} {$ENDIF};
 
   {**
    *  Copy a portion of the source texture to the current rendering target, rotating it by angle around the given center
@@ -903,7 +909,7 @@ function SDL_RenderCopyEx(renderer: PSDL_Renderer; texture: PSDL_Texture; const 
    *
    *    0 on success, or -1 on error
    *}
-function SDL_RenderCopyExF(renderer: PSDL_Renderer; texture: PSDL_Texture; const srcrect: PSDL_Rect; dstrect: PSDL_FRect; angle: Double; center: PSDL_FPoint; flip: cint): cint32 cdecl;
+function SDL_RenderCopyExF(renderer: PSDL_Renderer; texture: PSDL_Texture; const srcrect: PSDL_Rect; dstrect: PSDL_FRect; angle: cdouble; center: PSDL_FPoint; flip: TSDL_RenderFlip): cint32 cdecl;
   external SDL_LibName {$IFDEF DELPHI} {$IFDEF MACOS} name '_SDL_RenderCopyExF' {$ENDIF} {$ENDIF};
 
 {**

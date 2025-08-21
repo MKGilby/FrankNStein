@@ -45,6 +45,10 @@ const
   // If one game loop uses more than this time, consider it lag and skip it.
   MINLAG=1;
 
+  RES_TERMINATE=-1;
+  RES_NONE=0;
+  RES_SUCCESS=1;
+
 
 var
   MM:TMediaManager;

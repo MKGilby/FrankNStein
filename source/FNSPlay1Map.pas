@@ -10,7 +10,7 @@ unit FNSPlay1Map;
 interface
 
 uses
-  SysUtils, FNSDevice, FNSProf, FNSSpring, FNSMonster, FNSJsonMap;
+  SysUtils, FNSDevice, FNSProf, FNSSpring, FNSMonster, FNSJsonMap, FNSMeter;
 
 type
 
@@ -27,6 +27,7 @@ type
     fDevice:TDevice;
     fProf:TProf;
     fMonsters:TMonsters;
+    fMeter:TMeter;
     procedure MoveEx(pTimeUsed:double);
   end;
 
@@ -45,10 +46,12 @@ begin
   fMonsters:=TMonsters.Create;
   for i:=0 to fMap.MonsterCount-1 do
     fMonsters.AddMonster(fMap.MonsterData[i]);
+  fMeter:=TMeter.Create;
 end;
 
 destructor TPlay1Map.Destroy;
 begin
+  fMeter.Free;
   if Assigned(fMonsters) then fMonsters.Free;
   if Assigned(fProf) then fProf.Free;
   if Assigned(fDevice) then fDevice.Free;
@@ -60,6 +63,7 @@ procedure TPlay1Map.Draw;
 begin
   fMap.Draw;
   fDevice.Draw;
+  fMeter.Draw;
   Springs.Draw;
   fMonsters.Draw;
   fProf.Draw;
@@ -83,6 +87,7 @@ begin
   fProf.Move(pTimeUsed);
   fDevice.Move(pTimeUsed);
   fMonsters.Move(pTimeUsed);
+  fMeter.Move(pTimeUsed);
 end;
 
 end.

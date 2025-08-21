@@ -39,15 +39,18 @@ type
     fScalingQuality:integer;
     fMapCount:integer;
     fLevelPackID:integer;
+    fLastUsedSlot:integer;
     procedure fSetSoundVolume(value:float);
     procedure fSetMusicVolume(value:float);
     procedure fSetMapCount(value:integer);
+    procedure fSetLastUsedSlot(value:integer);
   public
     FullScreen:boolean;
     property ScalingQuality:integer read fScalingQuality write fScalingQuality;
     property SoundVolume:float read fSoundVolume write fSetSoundVolume;
     property MusicVolume:float read fMusicVolume write fSetMusicVolume;
     property MapCount:integer read fMapCount write fSetMapCount;
+    property LastUsedSlot:integer read fLastUsedSlot write fSetLastUsedSlot;
   end;
 
 implementation
@@ -87,6 +90,7 @@ begin
     FullScreen:=(i and 1=1);
     fScalingQuality:=(i and $06)>>1;
   end;
+  if not ReadData(CFG,CFG,2*sizeof(Float)+1,1,fLastUsedSlot) then fLastUsedSlot:=0;
   fLevelPackID:=LevelPacks.IndexOf(LEVELPACKNAME);
   fMapCount:=-1;
 end;
@@ -99,6 +103,7 @@ begin
   if FullScreen then b:=1 else b:=0;
   b+=fScalingQuality*2;
   WriteData(CFG,CFG,2*sizeof(Float),1,b);
+  WriteData(CFG,CFG,2*sizeof(Float)+1,1,fLastUsedSlot);
   Save(VMUFILENAME);
   inherited Destroy;
 end;
@@ -263,6 +268,11 @@ end;
 procedure TVMU.fSetMapCount(value: integer);
 begin
   if (value<>fMapCount) and (value>0) then fMapCount:=value;
+end;
+
+procedure TVMU.fSetLastUsedSlot(value: integer);
+begin
+  if (value<>fLastUsedSlot) then fLastUsedSlot:=value;
 end;
 
 end.

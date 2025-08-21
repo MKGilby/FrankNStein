@@ -11,8 +11,13 @@ r tga data\device.tga 1
 m setcolorkey 0 0 0 1
 w png device.png 1
 
-r tga data\meter.tga 1
-m setcolorkey 0 0 0 1
-w png meter.png 1
+m createatlas 320 200 1 2
+
+r png data\meter.png 1
+r json data\meter_anim.json 1
+m addall 1 2
+m setcolorkey 0 0 0 2
+m crop2 2
+w png meter.png 2
 
 

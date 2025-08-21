@@ -128,8 +128,8 @@ end;
 function TSlotSelector.Run:integer;
 var i:integer;
 begin
-  Result:=0;
-  fSlots[Result].Active:=true;
+  Result:=RES_NONE;
+  fSlots[VMU.LastUsedSlot].Active:=true;
   ClearKeys;
   repeat
     SDL_SetRenderDrawColor(PrimaryWindow.Renderer,DEFAULTCOLORS[0,0],DEFAULTCOLORS[0,1],DEFAULTCOLORS[0,2],255);
@@ -147,30 +147,29 @@ begin
     end;
     PutTexture(57,8,MM.Textures.ItemByName['Logo']);
     for i:=0 to 2 do fSlots[i].Draw;
-    Flip;
+    FlipNoLimit;
     HandleMessages;
     if (keys[SDL_SCANCODE_LEFT] or controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT])
-        and (Result>0) then begin
-      fSlots[Result].Active:=false;
-      dec(Result);
-      fSlots[Result].Active:=true;
+        and (VMU.LastUsedSlot>0) then begin
+      fSlots[VMU.LastUsedSlot].Active:=false;
+      VMU.LastUsedSlot:=VMU.LastUsedSlot-1;
+      fSlots[VMU.LastUsedSlot].Active:=true;
       keys[SDL_SCANCODE_LEFT]:=false;
       controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT]:=false;
     end;
     if (keys[SDL_SCANCODE_RIGHT] or controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT])
-        and (Result<MAXSLOTS-1) then begin
-      fSlots[Result].Active:=false;
-      inc(Result);
-      fSlots[Result].Active:=true;
+        and (VMU.LastUsedSlot<MAXSLOTS-1) then begin
+      fSlots[VMU.LastUsedSlot].Active:=false;
+      VMU.LastUsedSlot:=VMU.LastUsedSlot+1;
+      fSlots[VMU.LastUsedSlot].Active:=true;
       keys[SDL_SCANCODE_RIGHT]:=false;
       controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT]:=false;
     end;
-  until keys[SDL_SCANCODE_RETURN] or
-        keys[SDL_SCANCODE_SPACE] or
-        keys[SDL_SCANCODE_ESCAPE] or
-        controllerbuttons[SDL_CONTROLLER_BUTTON_A] or
-        controllerbuttons[SDL_CONTROLLER_BUTTON_B];
-  if controllerbuttons[SDL_CONTROLLER_BUTTON_B] or keys[SDL_SCANCODE_ESCAPE] then Result:=-1;
+    if keys[SDL_SCANCODE_RETURN] or keys[SDL_SCANCODE_SPACE] or
+       controllerbuttons[SDL_CONTROLLER_BUTTON_A] then Result:=RES_SUCCESS;
+    if keys[SDL_SCANCODE_ESCAPE] or Terminate or
+       controllerbuttons[SDL_CONTROLLER_BUTTON_B] then Result:=RES_TERMINATE;
+  until Result<>RES_NONE;
   ClearControllerButtons;
 end;
 

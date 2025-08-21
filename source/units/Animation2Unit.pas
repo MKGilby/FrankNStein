@@ -110,7 +110,8 @@ begin
   if (pFrameIndex>=0) and (pFrameIndex<fAnimationTimer.FrameCount) then
     with fAnimationTimer.Frames[pFrameIndex] do PutTexturePart(pX-fAnimationTimer.HotPointX,pY-fAnimationTimer.HotPointY,Left,Top,Width,Height,fTexture)
   else
-    with fAnimationTimer.CurrentFrame do PutTexturePart(pX-fAnimationTimer.HotPointX,pY-fAnimationTimer.HotPointY,Left,Top,Width,Height,fTexture);
+    with fAnimationTimer.CurrentFrame do
+      PutTexturePart(pX-fAnimationTimer.HotPointX,pY-fAnimationTimer.HotPointY,Left,Top,Width,Height,fTexture);
 end;
 
 procedure TAnimation.PutFramePart(tX, tY, sX, sY, sW, sH: integer;
