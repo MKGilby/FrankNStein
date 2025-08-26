@@ -17,7 +17,7 @@ uses
   AnimationDataUnit, FontDataUnit, ARGBImageUnit,
 //  ARGBImageGSDReaderUnit, ARGBImageGSDWriterUnit,
   ARGBImagePNGReaderUnit, ARGBImagePNGWriterUnit,
-//  ARGBImageTGAReaderUnit, ARGBImageTGAWriterUnit,
+  ARGBImageTGAReaderUnit, ARGBImageTGAWriterUnit,
 //  ARGBImageCELReaderUnit, ARGBImageCELWriterUnit,
 //  ARGBImageBMPReaderUnit,
   ARGBImageJSONReaderUnit, ARGBImageJSONWriterUnit,

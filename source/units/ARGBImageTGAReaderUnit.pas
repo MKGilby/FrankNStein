@@ -19,6 +19,8 @@
 //     * Following changes in AnimationDataUnit
 //   1.05: Gilby - 2022.07.19
 //     * Fix with ATGAs with zero frames. (It is one frame not zero)
+//   1.06: Gilby - 2023.12.14
+//     * Following changes in AnimationDataUnit
 
 {$ifdef fpc}
   {$mode delphi}
@@ -38,7 +40,7 @@ uses Classes, SysUtils, ARGBImageUnit, MKToolBox, AnimationDataUnit,
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.05';
+  Version='1.06';
 
 procedure ReadTGA24RLE(iSource:TStream;iWidth,iHeight:integer;var p);
 // const Istr=Fstr+'ReadTGARLE24';
