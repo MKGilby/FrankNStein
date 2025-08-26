@@ -21,7 +21,6 @@ const
      (48,24,36),   // Inactive slot background color
      (64,36,54)    // Active slot background color
   );
-  MAXSLOTS=3;
   MAPWIDTHINBLOCKS=32;
   MAPHEIGHTINBLOCKS=22;
   MAPTYPECONSTRUCTING=0;

@@ -3,7 +3,7 @@
 // You can freely distribute the sources
 //
 // Written by Gilby/MKSZTSZ
-// Hungary, 2020
+// Hungary, 2020-2024
 // ------------------------------------------------------------------
 
 // Version info:
@@ -30,6 +30,12 @@
 //   1.09 - Gilby - 2023.12.14
 //     * Following changes in AnimationDataUnit.
 //     * Added new format for ANIM and ANMZ chunks.
+//   1.10 - Gilby - 2024.08.16
+//     * Following changes in FontDataUnit.
+//   1.11 - Gilby - 2024.12.04
+//     * Removing unused variables.
+//   1.12 - Gilby - 2025.04.11
+//     * Following changes in used units.
 
 unit ARGBImagePNGWriterUnit;
 
@@ -53,7 +59,7 @@ uses Classes, SysUtils, ARGBImageUnit, CRC32Unit, FastPaletteUnit,
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.09';
+  Version='1.12';
 
   HEADER=#137#80#78#71#13#10#26#10;
   IHDR:uint32=$52444849; //  #82#68#72#73;
@@ -134,7 +140,7 @@ begin
 end;
 
 procedure WriteAnimations(pTarget:TStream;pAnimations:TAnimationDatas);
-var Xs,ch:TMemoryStream;i,j,f:integer;s:string;b:byte;
+var Xs,ch:TMemoryStream;i,j:integer;b:byte;
 begin
   Xs:=TMemoryStream.Create;
   ch:=TMemoryStream.Create;
@@ -145,7 +151,7 @@ begin
     Xs.Write(b,1);
     j:=pAnimations.Count;
     Xs.Write(j,2);
-    for i:=0 to pAnimations.Count-1 do pAnimations[i].SavetoStream(Xs);
+    for i:=0 to pAnimations.Count-1 do pAnimations.Items[i].SavetoStream(Xs);
     Xs.Position:=0;
     ch.Write(anMZ,4);
     CompressStream(Xs,ch,Xs.Size);
@@ -174,12 +180,12 @@ begin
     for i:=0 to 31 do byte((p+i)^):=0;
     j:=0;
     for i:=0 to 255 do
-      if pFontData.Charboxes[i].w>0 then begin
+      if pFontData.Charboxes[i].Width>0 then begin
         byte((p+i div 8)^):=byte((p+i div 8)^) or ad2[i mod 8];
-        word((p+32+j*8+0)^):=pFontData.CharBoxes[i].x;
-        word((p+32+j*8+2)^):=pFontData.CharBoxes[i].y;
-        word((p+32+j*8+4)^):=pFontData.CharBoxes[i].w;
-        word((p+32+j*8+6)^):=pFontData.CharBoxes[i].h;
+        word((p+32+j*8+0)^):=pFontData.CharBoxes[i].Left;
+        word((p+32+j*8+2)^):=pFontData.CharBoxes[i].Top;
+        word((p+32+j*8+4)^):=pFontData.CharBoxes[i].Width;
+        word((p+32+j*8+6)^):=pFontData.CharBoxes[i].Height;
         inc(j);
       end;
     compress(p^,ch,32+j*8);

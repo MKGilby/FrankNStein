@@ -117,6 +117,30 @@
 //       either cut to size (shrinking) or padded with empty space (enlarging).
 //   1.28 - Gilby - 2024.04.24
 //     * Changed MKToolBox.Replace to SysUtils.StringReplace.
+//   1.29 - Gilby - 2024.08.28
+//     + Added even parameter to Circle and FilledCircle.
+//       If it is set to true, circle will be 1 pixel wider and taller to occupy
+//       an even*even area.
+//   1.30 - Gilby - 2024.09.13
+//     * Bugfix in GetClipBox.
+//     * GetClipBox is now a class static function.
+//   1.31 - Gilby - 2024.09.18
+//     * Bugfix in WeightedMatrix.
+//   1.32 - Gilby - 2025.02.10
+//     * Added Create from another ARGBImage.
+//     * Added RecolorHSV with double type parameters (expecting values in 0..1 range)
+//   1.33 - Gilby - 2025.03.25
+//     * BugFix in FillImage. Used loop variable outside loop.
+//   1.34 - Gilby - 2025.04.03
+//     * Added CropRightBottom. It only crops from right and bottom.
+//       (Suitable for textureatlases)
+//   1.35 - Gilby - 2025.04.09
+//     * Following changes in Lists unit.
+//   1.36 - Gilby - 2025.04.23
+//     * Added FillImagePart. It fills a part of the image with another image.
+//   1.37 - Gilby - 2025.08.07
+//     * Added LoadFromFile and SaveToFile.
+//     * Made WriteFile and ReadFile deprecated.
 
 
 {$ifdef fpc}
@@ -172,13 +196,14 @@ type
     constructor Create; overload;
     constructor Create(iWidth,iHeight:integer); overload;
     constructor Create(iFilename:string); overload;
+    constructor Create(iImage:TARGBImage); overload;
 
     destructor Destroy; override;
 
     // Checks if the two rectangle (1 and 2) overlaps. If yes, gives back the
     // overlapping area in the TClipBox record. If not, gives back -1 in x1
     // of the result.
-    function GetClipBox(x1,y1,w1,h1,x2,y2,w2,h2:integer):TClipBox;
+    class function GetClipBox(x1,y1,w1,h1,x2,y2,w2,h2:integer):TClipBox; static;
 
     // Delete pixels from image where iMask has black (0,0,0) pixels
     // iMask must have the same size as image.
@@ -212,7 +237,10 @@ type
     procedure WeightedMatrix(matrix:TLMatrix);
 
     // Recolors the image to a given HSV value
-    procedure RecolorHSV(h,s,v:integer);
+    procedure RecolorHSV(h,s,v:integer); overload;
+
+    // Recolors the image to a given HSV value (all values must be beetween 0 and 1)
+    procedure RecolorHSV(h,s,v:double); overload;
 
     // Recolors the image to a given RGB value
     procedure RecolorRGB(r,g,b:integer);
@@ -264,12 +292,14 @@ type
     // Draws a circle. (Using Bresenham's circle drawing algorithm.)
     // Fills all channels with given pixel data.
     // Taken from https://www.geeksforgeeks.org/bresenhams-circle-drawing-algorithm/
-    procedure Circle(cx,cy,r:integer;color32:uint32);
+    // Set hack to true if you want the circle's width and height to be an even number.
+    procedure Circle(cx,cy,r:integer;color32:uint32;even:boolean=false);
 
     // Draws a filled circle. (Using Bresenham's circle drawing algorithm.)
     // Fills all channels with given pixel data.
     // Taken from https://www.geeksforgeeks.org/bresenhams-circle-drawing-algorithm/
-    procedure FilledCircle(cx,cy,r:integer;color32:uint32);
+    // Set hack to true if you want the circle's width and height to be an even number.
+    procedure FilledCircle(cx,cy,r:integer;color32:uint32;even:boolean=false);
 
     // Replaces a continuous color patch starting at the selected pixel.
     procedure FloodFill(x,y:integer;color32:uint32);
@@ -277,6 +307,10 @@ type
     // Crops the image to the smallest size possible containing all pixels
     // not equal the given color.
     procedure Crop(r,g,b,a:integer);
+
+    // Crops the image to the smallest size possible containing all pixels
+    // not equal the given color. Only cropping at the right and the bottom.
+    procedure CropRightBottom(r,g,b,a:integer);
 
     // Resizes the image to the given size. Data outside the new dimensions is lost.
     procedure Resize(pNewWidth,pNewHeight:integer);
@@ -308,6 +342,9 @@ type
     // Tilefills the image with another image
     procedure FillImage(pSource:TARGBImage);
 
+    // Tilefills a part of the image with another image
+    procedure FillImagePart(pLeft,pTop,pWidth,pHeight:integer;pSource:TARGBImage);
+
     // Adds padding between frames to avoid artifacts with fullscreen scaling
     procedure AddPadding(pHorizontalFrameCount,pVerticalFrameCount:integer;pR:integer=0;pG:integer=0;pB:integer=0;pA:integer=255);
 
@@ -332,12 +369,19 @@ type
     // (both size and every pixel including alpha)
     function IsIdentical(pOtherImage:TARGBImage):boolean;
 
-    procedure WriteFile(pFilename:string;pFormat:string); overload;
-    procedure WriteFile(pTarget:TStream;pFormat:string); overload;
-    function WriteFile(pFormat:string):TStream; overload;
+    procedure WriteFile(pFilename:string;pFormat:string); overload; deprecated 'Use SaveToFile instead.';
+    procedure WriteFile(pTarget:TStream;pFormat:string); overload; deprecated 'Use SaveToStream instead.';
+    function WriteFile(pFormat:string):TStream; overload; deprecated 'Use SaveToStream instead.';
 
-    procedure ReadFile(iFileName:string); overload;
-    Procedure ReadFile(pStream:TStream;pFileType:string); overload;
+    procedure ReadFile(iFileName:string); overload; deprecated 'Use LoadFromFile instead.';
+    Procedure ReadFile(pStream:TStream;pFileType:string); overload; deprecated 'Use LoadFromStream instead.';
+
+    procedure SaveToFile(pFilename:string;pFormat:string); overload;
+    procedure SaveToStream(pTarget:TStream;pFormat:string); overload;
+    function SaveToStream(pFormat:string):TStream; overload;
+
+    procedure LoadFromFile(iFileName:string); overload;
+    Procedure LoadFromStream(pStream:TStream;pFileType:string); overload;
 
   protected
     fWidth:integer;
@@ -374,7 +418,7 @@ uses SysUtils, MKToolBox, Logger, MKStream;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.28';
+  Version='1.37';
   POSTPROCESSCOLOR=$00FF00FF;  // Fully transparent magenta is the magic color!
 
 var
@@ -417,7 +461,26 @@ end;
 constructor TARGBImage.Create(iFilename:string);
 begin
   Create;
-  ReadFile(iFilename);
+  LoadFromFile(iFilename);
+end;
+
+constructor TARGBImage.Create(iImage: TARGBImage);
+var i:integer;
+begin
+  Create(iImage.Width,iImage.Height);
+  move(iImage.Rawdata^,fRawdata^,fWidth*fHeight*4);
+  if Assigned(iImage.FontData) then begin
+    fFontData:=TFontData.Create;
+    fFontData.Assign(iImage.FontData);
+  end;
+  if iImage.Animations.Count>0 then begin
+    for i:=0 to iImage.Animations.Count-1 do
+      if iImage.Animations.Items[i] is TFrameBasedAnimationData then
+        Animations.AddObject(iImage.Animations.Strings[i],TFrameBasedAnimationData(iImage.Animations.Items[i]).Clone())
+      else
+      if iImage.Animations.Items[i] is TTimeBasedAnimationData then
+        Animations.AddObject(iImage.Animations.Strings[i],TTimeBasedAnimationData(iImage.Animations.Items[i]).Clone());
+  end;
 end;
 
 destructor TARGBImage.Destroy;
@@ -428,7 +491,7 @@ begin
   inherited;
 end;
 
-function TARGBImage.GetClipBox(x1,y1,w1,h1,x2,y2,w2,h2:integer):TClipBox;
+class function TARGBImage.GetClipBox(x1,y1,w1,h1,x2,y2,w2,h2:integer):TClipBox;
 begin
   if x1<x2 then begin
     if x1+w1<x2 then begin
@@ -447,7 +510,7 @@ begin
       Result.x1:=0;
       Result.x2:=x1-x2;
       if x1+w1<=x2+w2 then begin
-        Result.wi:=w2;
+        Result.wi:=w1;
       end else begin
         Result.wi:=x2+w2-x1;
       end;
@@ -472,7 +535,7 @@ begin
       Result.y1:=0;
       Result.y2:=y1-y2;
       if y1+h1<=y2+h2 then begin
-        Result.he:=h2;
+        Result.he:=h1;
       end else begin
         Result.he:=y2+h2-y1;
       end;
@@ -721,17 +784,18 @@ begin
       for j:=-1 to 1 do
         for i:=-1 to 1 do
           if (y+j>=0) and (y+j<fHeight) and (x+i>=0) and (x+i<fWidth) then begin
-            r+=byte((s1+(j*fWidth+i)*4)^)*Matrix[i,j];
+            b+=byte((s1+(j*fWidth+i)*4)^)*Matrix[i,j];
             g+=byte((s1+(j*fWidth+i)*4+1)^)*Matrix[i,j];
-            b+=byte((s1+(j*fWidth+i)*4+2)^)*Matrix[i,j];
+            r+=byte((s1+(j*fWidth+i)*4+2)^)*Matrix[i,j];
             w+=Matrix[i,j];
           end;
-      r:=r div w;
-      g:=g div w;
       b:=b div w;
-      byte(s2^):=r;
+      g:=g div w;
+      r:=r div w;
+      byte(s2^):=b;
       byte((s2+1)^):=g;
-      byte((s2+2)^):=b;
+      byte((s2+2)^):=r;
+      byte((s2+3)^):=255;
       inc(s1,4);
       inc(s2,4);
     end;
@@ -746,6 +810,40 @@ begin
   r:=0;g:=0;b:=0;
   HSV2RGB(h,s,v,r,g,b);
   RecolorRGB(r,g,b);
+end;
+
+procedure TARGBImage.RecolorHSV(h, s, v: double);
+var r,g,b,gr:double;
+begin
+  if h<0 then h:=0;
+  if h>1 then h:=1;
+  if s<0 then s:=0;
+  if s>1 then s:=1;
+  if v<0 then v:=0;
+  if v>1 then v:=1;
+  if (h>=0) and (h<1/6) then begin
+    r:=1;          g:=6*h;        b:=0;
+  end else
+  if (h<2/6) then begin
+    r:=1-(6*h-1);  g:=1;          b:=0;
+  end else
+  if (h<3/6) then begin
+    r:=0;          g:=1;          b:=6*h-2;
+  end else
+  if (h<4/6) then begin
+    r:=0;          g:=1-(6*h-3);  b:=1;
+  end else
+  if (h<5/6) then begin
+    r:=6*h-4;      g:=0;          b:=1;
+  end else begin
+    r:=1;          g:=0;          b:=1-(6*h-5);
+  end;
+  gr:=(g*0.3+r*0.59+b*0.11);
+  RecolorRGB(
+    round((gr+(r-gr)*s)*v*255),
+    round((gr+(g-gr)*s)*v*255),
+    round((gr+(b-gr)*s)*v*255)
+  );
 end;
 
 procedure TARGBImage.RecolorRGB(r,g,b:integer);
@@ -1028,7 +1126,7 @@ begin
 end;
 
 // Taken from https://www.geeksforgeeks.org/bresenhams-circle-drawing-algorithm/
-procedure TARGBImage.Circle(cx,cy,r:integer; color32:uint32);
+procedure TARGBImage.Circle(cx,cy,r:integer; color32:uint32; even:boolean);
 
   procedure PutPixel8(x,y:integer);
   begin
@@ -1042,13 +1140,25 @@ procedure TARGBImage.Circle(cx,cy,r:integer; color32:uint32);
     PutPixel(cx-y, cy-x, color32);
   end;
 
+  procedure PutPixel8_even(x,y:integer);
+  begin
+    PutPixel(cx+x,   cy+y,   color32);
+    PutPixel(cx-x-1, cy+y,   color32);
+    PutPixel(cx+x,   cy-y-1, color32);
+    PutPixel(cx-x-1, cy-y-1, color32);
+    PutPixel(cx+y,   cy+x,   color32);
+    PutPixel(cx-y-1, cy+x,   color32);
+    PutPixel(cx+y,   cy-x-1, color32);
+    PutPixel(cx-y-1, cy-x-1, color32);
+  end;
+
 var x,y,d:integer;
 
 begin
   x:=0;
   y:=r;
   d:=3-2*r;
-  PutPixel8(x,y);
+  if not even then PutPixel8(x,y) else PutPixel8_even(x,y);
   while (y>=x) do begin
     inc(x);
     // check for decision parameter and correspondingly update d, x, y
@@ -1057,11 +1167,11 @@ begin
       d:=d+4*(x-y)+10;
     end else
       d:=d+4*x+6;
-    PutPixel8(x,y);
+    if not even then PutPixel8(x,y) else PutPixel8_even(x,y);
   end;
 end;
 
-procedure TARGBImage.FilledCircle(cx,cy,r:integer; color32:uint32);
+procedure TARGBImage.FilledCircle(cx,cy,r:integer; color32:uint32; even:boolean);
 
   procedure CHLine(x,y:integer);
   begin
@@ -1069,14 +1179,14 @@ procedure TARGBImage.FilledCircle(cx,cy,r:integer; color32:uint32);
     HLine(cx-x,cy-y,2*x+1,color32);
     HLine(cx-y,cy+x,2*y+1,color32);
     HLine(cx-y,cy-x,2*y+1,color32);
-{    for i:=-x to +x do begin
-      PutPixel(cx+i,cy+y,color32);
-      PutPixel(cx+i,cy-y,color32);
-    end;
-    for i:=-y to +y do begin
-      PutPixel(cx+i,cy+x,color32);
-      PutPixel(cx+i,cy-x,color32);
-    end;}
+  end;
+
+  procedure CHLine_even(x,y:integer);
+  begin
+    HLine(cx-x-1,cy+y  ,2*x+2,color32);
+    HLine(cx-x-1,cy-y-1,2*x+2,color32);
+    HLine(cx-y-1,cy+x  ,2*y+2,color32);
+    HLine(cx-y-1,cy-x-1,2*y+2,color32);
   end;
 
 var x,y,d:integer;
@@ -1085,7 +1195,7 @@ begin
   x:=0;
   y:=r;
   d:=3-2*r;
-  CHLine(x,y);
+  if not even then CHLine(x,y) else CHLine_even(x,y);
   while (y>=x) do begin
     inc(x);
     // check for decision parameter and correspondingly update d, x, y
@@ -1094,7 +1204,7 @@ begin
       d:=d+4*(x-y)+10;
     end else
       d:=d+4*x+6;
-    CHLine(x,y);
+    if not even then CHLine(x,y) else CHLine_even(x,y);
   end;
 end;
 
@@ -1186,10 +1296,42 @@ begin
   // 3. Copy cropped data to allocated memory
   for j:=0 to h-1 do
     move((fRawData+((y1+j)*fWidth+x1)*4)^,(p+(j*w)*4)^,w*4);
-  // 4. Assign new data to image
+  // 4. Free old image data
   freemem(fRawData);
+  // 5. Assign new data to image
   fRawData:=p;
   // 5. Adjust size
+  fWidth:=w;
+  fHeight:=h;
+end;
+
+procedure TARGBImage.CropRightBottom(r,g,b,a:integer);
+var i,j,x2,y2,w,h:integer;p:pointer;
+begin
+  // 1. Determine smaller image
+  x2:=0;
+  y2:=0;
+  p:=fRawdata;
+  for j:=0 to fHeight-1 do
+    for i:=0 to fWidth-1 do begin
+      if (byte(p^)<>b) or (byte((p+1)^)<>g) or (byte((p+2)^)<>r) or (byte((p+3)^)<>a) then begin
+        if i>x2 then x2:=i;
+        if j>y2 then y2:=j;
+      end;
+      inc(p,4);
+    end;
+  w:=x2+1;
+  h:=y2+1;
+  // 2. Allocate memory for smaller image
+  p:=GetMem(w*h*4);
+  // 3. Copy cropped data to allocated memory
+  for j:=0 to h-1 do
+    move((fRawData+(j*fWidth)*4)^,(p+(j*w)*4)^,w*4);
+  // 4. Free old image data
+  freemem(fRawData);
+  // 5. Assign new data to image
+  fRawData:=p;
+  // 6. Adjust size
   fWidth:=w;
   fHeight:=h;
 end;
@@ -1366,13 +1508,58 @@ begin
     for i:=0 to (Width div pSource.Width)-1 do
       pSource.CopyTo(0,0,pSource.Width,pSource.Height,i*pSource.Width,j*pSource.Height,Self);
     if Width mod pSource.Width>0 then
-      pSource.CopyTo(0,0,Width mod pSource.Width,pSource.Height,i*pSource.Width,j*pSource.Height,Self);
+      pSource.CopyTo(0,0,Width mod pSource.Width,pSource.Height,Width div pSource.Width*pSource.Width,j*pSource.Height,Self);
   end;
   if Height mod pSource.Height>0 then begin
     for i:=0 to (Width div pSource.Width)-1 do
-      pSource.CopyTo(0,0,pSource.Width,Height mod pSource.Height,i*pSource.Width,j*pSource.Height,Self);
+      pSource.CopyTo(0,0,pSource.Width,Height mod pSource.Height,i*pSource.Width,Height div pSource.Height*pSource.Height,Self);
     if Width mod pSource.Width>0 then
-      pSource.CopyTo(0,0,Width mod pSource.Width,Height mod pSource.Height,i*pSource.Width,j*pSource.Height,Self);
+      pSource.CopyTo(0,0,Width mod pSource.Width,Height mod pSource.Height,Width div pSource.Width*pSource.Width,Height div pSource.Height*pSource.Height,Self);
+  end;
+end;
+
+procedure TARGBImage.FillImagePart(pLeft,pTop,pWidth,pHeight:integer;pSource:TARGBImage);
+var i,j:integer;
+begin
+  for j:=0 to (pHeight div pSource.Height)-1 do begin
+    for i:=0 to (pWidth div pSource.Width)-1 do
+      PutImage(
+        pLeft+i*pSource.Width,
+        pTop+j*pSource.Height,
+        pSource);
+//      pSource.CopyTo(0,0,pSource.Width,pSource.Height,pLeft+i*pSource.Width,pTop+j*pSource.Height,Self);
+    if pWidth mod pSource.Width>0 then
+      PutImagePart(
+        pLeft+pWidth div pSource.Width*pSource.Width,
+        pTop+j*pSource.Height,
+        0,
+        0,
+        pWidth mod pSource.Width,
+        pSource.Height,
+        pSource);
+//      pSource.CopyTo(0,0,pWidth mod pSource.Width,pSource.Height,pLeft+pWidth div pSource.Width*pSource.Width,pTop+j*pSource.Height,Self);
+  end;
+  if pHeight mod pSource.Height>0 then begin
+    for i:=0 to (pWidth div pSource.Width)-1 do
+      PutImagePart(
+        pLeft+i*pSource.Width,
+        pTop+pHeight div pSource.Height*pSource.Height,
+        0,
+        0,
+        pSource.Width,
+        pHeight mod pSource.Height,
+        pSource);
+//      pSource.CopyTo(0,0,pSource.Width,pHeight mod pSource.Height,pLeft+i*pSource.Width,pTop+pHeight div pSource.Height*pSource.Height,Self);
+    if pWidth mod pSource.Width>0 then
+      PutImagePart(
+        pLeft+pWidth div pSource.Width*pSource.Width,
+        pTop+pHeight div pSource.Height*pSource.Height,
+        0,
+        0,
+        pWidth mod pSource.Width,
+        pHeight mod pSource.Height,
+        pSource);
+//      pSource.CopyTo(0,0,pWidth mod pSource.Width,pHeight mod pSource.Height,pLeft+pWidth div pSource.Width*pSource.Width,pTop+pHeight div pSource.Height*pSource.Height,Self);
   end;
 end;
 
@@ -1631,58 +1818,91 @@ begin
 end;
 
 procedure TARGBImage.ReadFile(iFileName: string);
-var ext:string;i:integer;s:string;Xs:TStream;
 begin
-  s:=iFilename;
-  if ExtractFileExt(s)='.ZL' then s:=ChangeFileExt(s,'');
-  ext:=uppercase(ExtractFileExt(s));
-  if length(ext)>1 then delete(ext,1,1);
-  i:=ARGBImageReaders.IndexOf(ext);
-  if i=-1 then raise Exception.Create('Extension not recognized! ('+ext+')');
-  Xs:=MKStreamOpener.OpenStream(iFileName);
-  if ARGBImageReaders[i].AffectsImage then begin
-    if (fRawdata<>nil) then Freemem(fRawdata);
-    fAnimations.Clear;
-    if Assigned(fFontData) then FreeAndNil(fFontData);
-  end;
-  ARGBImageReaders[i].proc(Xs,fWidth,fHeight,fRawdata,fAnimations,fFontData);
-  FreeAndNil(Xs);
+  LoadFromFile(iFileName);
 end;
 
 procedure TARGBImage.ReadFile(pStream: TStream; pFileType: string);
-var i:integer;
 begin
-  i:=ARGBImageReaders.IndexOf(uppercase(pFileType));
-  if i=-1 then raise Exception.Create('Filetype not recognized! ('+pFileType+')');
-  if ARGBImageReaders[i].AffectsImage then begin
-    if (fRawdata<>nil) then Freemem(fRawdata);
-    fAnimations.Clear;
-    if Assigned(fFontData) then FreeAndNil(fFontData);
-  end;
-  ARGBImageReaders[i].proc(pStream,fWidth,fHeight,fRawdata,fAnimations,fFontData);
+  LoadFromStream(pStream,pFileType);
 end;
 
 procedure TARGBImage.WriteFile(pFilename:string;pFormat:string);
-var Xs:TStream;
 begin
-  Xs:=TFileStream.Create(pFilename,fmCreate);
-  WriteFile(Xs,pFormat);
-  FreeAndNil(Xs);
+  SaveToFile(pFilename,pFormat);
 end;
 
 procedure TARGBImage.WriteFile(pTarget:TStream;pFormat:string);
-var i:integer;
 begin
-  if ARGBImageWriters.Count=0 then raise Exception.Create('No RawPicture writers are registered!');
-  i:=ARGBImageWriters.IndexOf(pFormat);
-  if i=-1 then raise Exception.Create(pFormat+' writer is not registered!');
-  ARGBImageWriters[i].Proc(pTarget,fWidth,fHeight,fRawdata,fAnimations,fFontData);
+  SaveToStream(pTarget,pFormat);
 end;
 
 function TARGBImage.WriteFile(pFormat:string):TStream;
 begin
+  Result:=SaveToStream(pFormat);
+end;
+
+procedure TARGBImage.SaveToFile(pFilename:string; pFormat:string);
+var Xs:TStream;
+begin
+  Xs:=TFileStream.Create(pFilename,fmCreate);
+  try
+    SaveToStream(Xs,pFormat);
+  finally
+    Xs.Free;
+  end;
+end;
+
+procedure TARGBImage.SaveToStream(pTarget:TStream; pFormat:string);
+var tmp:TARGBImageWriterItem;
+begin
+  if ARGBImageWriters.Count=0 then raise Exception.Create('No ARGBImage writers are registered!');
+  tmp:=ARGBImageWriters[pFormat];
+  if not Assigned(tmp) then raise Exception.Create(pFormat+' writer is not registered!');
+  tmp.Proc(pTarget,fWidth,fHeight,fRawdata,fAnimations,fFontData);
+end;
+
+function TARGBImage.SaveToStream(pFormat:string):TStream;
+begin
   Result:=TMemoryStream.Create;
-  WriteFile(Result,pFormat);
+  SaveToStream(Result,pFormat);
+end;
+
+procedure TARGBImage.LoadFromFile(iFileName:string);
+var ext,s:string;Xs:TStream;tmp:TARGBImageReaderItem;
+begin
+  if ARGBImageReaders.Count=0 then raise Exception.Create('No ARGBImage readers are registered!');
+  s:=iFilename;
+  if ExtractFileExt(s)='.ZL' then s:=ChangeFileExt(s,'');
+  ext:=uppercase(ExtractFileExt(s));
+  if length(ext)>1 then delete(ext,1,1);
+  tmp:=ARGBImageReaders[ext];
+  if not Assigned(tmp) then raise Exception.Create('Extension not recognized! ('+ext+')');
+  Xs:=MKStreamOpener.OpenStream(iFileName);
+  try
+    if tmp.AffectsImage then begin
+      if (fRawdata<>nil) then Freemem(fRawdata);
+      fAnimations.Clear;
+      if Assigned(fFontData) then FreeAndNil(fFontData);
+    end;
+    tmp.proc(Xs,fWidth,fHeight,fRawdata,fAnimations,fFontData);
+  finally
+    Xs.Free;
+  end;
+end;
+
+procedure TARGBImage.LoadFromStream(pStream:TStream; pFileType:string);
+var tmp:TARGBImageReaderItem;
+begin
+  if ARGBImageReaders.Count=0 then raise Exception.Create('No ARGBImage readers are registered!');
+  tmp:=ARGBImageReaders[pFileType];
+  if not Assigned(tmp) then raise Exception.Create('Filetype not recognized! ('+pFileType+')');
+  if tmp.AffectsImage then begin
+    if (fRawdata<>nil) then Freemem(fRawdata);
+    fAnimations.Clear;
+    if Assigned(fFontData) then FreeAndNil(fFontData);
+  end;
+  tmp.proc(pStream,fWidth,fHeight,fRawdata,fAnimations,fFontData);
 end;
 
 procedure RegisterARGBImageReader(pType:string;pProc:TARGBImageFileReaderProc;pAffectsImage:boolean);

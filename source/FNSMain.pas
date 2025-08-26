@@ -22,7 +22,6 @@ type
     procedure Run;
   private
     fMainWindow:TWindow;
-    fSlotSelector:TSlotSelector;
     fMapSelect:TMapSelect;
   end;
 
@@ -68,14 +67,12 @@ begin
 
   LoadAssets;
 
-  fSlotSelector:=TSlotSelector.Create;
   fMapSelect:=TMapSelect.Create(1);
 end;
 
 destructor TMain.Destroy;
 begin
   if Assigned(fMapSelect) then fMapSelect.Free;
-  if Assigned(fSlotSelector) then fSlotSelector.Free;
   FreeAssets;
   if Assigned(fMainWindow) then fMainWindow.Free;
   inherited Destroy;
@@ -84,16 +81,19 @@ end;
 procedure TMain.Run;
 var res:integer;
 begin
-  VMU.SetSlotUsed(0);
-  MM.Musics.ItemByName['Main']._music.Play;
+//  MM.Musics.ItemByName['Main']._music.Play;
   with TStartScreen.Create do try res:=Run; finally Free; end;
   if res=RES_SUCCESS then begin
     repeat
-      res:=fSlotSelector.Run;
-      if res=RES_SUCCESS then fMapSelect.Run;
+      with TSlotSelector.Create do try res:=Run; finally Free; end;
+      if res=RES_SUCCESS then begin
+        VMU.Slots[VMU.Config.LastUsedSlot].IsUsed:=true;
+        VMU.Slots[VMU.Config.LastUsedSlot].UpdateLastUsed;
+        fMapSelect.Run;
+      end;
     until res=RES_TERMINATE;
   end;
-  MM.Musics.ItemByName['Main']._music.Stop;
+//  MM.Musics.ItemByName['Main']._music.Stop;
 end;
 
 end.

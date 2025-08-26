@@ -8,31 +8,34 @@
         <MainUnitHasCreateFormStatements Value="False"/>
         <MainUnitHasTitleStatement Value="False"/>
         <MainUnitHasScaledStatement Value="False"/>
+        <CompatibilityMode Value="True"/>
       </Flags>
       <SessionStorage Value="InProjectDir"/>
-      <Title Value="FrankNStein"/>
+      <Title Value="mkconv2"/>
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
+    <i18n>
+      <EnableI18N LFM="False"/>
+    </i18n>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <AutoIncrementBuild Value="True"/>
-      <MinorVersionNr Value="9"/>
-      <BuildNr Value="16"/>
-      <StringTable CompanyName="MKSZTSZ"/>
+      <MajorVersionNr Value="4"/>
+      <MinorVersionNr Value="22"/>
+      <StringTable CompanyName="MKSZTSZ" ProductName="MKSZTSZ File Converter"/>
     </VersionInfo>
-    <BuildModes>
-      <Item Name="Default" Default="True"/>
-      <Item Name="Debug">
+    <BuildModes Count="3">
+      <Item1 Name="Default" Default="True"/>
+      <Item2 Name="Debug">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
           <Target>
-            <Filename Value="FrankNStein"/>
+            <Filename Value="..\mkconv2"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="units;units\SDL2"/>
+            <OtherUnitFiles Value="units\sdl2"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -52,31 +55,31 @@
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <DebugInfoType Value="dsDwarf3"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
               <UseHeaptrc Value="True"/>
               <TrashVariables Value="True"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>
           </Linking>
-          <Other>
-            <CompilerMessages>
-              <IgnoredMessages idx6058="True" idx3124="True" idx3123="True"/>
-            </CompilerMessages>
-          </Other>
         </CompilerOptions>
-      </Item>
-      <Item Name="Release">
+      </Item2>
+      <Item3 Name="Release">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
           <Target>
-            <Filename Value="FrankNStein"/>
+            <Filename Value="..\mkconv2"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="units;units\SDL2"/>
+            <OtherUnitFiles Value="..\..\source\units"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+            </SyntaxOptions>
+          </Parsing>
           <CodeGeneration>
             <SmartLinkUnit Value="True"/>
             <Optimizations>
@@ -86,101 +89,77 @@
           <Linking>
             <Debugging>
               <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
             </Debugging>
             <LinkSmart Value="True"/>
           </Linking>
+          <Other>
+            <CompilerMessages>
+              <IgnoredMessages idx6058="True" idx3124="True" idx3123="True"/>
+            </CompilerMessages>
+          </Other>
         </CompilerOptions>
-      </Item>
+      </Item3>
+      <SharedMatrixOptions Count="1">
+        <Item1 ID="762203028744" Modes="Debug" Value="-dDebug"/>
+      </SharedMatrixOptions>
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
-      <UseFileFilters Value="True"/>
     </PublishOptions>
     <RunParams>
+      <local>
+        <CommandLineParams Value="testfontjson.mc2"/>
+        <WorkingDirectory Value="b:\Projects\MKConv2\test\"/>
+      </local>
       <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default">
+          <local>
+            <CommandLineParams Value="testfontjson.mc2"/>
+            <WorkingDirectory Value="b:\Projects\MKConv2\test\"/>
+          </local>
+        </Mode0>
+      </Modes>
     </RunParams>
-    <Units>
-      <Unit>
-        <Filename Value="FrankNStein.lpr"/>
+    <Units Count="3">
+      <Unit0>
+        <Filename Value="mkconv2.lpr"/>
         <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSMain.pas"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="CommandsUnit.pas"/>
         <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSShared.pas"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="AnimXMLReader.pas"/>
         <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSSlotSelector.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSStartScreen.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSVMU.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSMapSelect.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSDevice.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSPlay1Map.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSProf.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSSpring.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSMonster.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSJsonMap.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="FNSMeter.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
+      </Unit2>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="FrankNStein"/>
+      <Filename Value="mkconv2"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="units;units\SDL2"/>
+      <OtherUnitFiles Value="B:\Programming\unitsrc\CSVUnits\;B:\Programming\unitsrc\;B:\Programming\unitsrc\MKCompression\;B:\Programming\unitsrc\Datafiles\"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
   </CompilerOptions>
   <Debugging>
-    <Exceptions>
-      <Item>
+    <Exceptions Count="3">
+      <Item1>
         <Name Value="EAbort"/>
-      </Item>
-      <Item>
+      </Item1>
+      <Item2>
         <Name Value="ECodetoolError"/>
-      </Item>
-      <Item>
+      </Item2>
+      <Item3>
         <Name Value="EFOpenError"/>
-      </Item>
+      </Item3>
     </Exceptions>
   </Debugging>
 </CONFIG>

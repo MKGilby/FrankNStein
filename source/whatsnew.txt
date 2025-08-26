@@ -1,3 +1,8 @@
+2025.08.26 - Build 16
+- Added tool sources and build script for them.
+- Reworked VMU (dropped PlayerRegistryUnit).
+- Slot selector updates after coming back from playing.
+
 2025.08.21 - Build 15
 - Added electro-meter gfx. No needle yet.
 - Updated used units.

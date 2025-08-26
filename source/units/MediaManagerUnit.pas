@@ -62,6 +62,12 @@
 //     * Following changes in AnimationDataUnit and Animation2Unit.
 //     * Added Loadfont.
 //     * Added recognising MKR files.
+//  V1.11: Gilby - 2024.08.17
+//     * Change in MKR file handling.
+//  V1.12: Gilby - 2025.03.31
+//     * BUGFIX when using MM_DONTKEEPIMAGE. Animations were freed with the image.
+//  V1.13: Gilby - 2025.08.22
+//     * Following changes in used units.
 
 unit MediaManagerUnit;
 
@@ -92,6 +98,7 @@ type
 
   TAnimationDataWithTexture=class
     constructor Create(iAnimationData:TBaseAnimationData;iTexture:TTexture;iSourceImage:TARGBImage=nil);
+    destructor Destroy; override;
     function SpawnAnimation:TAnimation;
   private
     fAnimationData:TBaseAnimationData;
@@ -148,16 +155,25 @@ uses SysUtils, Logger, Font2Unit, MKToolbox;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.10';
+  Version='1.13';
 
 { TAnimationDataWithTexture }
 
 constructor TAnimationDataWithTexture.Create(iAnimationData: TBaseAnimationData;
   iTexture: TTexture; iSourceImage: TARGBImage=nil);
 begin
-  fAnimationData:=iAnimationData;
+  if iAnimationData is TFrameBasedAnimationData then
+    fAnimationData:=TFrameBasedAnimationData(iAnimationData).Clone
+  else if iAnimationData is TTimeBasedAnimationData then
+    fAnimationData:=TTimeBasedAnimationData(iAnimationData).Clone;
   fTexture:=iTexture;
   fARGBImage:=iSourceImage;
+end;
+
+destructor TAnimationDataWithTexture.Destroy;
+begin
+  fAnimationData.Free;
+  inherited Destroy;
 end;
 
 function TAnimationDataWithTexture.SpawnAnimation: TAnimation;
@@ -209,7 +225,7 @@ begin
   ext:=uppercase(ExtractFileExt(pFilename));
   if length(ext)>1 then delete(ext,1,1);
   if fTreatMP3AsMusic then i:=2 else i:=3;
-  i:=strtoint(decode(ext,Format('PNG,1,TGA,1,BMP,1,CEL,1,GSD,1,MO3,2,MP3,%d,WAV,3,0',[i])));
+  i:=strtoint(decode(ext,Format('PNG,1,TGA,1,BMP,1,CEL,1,GSD,1,MO3,2,MP3,%d,WAV,3,MKR,1,0',[i])));
   case i of
     1:LoadImage(pFilename,pName,pFlags);
     2:LoadMusic(pFilename,pName);
@@ -248,7 +264,10 @@ begin
     atmT:=TStaticTexture.Create(pImage);
     fTextures.AddObject(pImageName,atmT);
     for i:=0 to pImage.Animations.Count-1 do begin
-      atmA:=TAnimationDataWithTexture.Create(pImage.Animations[i],atmT,pImage);
+      if pFlags and MM_DONTKEEPIMAGE=0 then
+        atmA:=TAnimationDataWithTexture.Create(pImage.Animations.Items[i],atmT,pImage)
+      else
+        atmA:=TAnimationDataWithTexture.Create(pImage.Animations.Items[i],atmT);
 //      atmA.Animation.LogData;
       fAnimationDWTs.AddObject(atmA.Animation.Name,atmA);
       if pFlags and MM_CREATEMASKFORANIMATIONFRAMES<>0 then

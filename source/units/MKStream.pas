@@ -10,7 +10,7 @@
              under the GNU GPL Version 2.
 
   Written by Gilby/MKSZTSZ
-  Hungary, 2008-2021
+  Hungary, 2008-2025
 
   --------------------------------------------------
 
@@ -80,6 +80,12 @@
 //    * Complete rework
 //  V3.01: 2022.10.06 - Gilby
 //    * Using fgl.TFGObjectList for TStreams instead of Lists.TGenericList
+//  V3.01a: 2023.06.26 - Gilby
+//    * Removed an unneeded variable declaration and two commented out lines.
+//  V3.02: 2025.04.09 - Gilby
+//    * Following changes in Lists unit.
+//  V3.02a: 2025.04.16 - Gilby
+//    * Bugfix in moving cache item to the end to prevent dropping out.
 
 {$ifdef fpc}
   {$mode delphi}
@@ -168,7 +174,7 @@ uses SysUtils, MKToolBox, Logger;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='3.01';
+  Version='3.02a';
 
 var ExePath:string;
 
@@ -193,11 +199,8 @@ begin
 end;
 
 destructor TMKStreamOpener.Destroy;
-var i:integer;
 begin
-//  for i:=0 to fStreams.Count-1 do FreeAndNil(fStreams[i]._StreamOpener);
   FreeAndNil(fStreams);
-//  for i:=0 to fCache.Count-1 do FreeAndNil(fCache[i]._stream);
   FreeAndNil(fCache);
   inherited ;
 end;
@@ -262,15 +265,14 @@ begin
 
   if fUseCache then begin
     Log.LogDebug('Check in cache ('+aFilename+')',Istr);
-    i:=fCache.IndexOf(aFilename);
-    if i>-1 then begin
-      atm:=fCache[i];
+    atm:=fCache[aFilename];
+    if Assigned(atm) then begin
       Result:=TMemoryStream.Create;
       Result.CopyFrom(atm._stream,atm._stream.Size);
       atm._stream.Seek(0,soFromBeginning);
       Result.Seek(0,soFromBeginning);
       // Move the object to the end of the cache to keep it from dropping out.
-      fCache.Exchange(i,fCache.Count-1);
+      fCache.Exchange(fCache.IndexOfObject(atm),fCache.Count-1);
 //      fCache.Delete(i);
 //      fCache.AddObject(atm._filename,atm);
       exit;

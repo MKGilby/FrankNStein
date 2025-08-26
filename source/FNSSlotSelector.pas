@@ -20,6 +20,7 @@ type
     constructor Create(iSlot,iLeft:integer);
     destructor Destroy; override;
     procedure Draw;
+    procedure UpdateData;
   private
     fProf:TAnimation;
     fSlot:integer;
@@ -43,7 +44,7 @@ type
 
 implementation
 
-uses FNSShared, mk_sdl2, sdl2;
+uses FNSShared, FNSVMU, mk_sdl2, sdl2, MKToolbox;
 
 const
   SLOTWIDTH=76;
@@ -60,15 +61,7 @@ begin
   fSlot:=iSlot;
   fLeft:=iLeft;
   fProf:=MM.Animations.ItemByName['ProfRight'].SpawnAnimation;
-  fIsUsed:=VMU.IsSlotUsed(fSlot);
-  if fIsUsed then begin
-    fLastDate:=VMU.GetSlotLastUseDate(fSlot);
-    fLastTime:=VMU.GetSlotLastUseTime(fSlot);
-  end else begin
-    fLastDate:='';
-    fLastTime:='';
-  end;
-  fCompletedMapCount:=VMU.GetCompletedMapCount(fSlot);
+  UpdateData;
 end;
 
 destructor TSlot.Destroy;
@@ -79,7 +72,7 @@ end;
 
 procedure TSlot.Draw;
 
-  procedure Print(pFont,pText:string;pX,pLine,pAlign:integer); inline;
+  procedure Print(pFont,pText:string;pX,pLine,pAlign:integer);
   begin
     MM.Fonts[pFont].OutText(pText,fLeft+pX,SLOTTOP+SLOTMARGIN+SLOTLINEHEIGHT*pLine,pAlign);
   end;
@@ -96,7 +89,6 @@ begin
   Print('Blue',Format('SLOT %d',[fSlot+1]),SLOTWIDTH div 2,0,1);
   if fIsUsed then begin
     Print('Purple','MAPS:',SLOTMARGIN,2,0);
-    // We write mapcount-1 because the congratulations map is not counted.
     Print('Yellow',Format('%d/%d',[fCompletedMapCount,MapList.Count]),SLOTWIDTH-SLOTMARGIN,3,2);
     Print('Purple','LAST',SLOTMARGIN,5,0);
     Print('Purple','PLAYED:',SLOTWIDTH-SLOTMARGIN,6,2);
@@ -107,6 +99,19 @@ begin
   end else begin
     Print('Pink','EMPTY',SLOTWIDTH div 2,7,1);
   end;
+end;
+
+procedure TSlot.UpdateData;
+begin
+  fIsUsed:=VMU.Slots[fSlot].IsUsed;
+  if fIsUsed then begin
+    fLastDate:=DateToStr(VMU.Slots[fSlot].LastUsed,FS);
+    fLastTime:=TimeToStr(VMU.Slots[fSlot].LastUsed,FS);
+  end else begin
+    fLastDate:='';
+    fLastTime:='';
+  end;
+  fCompletedMapCount:=VMU.Slots[fSlot].CompletedMapCount;
 end;
 
 { TSlotSelector }
@@ -126,10 +131,11 @@ begin
 end;
 
 function TSlotSelector.Run:integer;
-var i:integer;
+var i,sl:integer;
 begin
   Result:=RES_NONE;
-  fSlots[VMU.LastUsedSlot].Active:=true;
+  sl:=VMU.Config.LastUsedSlot;
+  fSlots[sl].Active:=true;
   ClearKeys;
   repeat
     SDL_SetRenderDrawColor(PrimaryWindow.Renderer,DEFAULTCOLORS[0,0],DEFAULTCOLORS[0,1],DEFAULTCOLORS[0,2],255);
@@ -146,27 +152,30 @@ begin
       MM.Fonts['White'].OutText('PRESS SPACE TO CONTINUE',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-10,1);
     end;
     PutTexture(57,8,MM.Textures.ItemByName['Logo']);
-    for i:=0 to 2 do fSlots[i].Draw;
+    for i:=0 to MAXSLOTS-1 do fSlots[i].Draw;
     FlipNoLimit;
     HandleMessages;
     if (keys[SDL_SCANCODE_LEFT] or controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT])
-        and (VMU.LastUsedSlot>0) then begin
-      fSlots[VMU.LastUsedSlot].Active:=false;
-      VMU.LastUsedSlot:=VMU.LastUsedSlot-1;
-      fSlots[VMU.LastUsedSlot].Active:=true;
+        and (sl>0) then begin
+      fSlots[sl].Active:=false;
+      dec(sl);
+      fSlots[sl].Active:=true;
       keys[SDL_SCANCODE_LEFT]:=false;
       controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT]:=false;
     end;
     if (keys[SDL_SCANCODE_RIGHT] or controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT])
-        and (VMU.LastUsedSlot<MAXSLOTS-1) then begin
-      fSlots[VMU.LastUsedSlot].Active:=false;
-      VMU.LastUsedSlot:=VMU.LastUsedSlot+1;
-      fSlots[VMU.LastUsedSlot].Active:=true;
+        and (sl<MAXSLOTS-1) then begin
+      fSlots[sl].Active:=false;
+      inc(sl);
+      fSlots[sl].Active:=true;
       keys[SDL_SCANCODE_RIGHT]:=false;
       controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT]:=false;
     end;
     if keys[SDL_SCANCODE_RETURN] or keys[SDL_SCANCODE_SPACE] or
-       controllerbuttons[SDL_CONTROLLER_BUTTON_A] then Result:=RES_SUCCESS;
+       controllerbuttons[SDL_CONTROLLER_BUTTON_A] then begin
+      VMU.Config.LastUsedSlot:=sl;
+      Result:=RES_SUCCESS;
+    end;
     if keys[SDL_SCANCODE_ESCAPE] or Terminate or
        controllerbuttons[SDL_CONTROLLER_BUTTON_B] then Result:=RES_TERMINATE;
   until Result<>RES_NONE;

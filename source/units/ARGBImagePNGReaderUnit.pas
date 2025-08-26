@@ -199,6 +199,9 @@ begin
         byte(Target^):=(byte((ScanLine)^)+(byte(PreScanLine^)) div 2) and $ff;
         byte((Target+1)^):=(byte((ScanLine+1)^)+(byte((PreScanLine+1)^)) div 2) and $ff;
         byte((Target+2)^):=(byte((ScanLine+2)^)+(byte((PreScanLine+2)^)) div 2) and $ff;
+//        byte(Target^):=((byte((ScanLine)^)+byte(PreScanLine^)) div 2) and $ff;
+//        byte((Target+1)^):=((byte((ScanLine+1)^)+byte((PreScanLine+1)^)) div 2) and $ff;
+//        byte((Target+2)^):=((byte((ScanLine+2)^)+byte((PreScanLine+2)^)) div 2) and $ff;
         for i:=3 to ScanLineSize-1 do
           byte((Target+i)^):=(byte((ScanLine+i)^)+(byte((Target+i-3)^)+byte((PreScanLine+i)^)) div 2) and $ff;
       end;
@@ -299,6 +302,8 @@ begin
   try
     pSource.Position:=0;
     UnCompressStream(pSource,Xs);
+//    Xs.Position:=0;
+//    Xs.SaveToFile('anmz.dat');
     Xs.Position:=0;
     ReadAnim(Xs,pAnimations);
   finally
