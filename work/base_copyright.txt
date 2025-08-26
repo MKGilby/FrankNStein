@@ -1,5 +1,5 @@
 {
-  Frank N Stein Refurbished - Copyright 2023 MKSZTSZ
+  Frank N Stein Refurbished - Copyright 2025 MKSZTSZ
   Written by Szabó "Gilby" Zsolt / MKSZTSZ
 
   This file is part of the source code of Frank N Stein Refurbished.
