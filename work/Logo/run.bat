@@ -1,7 +1,8 @@
 @echo off
 echo This script converts the logo to PNGs.
 
-..\..\tools\mkconv2 convert.mc2
+call ..\setenv.bat
+%WORKTOOLSDIR%\mkconv2 convert.mc2
 copy data\spectrum.png .
-for %%i in (*.png) do ..\..\tools\pngout %%i ..\..\data\%%i /y /kanMZ,fnTZ,anIM /f0
+for %%i in (*.png) do %WORKTOOLSDIR%\pngout %%i ..\..\data\%%i /y /kanMZ,fnTZ,anIM /f0
 del *.png

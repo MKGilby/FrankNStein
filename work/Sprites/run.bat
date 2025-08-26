@@ -1,9 +1,11 @@
 @echo off
 echo This script converts the sprites to spritesheets.
 
-SkeletonPrep
-..\..\tools\mkconv2 convert.mc2
+call ..\setenv.bat
+
+%WORKTOOLSDIR%\SkeletonPrep
+%WORKTOOLSDIR%\mkconv2 convert.mc2
 del skeletonsprite.png
-for %%i in (*.png) do ..\..\tools\pngout %%i ..\..\data\%%i /y /kanMZ,fnTZ,anIM /f0
+for %%i in (*.png) do %WORKTOOLSDIR%\pngout %%i ..\..\data\%%i /y /kanMZ,fnTZ,anIM /f0
 del *.png
 del *.log
