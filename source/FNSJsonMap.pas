@@ -60,6 +60,7 @@ type
     procedure LoadDecorations(JSON:TJSONData);
     procedure FillBackWithStones(pImage:TARGBImage);
     procedure CreateTileMap;
+    procedure LoadOverlay(pImage:TARGBImage;pName:string);
     function GetString(JSON:TJSONData;Path:string;Default:string=''):string;
     function GetInteger(JSON:TJSONData;Path:string;Default:integer=0):integer;
     function GetFloat(JSON:TJSONData;Path:string;Default:double=0):double;
@@ -137,24 +138,19 @@ begin
     if not iMetaDataOnly then begin
       tmp:=TARGBImage.Create(LOGICALWINDOWWIDTH,LOGICALWINDOWHEIGHT);
       try
-      tmp.bar(0,0,tmp.Width,tmp.Height,0,0,0,255);
-      FillBackWithStones(tmp);
-      MM.Images.ItemByName['Decorations'].CopyTo(0,0,8,16,48,0,tmp,true);  // Bulb
-      MM.Images.ItemByName['Decorations'].CopyTo(8,0,48,16,112,0,tmp,true);  // Shelf
-      MM.Images.ItemByName['Decorations'].CopyTo(56,0,24,16,8,0,tmp,true);  // Lives
-      CreateTileMap;
-      if maptype=MAPTYPECONSTRUCTING then begin
-        for i:=0 to 25 do begin
-          if platf[i+1]<>' ' then fTileMap[i,4]:=TILE_WALL;
-          MM.Images.ItemByName['Decorations'].CopyTo(80+(ord(platf[i+1])-49)*8,0,8,8,i*8,32,tmp,true)  // Top platform
+        tmp.bar(0,0,tmp.Width,tmp.Height,0,0,0,255);
+        FillBackWithStones(tmp);
+        if fMapType=MAPTYPECONSTRUCTING then LoadOverlay(tmp,'constr');
+        CreateTileMap;
+        if maptype=MAPTYPECONSTRUCTING then begin
+          for i:=0 to 25 do begin
+            if platf[i+1]<>' ' then fTileMap[i,4]:=TILE_WALL;
+          end;
         end;
-      end;
-      with MM.Images.ItemByName['Device'] do
-        CopyTo(0,0,Width,Height,26*8,8,tmp,true);
-      LoadTiles(JSON,tmp);
-      LoadMonsters(JSON);
-      LoadDecorations(JSON);
-      fTexture:=TStaticTexture.Create(tmp);
+        LoadTiles(JSON,tmp);
+        LoadMonsters(JSON);
+        LoadDecorations(JSON);
+        fTexture:=TStaticTexture.Create(tmp);
       finally
         tmp.Free;
       end;
@@ -366,6 +362,17 @@ begin
   end;
   // Clear spring container.
   Springs.Clear;
+end;
+
+procedure TJSONMap.LoadOverlay(pImage: TARGBImage; pName: string);
+var tmp:TARGBImage;
+begin
+  tmp:=TARGBImage.Create(Format('ovr_%s.png',[pName]));
+  try
+    pImage.PutImage(0,0,tmp,true);
+  finally
+    tmp.Free;
+  end;
 end;
 
 function TJSONMap.GetString(JSON: TJSONData; Path: string; Default: string ): string;

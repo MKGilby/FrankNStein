@@ -91,8 +91,6 @@ begin
   MM.Load('msprites.png','MaskedSprites',MM_CREATEMASKFORANIMATIONFRAMES);
   Log.LogStatus('  Decorations...');
   MM.Load('backwall.png','Stones');
-  MM.Load('decorations.png','Decorations');
-  MM.Load('device.png','Device');
   MM.Load('meter.png','Meter');
   MM.Load('tiles.png','Tiles');
   Log.LogStatus('  Music...');

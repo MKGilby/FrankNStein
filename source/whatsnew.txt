@@ -1,3 +1,9 @@
+2025.08.30 - Build 17
+- Reworked fixed decoration handling. Now it's a full screen overlay picture
+  depending on the type of the map. I construct it with mkconv2 from pieces,
+  but you can draw one 256x192 png with transparent background.
+- Removed some unneeded graphics files.
+
 2025.08.26 - Build 16
 - Added tool sources and build script for them.
 - Reworked VMU (dropped PlayerRegistryUnit).
