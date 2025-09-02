@@ -91,7 +91,6 @@ begin
   MM.Load('msprites.png','MaskedSprites',MM_CREATEMASKFORANIMATIONFRAMES);
   Log.LogStatus('  Decorations...');
   MM.Load('backwall.png','Stones');
-  MM.Load('meter.png','Meter');
   MM.Load('tiles.png','Tiles');
   Log.LogStatus('  Music...');
   MM.LoadMusic('music\rb_theme.mo3','Main');
@@ -107,12 +106,14 @@ end;
 
 procedure FreeAssets;
 begin
-  Log.LogStatus('Common classes...');
+  Log.LogStatus('Freeing...');
+  Log.LogStatus('  Common classes...');
   if Assigned(Springs) then Springs.Free;
-  Log.LogStatus('Freeing VMU...');
+  Log.LogStatus('  VMU...');
   if Assigned(VMU) then VMU.Free;
-  Log.LogStatus('Freeing assets...');
+  Log.LogStatus('  Maps...');
   if Assigned(MapList) then MapList.Free;
+  Log.LogStatus('  Assets...');
   if Assigned(MM) then MM.Free;
 end;
 

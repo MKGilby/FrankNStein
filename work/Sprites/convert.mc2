@@ -37,6 +37,11 @@ m setcolorkey 0 0 0 1
 r json data\mons03.json 1
 m addall 1 2
 
+r png data\meter.png 1
+m setcolorkey 0 0 0 1
+r json data\meter.json 1
+m addall 1 4
+
 m crop2 2
 w png msprites.png 2
 m crop2 4
