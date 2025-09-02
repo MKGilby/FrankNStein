@@ -17,7 +17,6 @@
     <VersionInfo>
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
-      <MinorVersionNr Value="9"/>
       <BuildNr Value="17"/>
       <StringTable CompanyName="MKSZTSZ"/>
     </VersionInfo>
