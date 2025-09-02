@@ -54,6 +54,9 @@
 //      * Removed the hack to SDL_LockTexture. Using ctypes instead.
 //   V1.15a - 2024.08.26
 //      * Really removed the hack to SDL_LockTexture. :)
+//   V1.16 - 2025.09.02
+//      * Changing deprecated method in TStaticTexture.Create .
+//      * Uniformized constructor parameter names.
 
 {$ifdef fpc}
   {$mode delphi}
@@ -80,10 +83,10 @@ type
   { TWindow }
 
   TWindow=class
-    constructor Create(Left,Top,Width,Height:integer;Title:string);
-    constructor CreateDoubleSized(Left,Top,Width,Height:integer;Title:string);
-    constructor CreateFullScreenBordered(Width,Height:integer;Title:string);
-    constructor CreateCustomSized(Left,Top,Width,Height,LogicalWidth,LogicalHeight:integer;Title:string);
+    constructor Create(iLeft,iTop,iWidth,iHeight:integer;iTitle:string);
+    constructor CreateDoubleSized(iLeft,iTop,iWidth,iHeight:integer;iTitle:string);
+    constructor CreateFullScreenBordered(iWidth,iHeight:integer;iTitle:string);
+    constructor CreateCustomSized(iLeft,iTop,iWidth,iHeight,iLogicalWidth,iLogicalHeight:integer;iTitle:string);
     destructor Destroy; override;
   private
     fLogicalWidth,fLogicalHeight:integer;
@@ -113,14 +116,14 @@ type
 
   TStaticTexture=class(TTexture)
     // from ARGBImage
-    constructor Create(Source:TARGBImage;Renderer:PSDL_Renderer=nil); overload;
+    constructor Create(iSource:TARGBImage;iRenderer:PSDL_Renderer=nil); overload;
     // from file through MKStream
-    constructor Create(Source:string;Renderer:PSDL_Renderer=nil); overload;
+    constructor Create(iSource:string;iRenderer:PSDL_Renderer=nil); overload;
 //    destructor Destroy; override;
   end;
 
   TStreamingTexture=class(TTexture)
-    constructor Create(iWidth,iHeight:integer;Renderer:PSDL_Renderer=nil);
+    constructor Create(iWidth,iHeight:integer;iRenderer:PSDL_Renderer=nil);
     destructor Destroy; override;
     procedure Update;
   private
@@ -192,7 +195,7 @@ uses SysUtils, Logger, ctypes;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.15a';
+  Version='1.16';
 
 type
   TEventHandlers=array of TEventHandlerProc;
@@ -207,39 +210,39 @@ var
 
 // ------------------------------------------------------------ [ TWindow ] ---
 
-constructor TWindow.Create(Left,Top,Width,Height:integer;Title:string);
+constructor TWindow.Create(iLeft,iTop,iWidth,iHeight:integer;iTitle:string);
 begin
-  fWindow:=SDL_CreateWindow(PChar(Title), Left, Top, Width, Height, {SDL_WINDOW_OPENGL}0);
+  fWindow:=SDL_CreateWindow(PChar(iTitle), iLeft, iTop, iWidth, iHeight, {SDL_WINDOW_OPENGL}0);
   if fWindow=nil then raise Exception.Create('Could not create window!');
   fRenderer:=SDL_CreateRenderer(fWindow, -1, 0);
   if fRenderer=nil then raise Exception.Create('Could not create renderer!');
   if PrimaryWindow=nil then PrimaryWindow:=Self;
-  fLogicalWidth:=Width;
-  fLogicalHeight:=Height;
+  fLogicalWidth:=iWidth;
+  fLogicalHeight:=iHeight;
   FrameCount:=0;
   fps:=0;
   prevTicks:=SDL_GetTicks;
 end;
 
-constructor TWindow.CreateDoubleSized(Left,Top,Width,Height:integer;Title:string);
+constructor TWindow.CreateDoubleSized(iLeft,iTop,iWidth,iHeight:integer;iTitle:string);
 begin
-  fWindow:=SDL_CreateWindow(PChar(Title), Left, Top, Width*2, Height*2, SDL_WINDOW_OPENGL);
+  fWindow:=SDL_CreateWindow(PChar(iTitle), iLeft, iTop, iWidth*2, iHeight*2, SDL_WINDOW_OPENGL);
   if fWindow=nil then raise Exception.Create('Could not create window!');
   fRenderer:=SDL_CreateRenderer(fWindow, -1, 0);
   if fRenderer=nil then raise Exception.Create('Could not create renderer!');
 //  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 'linear');  // make the scaled rendering look smoother.
-  SDL_RenderSetLogicalSize(fRenderer, Width, Height);
+  SDL_RenderSetLogicalSize(fRenderer, iWidth, iHeight);
   if PrimaryWindow=nil then PrimaryWindow:=Self;
-  fLogicalWidth:=Width;
-  fLogicalHeight:=Height;
+  fLogicalWidth:=iWidth;
+  fLogicalHeight:=iHeight;
   FrameCount:=0;
   fps:=0;
   prevTicks:=SDL_GetTicks;
 end;
 
-constructor TWindow.CreateFullScreenBordered(Width,Height:integer;Title:string);
+constructor TWindow.CreateFullScreenBordered(iWidth,iHeight:integer;iTitle:string);
 begin
-  fWindow:=SDL_CreateWindow(PChar(Title),
+  fWindow:=SDL_CreateWindow(PChar(iTitle),
     SDL_WINDOWPOS_UNDEFINED,
     SDL_WINDOWPOS_UNDEFINED,
     0, 0,
@@ -248,26 +251,26 @@ begin
   fRenderer:=SDL_CreateRenderer(fWindow, -1, 0);
   if fRenderer=nil then raise Exception.Create('Could not create renderer!');
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 'linear');  // make the scaled rendering look smoother.
-  SDL_RenderSetLogicalSize(fRenderer, Width, Height);
+  SDL_RenderSetLogicalSize(fRenderer, iWidth, iHeight);
   if PrimaryWindow=nil then PrimaryWindow:=Self;
-  fLogicalWidth:=Width;
-  fLogicalHeight:=Height;
+  fLogicalWidth:=iWidth;
+  fLogicalHeight:=iHeight;
   FrameCount:=0;
   fps:=0;
   prevTicks:=SDL_GetTicks;
 end;
 
-constructor TWindow.CreateCustomSized(Left,Top,Width,Height,
-  LogicalWidth,LogicalHeight:integer; Title:string);
+constructor TWindow.CreateCustomSized(iLeft,iTop,iWidth,iHeight,
+  iLogicalWidth,iLogicalHeight:integer; iTitle:string);
 begin
-  fWindow:=SDL_CreateWindow(PChar(Title), Left, Top, Width, Height, SDL_WINDOW_OPENGL);
+  fWindow:=SDL_CreateWindow(PChar(iTitle), iLeft, iTop, iWidth, iHeight, SDL_WINDOW_OPENGL);
   if fWindow=nil then raise Exception.Create('Could not create window!');
   fRenderer:=SDL_CreateRenderer(fWindow, -1, 0);
   if fRenderer=nil then raise Exception.Create('Could not create renderer!');
-  SDL_RenderSetLogicalSize(fRenderer, LogicalWidth, LogicalHeight);
+  SDL_RenderSetLogicalSize(fRenderer, iLogicalWidth, iLogicalHeight);
   if PrimaryWindow=nil then PrimaryWindow:=Self;
-  fLogicalWidth:=LogicalWidth;
-  fLogicalHeight:=LogicalHeight;
+  fLogicalWidth:=iLogicalWidth;
+  fLogicalHeight:=iLogicalHeight;
   FrameCount:=0;
   fps:=0;
   prevTicks:=SDL_GetTicks;
@@ -302,12 +305,12 @@ end;
 
 // ----------------------------------------------------- [ TStaticTexture ] ---
 
-constructor TStaticTexture.Create(Source:TARGBImage;renderer:PSDL_Renderer);
+constructor TStaticTexture.Create(iSource:TARGBImage;iRenderer:PSDL_Renderer);
 begin
-  inherited Create(Renderer);
+  inherited Create(iRenderer);
 
-  fWidth:=Source.Width;
-  fHeight:=Source.Height;
+  fWidth:=iSource.Width;
+  fHeight:=iSource.Height;
   fTexture:=SDL_CreateTexture(fRenderer,
                               SDL_PIXELFORMAT_ARGB8888,
                               SDL_TEXTUREACCESS_STATIC,
@@ -315,23 +318,23 @@ begin
 
   if fTexture=nil then raise Exception.Create(Format('CreateTexture failed! (%s)',[SDL_GetError]));
 
-  if SDL_UpdateTexture(fTexture, nil, Source.RawData, Source.Width * sizeof (Uint32))<>0 then
+  if SDL_UpdateTexture(fTexture, nil, iSource.RawData, iSource.Width * sizeof (Uint32))<>0 then
     raise Exception.Create(Format('UpdateTexture failed! (%s)',[SDL_GetError]));
   SDL_SetTextureBlendMode(fTexture, SDL_BLENDMODE_BLEND);
 end;
 
-constructor TStaticTexture.Create(Source:string;Renderer:PSDL_Renderer);
+constructor TStaticTexture.Create(iSource:string;iRenderer:PSDL_Renderer);
 var RawPict:TARGBImage;
 begin
   RawPict:=TARGBImage.Create;
-  RawPict.ReadFile(Source);
-  Create(RawPict,Renderer);
+  RawPict.LoadFromFile(iSource);
+  Create(RawPict,iRenderer);
   FreeAndNil(RawPict);
 end;
 
-constructor TStreamingTexture.Create(iWidth,iHeight:integer;Renderer:PSDL_Renderer=nil);
+constructor TStreamingTexture.Create(iWidth,iHeight:integer;iRenderer:PSDL_Renderer=nil);
 begin
-  inherited Create(Renderer);
+  inherited Create(iRenderer);
   fWidth:=iWidth;
   fHeight:=iHeight;
   fARGBImage:=TARGBImage.Create(fWidth,fHeight);
