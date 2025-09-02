@@ -114,6 +114,8 @@
 //    * Big rework: Get rid of mount. One entity for one file.
 //  V2.01: Gilby - 2021.11.15
 //    * Changes to comply TStreamOpener
+//  V2.02: Gilby - 2025.03.14
+//    * Bugfix in Add (prefixed FileExists to use the SysUtils one)
 
 
 {$ifdef fpc}
@@ -198,8 +200,8 @@ implementation
 uses SysUtils, Logger, {$ifdef fpc}CompressorUnit, {$endif}MKToolBox;
 
 const
-  Fstr='MAD4MidLevelUnit.pas, ';
-  Version='2.01';
+  Fstr={$I %FILE%}+', ';
+  Version='2.02';
   _comp=$504D4F43;
   _rawd=$44574152;
   _fver=$52455646;
@@ -346,7 +348,7 @@ function TMAD4MIDLevel.Add(iFilename,SourceFileName:ansiString;const iCompMethod
 const Istr=Fstr+'TMAD4MIDLevel.Add';
 var Xs:TStream;
 begin
-  if FileExists(string(SourceFileName)) then begin
+  if SysUtils.FileExists(string(SourceFileName)) then begin
     Xs:=TFileStream.Create(string(SourceFileName),fmOpenRead);
     Result:=Add(iFileName,Xs,iCompMethod);
     FreeAndNil(Xs);
