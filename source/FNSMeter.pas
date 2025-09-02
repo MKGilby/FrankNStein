@@ -17,7 +17,7 @@ type
     procedure Move(pTimeUsed:double);
     procedure Draw;
   private
-    fBack,fFront:TAnimation;
+    fFront:TAnimation;
     fGauge:TStreamingTexture;
     fCurrentValue:double;
   end;
@@ -35,12 +35,10 @@ const
 constructor TMeter.Create;
 begin
 //  MM.Images.ItemByName['Meter'].WriteFile('test.tga','TGA');
-  fBack:=MM.Animations.ItemByName['MeterBack'].SpawnAnimation;
-  fFront:=MM.Animations.ItemByName['MeterFront'].SpawnAnimation;
+  fFront:=MM.Animations.ItemByName['Meter'].SpawnAnimation;
 //  fBack.LogData;
 //  fFront.LogData;
-  MM.Animations.ItemByName['MeterBack'].Animation.LogData;
-  MM.Animations.ItemByName['MeterFront'].Animation.LogData;
+  MM.Animations.ItemByName['Meter'].Animation.LogData;
   fGauge:=TStreamingTexture.Create(24,16);
   fGauge.ARGBImage.Clear(0);
   fGauge.Update;
@@ -51,7 +49,6 @@ destructor TMeter.Destroy;
 begin
   fGauge.Free;
   fFront.Free;
-  fBack.Free;
   inherited Destroy;
 end;
 
@@ -63,7 +60,6 @@ end;
 procedure TMeter.Draw;
 begin
 //  PutTexture(0,32,MM.Textures.ItemByName['Meter']);
-  fBack.PutFrame(METERLEFT,METERTOP);
 //  PutTexture(METERLEFT,METERTOP,fGauge);
   fFront.PutFrame(METERLEFT,METERTOP);
 end;
