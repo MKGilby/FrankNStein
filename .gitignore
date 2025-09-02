@@ -50,3 +50,5 @@ source/FrankNStein.exe
 *.vmu
 work/.burdockpaint/settings.ini
 work/Decorations/convert_old.mc2
+/release
+source/BuildAndUpload.ps1
