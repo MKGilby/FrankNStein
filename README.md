@@ -45,6 +45,10 @@ containing your fpc.exe
 
 ## What's new
 
+### 2025.09.05 - Build 18
+- Power meter now measures power, as in original. Later I will add Rebooted
+  style meter too.
+
 ### 2025.08.30 - Build 17
 - Reworked fixed decoration handling. Now it's a full screen overlay picture
   depending on the type of the map. I construct it with mkconv2 from pieces,
