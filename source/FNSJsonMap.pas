@@ -10,7 +10,8 @@ unit FNSJsonMap;
 interface
 
 uses
-  Classes, SysUtils, fpjson, jsonparser, TileMapUnit, mk_sdl2, ARGBImageUnit;
+  Classes, SysUtils, fpjson, jsonparser, TileMapUnit, mk_sdl2, ARGBImageUnit,
+  FNSSpring;
 
 type
 
@@ -43,7 +44,7 @@ type
   { TJSONMap }
 
   TJSONMap=class
-    constructor Create(iMapNo:integer;iMetaDataOnly:boolean=true);
+    constructor Create(iMapNo:integer;iSprings:TSprings;iMetaDataOnly:boolean=true);
     destructor Destroy; override;
     procedure Draw;
   private
@@ -51,6 +52,7 @@ type
     fMapType:integer;
     fTileMap:TTileMap;
     fTexture:TTexture;
+    fSprings:TSprings;
     // Array of monster data
     fMonsters:TMonsterDataList;
     // Array of decoration data
@@ -119,10 +121,11 @@ end;
 
 { TJSONMap }
 
-constructor TJSONMap.Create(iMapNo:integer; iMetaDataOnly:boolean);
+constructor TJSONMap.Create(iMapNo:integer;iSprings:TSprings;iMetaDataOnly:boolean);
 const platf='12345   123334512451233345';
 var Stream:TStream;JSON:TJSONData;tmp:TARGBImage;i:integer;
 begin
+  fSprings:=iSprings;
   Stream:=MKStreamOpener.OpenStream(Format('maps\%.2d.json',[iMapNo]));
   try
     JSON:=GetJSON(Stream);
@@ -212,7 +215,7 @@ begin
               end;
           ':':begin
                 fTileMap.Tiles[j,i]:=TILE_SPRING;
-                Springs.AddSpringAt(j,i);
+                fSprings.AddSpringAt(j,i);
               end;
           '1'..'7':begin
                 fTileMap.Tiles[j,i]:=TILE_PIECE+ord(s[j+1])-ord('1');
@@ -361,7 +364,7 @@ begin
     fTileMap[i,22]:=TILE_WALL;
   end;
   // Clear spring container.
-  Springs.Clear;
+  fSprings.Clear;
 end;
 
 procedure TJSONMap.LoadOverlay(pImage: TARGBImage; pName: string);
@@ -432,7 +435,7 @@ var i:integer;map:TJSONMap;
 begin
   i:=1;
   while MKStreamOpener.FileExists(Format('maps\%.2d.json',[i])) do begin
-    map:=TJSONMap.Create(i);
+    map:=TJSONMap.Create(i,nil);
     Add(Format('%s=%s',[map.Name,map.Author]));
     map.Free;
     inc(i);

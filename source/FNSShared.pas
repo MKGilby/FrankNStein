@@ -9,7 +9,7 @@ unit FNSShared;
 
 interface
 
-uses MediaManagerUnit, sdl2, FNSVMU, FNSSpring, FNSJsonMap;
+uses MediaManagerUnit, sdl2, FNSVMU, FNSJsonMap;
 
 const
   LOGICALWINDOWWIDTH=256;
@@ -54,7 +54,7 @@ var
   Controller:PSDL_GameController;
   VMU:TVMU;
   MapList:TMapList;
-  Springs:TSprings;
+//  Springs:TSprings;
 
 procedure LoadAssets;
 procedure FreeAssets;
@@ -100,15 +100,15 @@ begin
   Log.LogStatus('Loading VMU...');
   VMU:=TVMU.Create;
   VMU.MapCount:=MapList.Count;
-  Log.LogStatus('Creating common classes...');
-  Springs:=TSprings.Create;
+//  Log.LogStatus('Creating common classes...');
+//  Springs:=TSprings.Create;
 end;
 
 procedure FreeAssets;
 begin
   Log.LogStatus('Freeing...');
-  Log.LogStatus('  Common classes...');
-  if Assigned(Springs) then Springs.Free;
+//  Log.LogStatus('  Common classes...');
+//  if Assigned(Springs) then Springs.Free;
   Log.LogStatus('  VMU...');
   if Assigned(VMU) then VMU.Free;
   Log.LogStatus('  Maps...');

@@ -32,11 +32,9 @@ type
     property Y:integer read fY;
   end;
 
-  TSpringList=TFPGObjectList<TSpring>;
-
   { TSprings }
 
-  TSprings=class(TSpringList)
+  TSprings=class(TFPGObjectList<TSpring>)
     procedure AddSpringAt(iX,iY:integer);
     procedure Draw;
     procedure Move(pTimeUsed:double);

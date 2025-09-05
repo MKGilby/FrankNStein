@@ -25,6 +25,7 @@ type
 //    fCurrentMapNo:integer;
     fMap:TJSONMap;
     fDevice:TDevice;
+    fSprings:TSprings;
     fProf:TProf;
     fMonsters:TMonsters;
     fMeter:TMeter;
@@ -40,9 +41,10 @@ uses FNSShared;
 constructor TPlay1Map.Create(iMapNo: integer);
 var i:integer;
 begin
-  fMap:=TJSONMap.Create(iMapNo,false);
+  fSprings:=TSprings.Create;
+  fMap:=TJSONMap.Create(iMapNo,fSprings,false);
   fDevice:=TDevice.Create(fMap);
-  fProf:=TProf.Create(fMap.TileMap,fDevice);
+  fProf:=TProf.Create(fMap.TileMap,fDevice,fSprings);
   fMonsters:=TMonsters.Create;
   for i:=0 to fMap.MonsterCount-1 do
     fMonsters.AddMonster(fMap.MonsterData[i]);
@@ -56,6 +58,7 @@ begin
   if Assigned(fProf) then fProf.Free;
   if Assigned(fDevice) then fDevice.Free;
   if Assigned(fMap) then fMap.Free;
+  fSprings.Free;
   inherited Destroy;
 end;
 
@@ -64,7 +67,7 @@ begin
   fMap.Draw;
   fDevice.Draw;
   fMeter.Draw;
-  Springs.Draw;
+  fSprings.Draw;
   fMonsters.Draw;
   fProf.Draw;
 end;
@@ -83,7 +86,7 @@ end;
 
 procedure TPlay1Map.MoveEx(pTimeUsed:double);
 begin
-  Springs.Move(pTimeUsed);
+  fSprings.Move(pTimeUsed);
   fProf.Move(pTimeUsed);
   fDevice.Move(pTimeUsed);
   fMonsters.Move(pTimeUsed);

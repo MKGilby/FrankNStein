@@ -16,7 +16,7 @@ type
   { TProf }
 
   TProf=class
-    constructor Create(iMap:TTileMap;iDevice:TDevice);
+    constructor Create(iMap:TTileMap;iDevice:TDevice;iSprings:TSprings);
     destructor Destroy; override;
     procedure Draw;
     procedure Move(pTimeUsed:double);  // in secs.
@@ -28,6 +28,7 @@ type
     fMap:TTileMap;
     fState:(psIdle,psFalling,psJumping,psSliding,psSlidingDown);
     fDevice:TDevice;
+    fSprings:TSprings;
     fTempSpring:TSpring;
     // This one is called in small steps
 //    procedure MoveEx(pTimeUsed:double);
@@ -48,7 +49,7 @@ const
 
 { TProf }
 
-constructor TProf.Create(iMap:TTileMap; iDevice:TDevice);
+constructor TProf.Create(iMap:TTileMap;iDevice:TDevice;iSprings:TSprings);
 begin
   fAnimLeft:=MM.Animations.ItemByName['ProfLeft'].SpawnAnimation;
   fAnimRight:=MM.Animations.ItemByName['ProfRight'].SpawnAnimation;
@@ -61,6 +62,7 @@ begin
   fDirX:=1;
   fMap:=iMap;
   fDevice:=iDevice;
+  fSprings:=iSprings;
   fTempSpring:=nil;
 //  MAXTIMESLICE:=1/max(SPEEDX,SPEEDY);
 end;
@@ -129,7 +131,7 @@ begin
           fDevice.PickupPiece;
         end
         else if fMap.Tiles[px,py+2]=TILE_SPRING then begin
-          fTempSpring:=Springs.SpringAt(pX,pY+2);
+          fTempSpring:=fSprings.SpringAt(pX,pY+2);
           fTempSpring.PushedDown:=true;
           if (keys[SDL_SCANCODE_SPACE] or controllerbuttons[SDL_CONTROLLER_BUTTON_A]) then begin
             fState:=psJumping;
