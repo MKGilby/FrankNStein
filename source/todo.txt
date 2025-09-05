@@ -1,4 +1,8 @@
 - BUG or FEATURE? Player can change direction when falling on ice.
+- Make power-meter work.
+- Add TNT lever.
+- Add FrankNStein gfx.
+- Make TNT lever work.
 - Adjustable game speed. The original speed seems to be a little sluggish.
 - Add settings menu. (F12 as usual)
 - Next piece flashing should be adjustable in settings menu.
