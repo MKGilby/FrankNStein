@@ -6,21 +6,33 @@
 m create 256 192 2
 m bar 0 0 256 192 0 0 0 255 2
 
-; Load and add life picture to image
-r png data\lifepic.png 1
-m copyto 0 0 24 16 8 0 1 2
+; Load and add life box to image
+r png data\lifebox.png 1
+m copyto 0 0 24 24 0 8 1 2
+
+; Load and add prof picture to image
+r png data\profpic.png 1
+m copyto 0 0 24 16 32 0 1 2
 
 ; Load and add lightbulb to image
 r png data\bulb.png 1
-m copyto 0 0 8 16 48 0 1 2
+m copyto 0 0 8 16 64 0 1 2
+
+; Load and add housepic to image
+r png data\housepic.png 1
+m copyto 0 0 48 16 88 0 1 2
 
 ; Load and add shelf to image
-r png data\shelf.png 1
-m copyto 0 0 48 16 112 0 1 2
+r png data\smallshelf.png 1
+m copyto 0 0 48 16 128 0 1 2
 
 ; Load and add meter background to image
 r png data\meter1.png 1
 m copyto 0 0 43 16 168 0 1 2
+
+; Load and add lever background to image
+r png data\leverbk.png 1
+m copyto 0 0 8 16 200 16 1 2
 
 ; Load and add device background to image
 r tga data\device.tga 1
