@@ -1,6 +1,6 @@
 ; This script creates the decoration overlays.
 
-; 1. Constructing
+; 1. Constructing (original)
 
 ; Create an empty image and clear it black
 m create 256 192 2
@@ -67,4 +67,71 @@ m copyto 24 0 16 6 192 32 1 2
 
 ; Set black color transparent and save image
 m setcolorkey 0 0 0 2
-w png ovr_constr.png 2
+w png ovr_constr_org.png 2
+
+
+; 2. Constructing (Rebooted)
+
+; Create an empty image and clear it black
+m create 256 192 2
+m bar 0 0 256 192 0 0 0 255 2
+
+; Load and add lifepic to image
+r png data\lifepic.png 1
+m copyto 0 0 24 24 0 0 1 2
+
+; Load and add lightbulb to image
+r png data\bulb.png 1
+m copyto 0 0 8 16 48 0 1 2
+
+; Load and add housepic to image
+r png data\housepic.png 1
+m copyto 0 0 48 16 80 0 1 2
+
+; Load and add shelf to image
+r png data\shelf.png 1
+m copyto 0 0 48 16 112 0 1 2
+
+; Load and add meter background to image
+r png data\meter1.png 1
+m copyto 0 0 43 16 168 0 1 2
+
+; Load and add lever background to image
+r png data\leverbk.png 1
+m copyto 0 0 8 16 200 16 1 2
+
+; Load and add device background to image
+r tga data\device.tga 1
+m copyto 0 0 48 48 208 8 1 2
+
+; Load and add upper-right corner wire piece to image
+r png data\wire2.png 1
+m copyto 0 0 8 8 248 0 1 2
+
+; Load and add upper platform to picture
+r png data\upper.png 1
+; 5 length from block 0
+m copyto  0 0 40 6   0 32 1 2
+
+; 8 length from block 8
+m copyto  0 0 16 6  64 32 1 2
+m copyto 16 0  8 6  80 32 1 2
+m copyto 16 0  8 6  88 32 1 2
+m copyto 16 0  8 6  96 32 1 2
+m copyto 16 0  8 6 104 32 1 2
+m copyto 24 0 16 6 112 32 1 2
+
+; 4 length from block 16
+m copyto  0 0 16 6 128 32 1 2
+m copyto 24 0 16 6 144 32 1 2
+
+; 6 length from block 20
+m copyto  0 0 16 6 160 32 1 2
+m copyto 16 0  8 6 176 32 1 2
+m copyto 16 0  8 6 184 32 1 2
+m copyto 24 0 16 6 192 32 1 2
+
+; Set black color transparent and save image
+m setcolorkey 0 0 0 2
+w png ovr_constr_rbt.png 2
+

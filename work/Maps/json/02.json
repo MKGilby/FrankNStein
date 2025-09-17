@@ -1,7 +1,8 @@
 {
-  "Type" : "Construction",
+  "Type" : "Constructing",
+  "Game" : "Rebooted",
   "Author" : "Colin Stewart",
-  "Name" : "Re-booted Map 03",
+  "Name" : "Rebooted Map 03",
   "TileRows" : [
     "",
     "",
@@ -34,14 +35,14 @@
       "Start" : 72,
       "PPS" : 4,
       "AnimationNo" : 8
-    }
+    },
     { "Row" : 5,
       "Left" : 0,
       "Right" : 192,
       "Start" : 120,
       "PPS" : 2,
       "AnimationNo" : 13
-    }
+    },
     { "Row" : 9,
       "Left" : 112,
       "Right" : 240,

@@ -40,13 +40,18 @@ containing your fpc.exe
    At the time of writing of this document the latest SDL2 version is 2.32.8.
 
 ## Compiled binaries from current build with datafiles and DLLs
-[x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.19.zip "Download x64 version") or
-[x86](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_x86_0.0.0.19.zip "Download x86 version").
+[x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.20.zip "Download x64 version") or
+[x86](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_x86_0.0.0.20.zip "Download x86 version").
 
 ## What's new
 
-### 2025.09.05 - Build 19
-- Decorations fixed for original constructor level types.
+### 2025.09.17 - Build 20
+- Decorations added for rebooted constructing level types.
+- Slight rework on map type/game version handling.
+- Fix in map 02, two commas were missing.
+
+### 2025.09.15 - Build 19
+- Decorations fixed for original constructing level types.
 
 ### 2025.09.05 - Build 18
 - Power meter now measures power, as in original. Later I will add Rebooted

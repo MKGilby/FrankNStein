@@ -50,6 +50,7 @@ type
   private
     fName,fAuthor:string;
     fMapType:integer;
+    fGameVersion:integer;
     fTileMap:TTileMap;
     fTexture:TTexture;
     fSprings:TSprings;
@@ -123,7 +124,7 @@ end;
 
 constructor TJSONMap.Create(iMapNo:integer;iSprings:TSprings;iMetaDataOnly:boolean);
 const platf='12345   123334512451233345';
-var Stream:TStream;JSON:TJSONData;tmp:TARGBImage;i:integer;
+var Stream:TStream;JSON:TJSONData;tmp:TARGBImage;i:integer;s:string;
 begin
   fSprings:=iSprings;
   Stream:=MKStreamOpener.OpenStream(Format('maps\%.2d.json',[iMapNo]));
@@ -133,9 +134,15 @@ begin
     Stream.Free;
   end;
   try
-    fMapType:=strtoint(decode(GetString(JSON,'Type','Constructing'),Format(
-      'Construction,%d,InterimOriginal,%d,InterimRebooted,%d,Congratulations,%d,%d',
-      [MAPTYPECONSTRUCTING,MAPTYPEINTERIMORIGINAL,MAPTYPEINTERIMREBOOTED,MAPTYPECONGRATULATIONS,MAPTYPECONSTRUCTING])));
+    s:=uppercase(GetString(JSON,'Type','Constructing'));
+    if s='CONSTRUCTING' then fMapType:=MAPTYPECONSTRUCTING
+    else if s='INTERIM' then fMapType:=MAPTYPEINTERIM
+    else if s='CONGRATULATIONS' then fMapType:=MAPTYPECONGRATULATIONS
+    else raise Exception.Create(Format('Unknown map type! (%s)',[GetString(JSON,'Type','Constructing')]));
+    s:=uppercase(GetString(JSON,'Game','Original'));
+    if s='ORIGINAL' then fGameVersion:=GAMEVERSIONORIGINAL
+    else if s='REBOOTED' then fGameVersion:=GAMEVERSIONREBOOTED
+    else raise Exception.Create(Format('Unknown game version! (%s)',[GetString(JSON,'Game','Original')]));
     fAuthor:=GetString(JSON,'Author','N/A');
     fName:=GetString(JSON,'Name','N/A');
     if not iMetaDataOnly then begin
@@ -370,7 +377,10 @@ end;
 procedure TJSONMap.LoadOverlay(pImage: TARGBImage; pName: string);
 var tmp:TARGBImage;
 begin
-  tmp:=TARGBImage.Create(Format('ovr_%s.png',[pName]));
+  if fGameVersion=GAMEVERSIONORIGINAL then
+    tmp:=TARGBImage.Create(Format('ovr_%s_org.png',[pName]))
+  else if fGameVersion=GAMEVERSIONREBOOTED then
+    tmp:=TARGBImage.Create(Format('ovr_%s_rbt.png',[pName]));
   try
     pImage.PutImage(0,0,tmp,true);
   finally

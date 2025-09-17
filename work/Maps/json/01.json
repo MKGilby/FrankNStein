@@ -1,5 +1,6 @@
 {
-  "Type" : "Construction",
+  "Type" : "Constructing",
+  "Game" : "Original",
   "Author" : "Colin Stewart",
   "Name" : "Original Map 01",
   "TileRows" : [
