@@ -10,7 +10,8 @@ unit FNSPlay1Map;
 interface
 
 uses
-  SysUtils, FNSDevice, FNSProf, FNSSpring, FNSMonster, FNSJsonMap, FNSMeter;
+  SysUtils, FNSDevice, FNSProf, FNSSpring, FNSMonster, FNSJsonMap, FNSMeter,
+  FNSLever;
 
 type
 
@@ -29,6 +30,7 @@ type
     fProf:TProf;
     fMonsters:TMonsters;
     fMeter:TMeter;
+    fLever:TLever;
     procedure MoveEx(pTimeUsed:double);
   end;
 
@@ -49,15 +51,17 @@ begin
   for i:=0 to fMap.MonsterCount-1 do
     fMonsters.AddMonster(fMap.MonsterData[i]);
   fMeter:=TMeter.Create;
+  fLever:=TLever.Create(fMap,25*8,2*8);
 end;
 
 destructor TPlay1Map.Destroy;
 begin
+  fLever.Free;
   fMeter.Free;
-  if Assigned(fMonsters) then fMonsters.Free;
-  if Assigned(fProf) then fProf.Free;
-  if Assigned(fDevice) then fDevice.Free;
-  if Assigned(fMap) then fMap.Free;
+  fMonsters.Free;
+  fProf.Free;
+  fDevice.Free;
+  fMap.Free;
   fSprings.Free;
   inherited Destroy;
 end;
@@ -67,6 +71,7 @@ begin
   fMap.Draw;
   fDevice.Draw;
   fMeter.Draw;
+  fLever.Draw;
   fSprings.Draw;
   fMonsters.Draw;
   fProf.Draw;
@@ -87,10 +92,11 @@ end;
 procedure TPlay1Map.MoveEx(pTimeUsed:double);
 begin
   fSprings.Move(pTimeUsed);
-  fProf.Move(pTimeUsed);
+  if fProf.Move(pTimeUsed)=pmrPickedUpLastPiece then fLever.Arm;
   fDevice.Move(pTimeUsed);
   fMonsters.Move(pTimeUsed);
   fMeter.Move(pTimeUsed);
+  fLever.Move(pTimeUsed);
 end;
 
 end.

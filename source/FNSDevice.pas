@@ -20,10 +20,9 @@ type
     procedure SetStartPosition(pX,pY:integer);
     procedure PickedUp;
     procedure Move(pTimeUsed:double); reintroduce;
-    procedure Draw; override;
   private
     fStartX,fStartY,fEndX,fEndY:integer;
-    fState:integer;  // 0-Not picked up, 1-Floating to place, 2-Finished
+    fState:(sOnMap,sFloating,sFinished);  // Not picked up, Floating to place, Finished
     fFase:double;
   end;
 
@@ -34,7 +33,7 @@ type
     destructor Destroy; override;
     procedure Draw;
     procedure Move(pTimeUsed:double);
-    procedure PickupPiece;
+    function PickupPiece:boolean;  // Returns true when picked up the last piece
   private
     fPieces:array[0..6] of TAnimatedSprite;
     fSkeleton:array[0..6] of TSkeletonPiece;
@@ -63,18 +62,18 @@ begin
   fStartY:=pY;
   fX:=pX;
   fY:=pY;
-  fState:=0;
+  fState:=sOnMap;
 end;
 
 procedure TSkeletonPiece.PickedUp;
 begin
-  fState:=1;
+  fState:=sFloating;
   fFase:=0;
 end;
 
 procedure TSkeletonPiece.Move(pTimeUsed:double);
 begin
-  if fState=1 then begin
+  if fState=sFloating then begin
     fFase+=pTimeUsed/FLOATINGTIME;
     if fFase<1 then begin
       fX:=trunc(fStartX+(fEndX-fStartX)*fFase);
@@ -82,15 +81,11 @@ begin
     end else begin
       fX:=fEndX;
       fY:=fEndY;
-      fFase:=2;
+      fState:=sFinished;
     end;
   end;
 end;
 
-procedure TSkeletonPiece.Draw;
-begin
-  if fState>=1 then inherited Draw;
-end;
 
 { TDevice }
 
@@ -159,7 +154,7 @@ begin
     fSkeleton[i].Move(pTimeUsed);
 end;
 
-procedure TDevice.PickupPiece;
+function TDevice.PickupPiece:boolean;
 begin
   if fNextPiece<7 then begin
     fSkeleton[fNextPiece].PickedUp;
@@ -169,6 +164,7 @@ begin
     if fNextPiece<7 then
       fPieces[fNextPiece].Animation.Timer.Paused:=false;
   end;
+  Result:=(fNextPiece=7);
 end;
 
 end.

@@ -200,34 +200,37 @@ begin
       while length(s)<32 do s+=' ';
       for j:=0 to 31 do begin
         case s[j+1] of
-          '-':begin
+          '-':begin  // Wall/platform
                 fTileMap.Tiles[j,i]:=TILE_WALL;
                 tiles.CopyTo(walltile*8,0,8,8,j*8,i*8,pImage,true);
               end;
-          'L','>','<','/':begin
+          'L','>','<','/':begin  // Stairs
                 fTileMap.Tiles[j,i]:=TILE_WALL;
                 tiles.CopyTo((pos(s[j+1],tileorder)-1)*8,0,8,8,j*8,i*8,pImage,true);
               end;
-          '(',')':begin
+          '(',')':begin  // Ice
                 fTileMap.Tiles[j,i]:=TILE_ICE;
                 tiles.CopyTo((pos(s[j+1],tileorder)-1)*8,0,8,8,j*8,i*8,pImage,true);
               end;
-          '^','|','v':begin
+          '^','|','v':begin  // Slider pole
                 fTileMap.Tiles[j,i]:=TILE_POLE;
                 tiles.CopyTo((pos(s[j+1],tileorder)-1)*8,0,8,8,j*8,i*8,pImage,true);
               end;
-          '!':begin
+          '!':begin  // Zapper
                 fTileMap.Tiles[j,i]:=TILE_ZAPPER;
                 tiles.CopyTo((pos(s[j+1],tileorder)-1)*8,0,8,8,j*8,i*8,pImage,true);
               end;
-          ':':begin
+          ':':begin  // Spring
                 fTileMap.Tiles[j,i]:=TILE_SPRING;
                 fSprings.AddSpringAt(j,i);
               end;
-          '1'..'7':begin
+          '1'..'7':begin  // Skeleton piece
                 fTileMap.Tiles[j,i]:=TILE_PIECE+ord(s[j+1])-ord('1');
                 tiles.CopyTo(walltile*8,0,8,8,j*8,i*8,pImage,true);
                 inc(pc);
+              end;
+          'x':begin  // Invisible wall
+                fTileMap.Tiles[j,i]:=TILE_WALL;
               end;
         end;
       end;

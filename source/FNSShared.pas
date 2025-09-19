@@ -39,6 +39,7 @@ const
   TILE_MUD=5;
   TILE_JUMPER=6;
   TILE_POLE=7;
+  TILE_LEVER=8;
   TILE_PIECE=128;
 
   // Split the game loop elapsed time into this tiny fragments (in seconds).

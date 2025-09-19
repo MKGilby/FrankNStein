@@ -8,6 +8,11 @@ m setcolorkey 0 0 0 1
 r json data\player.json 1
 m addall 1 2
 
+r png data\shockedprof.png 1
+m setcolorkey 0 0 0 1
+r json data\shocked.json 1
+m addall 1 2
+
 r png skeletonsprite.png 1
 m addall 1 4
 
@@ -40,6 +45,11 @@ m addall 1 2
 r png data\meter.png 1
 m setcolorkey 0 0 0 1
 r json data\meter.json 1
+m addall 1 4
+
+r png data\lever.png 1
+m setcolorkey 0 0 0 1
+r json data\lever.json 1
 m addall 1 4
 
 m crop2 2

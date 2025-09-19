@@ -13,13 +13,15 @@ uses SysUtils, Animation2Unit, TileMapUnit, FNSDevice, FNSSpring;
 
 type
 
+  TPlayerMoveRes=(pmrNone,pmrPickedUpLastPiece);
+
   { TProf }
 
   TProf=class
     constructor Create(iMap:TTileMap;iDevice:TDevice;iSprings:TSprings);
     destructor Destroy; override;
     procedure Draw;
-    procedure Move(pTimeUsed:double);  // in secs.
+    function Move(pTimeUsed:double):TPlayerMoveRes;  // ellapsed time in secs.
   private
     fX,fY:double;
     fDirX:integer;
@@ -102,9 +104,10 @@ begin
   end;
 end;
 
-procedure TProf.Move(pTimeUsed:double);
+function TProf.Move(pTimeUsed:double):TPlayerMoveRes;
 var x,y,px,py,i:integer;
 begin
+  Result:=pmrNone;
   x:=trunc(fX*256);
   y:=trunc(fy*192);
   px:=x div 8;
@@ -128,7 +131,7 @@ begin
         if (fMap.Tiles[px,py+2]=TILE_EMPTY) then fState:=psFalling
         else if fMap.Tiles[px,py+2]=TILE_PIECE+fDevice.NextPiece then begin
           fMap.Tiles[px,py+2]:=TILE_WALL;
-          fDevice.PickupPiece;
+          if fDevice.PickupPiece then Result:=pmrPickedUpLastPiece;
         end
         else if fMap.Tiles[px,py+2]=TILE_SPRING then begin
           fTempSpring:=fSprings.SpringAt(pX,pY+2);
