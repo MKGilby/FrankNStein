@@ -13,7 +13,7 @@ uses SysUtils, Animation2Unit, TileMapUnit, FNSDevice, FNSSpring;
 
 type
 
-  TPlayerMoveRes=(pmrNone,pmrPickedUpLastPiece);
+  TPlayerMoveRes=(pmrNone,pmrPickedUpLastPiece,pmrBesideLever);
 
   { TProf }
 
@@ -152,6 +152,8 @@ begin
           i:=1;
           while (fMap.Tiles[px,py+2+i]=TILE_POLE) do inc(i);
           fRemainingDistance:=POLESLIDEDISTANCE*i;
+        end else if (fMap.Tiles[px+1,py+1]=TILE_LEVER) then begin
+          Result:=pmrBesideLever;
         end;
       end else begin
         if Assigned(fTempSpring) then begin

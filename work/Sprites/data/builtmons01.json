@@ -1,7 +1,7 @@
 { "Animations" :
   [
     { "Type" : "FrameBased",
-      "Name" : "BuiltMons",
+      "Name" : "BuiltMons01",
       "Width" : 16,
       "Height" : 32,
       "HotPoint" : { "x" : 0, "y" : 0 },

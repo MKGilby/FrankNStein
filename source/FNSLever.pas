@@ -9,13 +9,15 @@ uses
 
 type
 
+  TLeverMoveRes=(lmrNone,lmrFinished);
+
   { TLever }
 
   TLever=class
     constructor Create(iMap:TJSONMap;iX,iY:integer);
     destructor Destroy; override;
     procedure Draw;
-    procedure Move(pTimeUsed:double);
+    function Move(pTimeUsed:double):TLeverMoveRes;
     procedure Arm;
     procedure Push;
   private
@@ -54,34 +56,45 @@ begin
   case fState of
     sIdle:fAnimation.PutFrame(fX,fY,0);
     sArmed:if trunc(fFase*4) mod 2=0 then
-             fAnimation.PutFrame(fX,fY,3)
+             fAnimation.PutFrame(fX,fY,1)
            else
              fAnimation.PutFrame(fX,fY,0);
-    sPushing: fAnimation.PutFrame(fX,fY,3+trunc(fFase*5));
-    sFinished: fAnimation.PutFrame(fX,fY,0);
+    sPushing: fAnimation.PutFrame(fX,fY,1+trunc(fFase*5));
+    sFinished: fAnimation.PutFrame(fX,fY,6);
   end;
 end;
 
-procedure TLever.Move(pTimeUsed:double);
+function TLever.Move(pTimeUsed: double): TLeverMoveRes;
 begin
+  Result:=lmrNone;
   case fstate of
     sIdle: ;
     sArmed: fFase:=fFase+pTimeUsed;
-    sPushing: fFase:=fFase+pTimeUsed;
+    sPushing: begin
+      fFase:=fFase+pTimeUsed;
+      if fFase>=1 then begin
+        fState:=sFinished;
+        Result:=lmrFinished;
+      end;
+    end;
     sFinished: ;
   end;
 end;
 
 procedure TLever.Arm;
 begin
-  fState:=sArmed;
-  fFase:=0;
+  if fState=sIdle then begin
+    fState:=sArmed;
+    fFase:=0;
+  end;
 end;
 
 procedure TLever.Push;
 begin
-  fState:=sPushing;
-  fFase:=0;
+  if fState=sArmed then begin
+    fState:=sPushing;
+    fFase:=0;
+  end;
 end;
 
 end.

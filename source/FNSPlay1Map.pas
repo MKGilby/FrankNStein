@@ -92,11 +92,15 @@ end;
 procedure TPlay1Map.MoveEx(pTimeUsed:double);
 begin
   fSprings.Move(pTimeUsed);
-  if fProf.Move(pTimeUsed)=pmrPickedUpLastPiece then fLever.Arm;
+  case fProf.Move(pTimeUsed) of
+    pmrNone: ;
+    pmrPickedUpLastPiece: fLever.Arm;
+    pmrBesideLever: fLever.Push;
+  end;
   fDevice.Move(pTimeUsed);
   fMonsters.Move(pTimeUsed);
   fMeter.Move(pTimeUsed);
-  fLever.Move(pTimeUsed);
+  if fLever.Move(pTimeUsed)=lmrFinished then fDevice.StartAnimateMonster;
 end;
 
 end.

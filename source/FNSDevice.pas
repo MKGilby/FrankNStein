@@ -34,11 +34,15 @@ type
     procedure Draw;
     procedure Move(pTimeUsed:double);
     function PickupPiece:boolean;  // Returns true when picked up the last piece
+    procedure StartAnimateMonster;
   private
     fPieces:array[0..6] of TAnimatedSprite;
     fSkeleton:array[0..6] of TSkeletonPiece;
     fOverlay:TAnimation;
+    fMonster:TAnimation;
     fNextPiece:integer;
+    fState:(dsIdle,dsAnimating,dsLightFading,dsFinished);
+    fFase:double;
   public
     property NextPiece:integer read fNextPiece;
   end;
@@ -53,6 +57,7 @@ const
   FLOATINGTIME=3;  // in seconds
 
 { TSkeletonPiece }
+{$region /fold}
 
 procedure TSkeletonPiece.SetStartPosition(pX,pY:integer);
 begin
@@ -86,8 +91,10 @@ begin
   end;
 end;
 
+{$endregion}
 
 { TDevice }
+{$region /fold}
 
 constructor TDevice.Create(iMap:TJSONMap);
 var i,j,pc:integer;
@@ -117,13 +124,16 @@ begin
           fSkeleton[pc].SetStartPosition(i*8,j*8);
         end;
   fPieces[0].Animation.Timer.Paused:=false;
-  fOverlay:=MM.Animations.ItemByName['DeviceOverlay'].SpawnAnimation;
+  fOverlay:=MM.Animations['DeviceOverlay'].SpawnAnimation;
+  fMonster:=MM.Animations['BuiltMons01'].SpawnAnimation;
+  fState:=dsIdle;
 end;
 
 destructor TDevice.Destroy;
 var i:integer;
 begin
-  if Assigned(fOverlay) then fOverlay.Free;
+  fMonster.Free;
+  fOverlay.Free;
   for i:=0 to 6 do begin
     if Assigned(fSkeleton[i]) then begin
       fSkeleton[i].Animation.Free;
@@ -140,9 +150,27 @@ end;
 procedure TDevice.Draw;
 var i:integer;
 begin
-  for i:=0 to fNextPiece-1 do fSkeleton[i].Draw;
-  for i:=fNextPiece to 6 do fPieces[i].Draw;
-  for i:=0 to 3 do fOverlay.PutFrame(DEVICEINNERLEFT,DEVICEINNERTOP+i*8);
+  case fState of
+    dsIdle: begin
+      for i:=0 to fNextPiece-1 do fSkeleton[i].Draw;
+      for i:=fNextPiece to 6 do fPieces[i].Draw;
+      for i:=0 to 3 do fOverlay.PutFrame(DEVICEINNERLEFT,DEVICEINNERTOP+i*8);
+    end;
+    dsAnimating: begin
+      for i:=0 to fNextPiece-1 do fSkeleton[i].Draw;
+      fMonster.PutFramePart(DEVICEINNERLEFT,DEVICEINNERTOP,0,0,16,trunc(32*fFase*0.5));
+      for i:=0 to 3 do fOverlay.PutFrame(DEVICEINNERLEFT,DEVICEINNERTOP+i*8);
+    end;
+    dsLightFading: begin
+      fMonster.PutFrame(DEVICEINNERLEFT,DEVICEINNERTOP);
+      for i:=0 to 3 do fOverlay.PutFrame(DEVICEINNERLEFT,DEVICEINNERTOP+i*8);
+      bar(DEVICEINNERLEFT,DEVICEINNERTOP,16,trunc((32*fFase*0.5)),$19,$1a,$1c,$ff);
+      fMonster.PutFramePart(DEVICEINNERLEFT,DEVICEINNERTOP,0,0,16,trunc(32*fFase*0.5));
+    end;
+    dsFinished: begin
+      fMonster.PutFrame(DEVICEINNERLEFT,DEVICEINNERTOP);
+    end;
+  end;
 end;
 
 procedure TDevice.Move(pTimeUsed:double);
@@ -152,6 +180,20 @@ begin
     fPieces[i].Animation.Animate(pTimeUsed);
   for i:=0 to 6 do
     fSkeleton[i].Move(pTimeUsed);
+  if fState=dsAnimating then begin
+    fFase:=fFase+pTimeUsed;
+    if fFase>2 then begin
+      fState:=dsLightFading;
+      fFase:=0;
+    end;
+  end else
+  if fState=dsLightFading then begin
+    fFase:=fFase+pTimeUsed;
+    if fFase>2 then begin
+      fState:=dsFinished;
+      fFase:=2;
+    end;
+  end;
 end;
 
 function TDevice.PickupPiece:boolean;
@@ -166,6 +208,14 @@ begin
   end;
   Result:=(fNextPiece=7);
 end;
+
+procedure TDevice.StartAnimateMonster;
+begin
+  fState:=dsAnimating;
+  fFase:=0;
+end;
+
+{$endregion}
 
 end.
 
