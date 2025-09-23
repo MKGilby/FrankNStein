@@ -52,6 +52,11 @@ m setcolorkey 0 0 0 1
 r json data\lever.json 1
 m addall 1 4
 
+r png data\builtmons01.png 1
+m setcolorkey 0 0 0 1
+r json data\builtmons01.json 1
+m addall 1 4
+
 m crop2 2
 w png msprites.png 2
 m crop2 4

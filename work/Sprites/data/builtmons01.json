@@ -1,0 +1,18 @@
+{ "Animations" :
+  [
+    { "Type" : "FrameBased",
+      "Name" : "BuiltMons",
+      "Width" : 16,
+      "Height" : 32,
+      "HotPoint" : { "x" : 0, "y" : 0 },
+      "FrameDelay" : 0,
+      "LoopDelay" : 0,
+      "StartFrame" : 0,
+      "Paused" : true,
+      "Frames" :
+        [
+          { "x" : 0, "y" : 0 }
+        ]
+    }
+  ]
+}
