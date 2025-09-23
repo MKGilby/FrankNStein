@@ -1,5 +1,4 @@
 @echo off
-echo This script converts the human readable maps into binary format.
-MapConverter
-copy maps.bin ..\..\data /Y
-del maps.bin
+echo This script copies the maps into the data dir.
+copy json\*.json %WORKDATADIR%\maps /Y
+
