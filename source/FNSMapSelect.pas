@@ -10,7 +10,7 @@ unit FNSMapSelect;
 
 interface
 
-uses SysUtils, FNSPlay1Map;
+uses SysUtils, FNSPlay1Map, mk_sdl2;
 
 type
 
@@ -23,49 +23,81 @@ type
   private
     fCurrentMapNo:integer;
     fPlay1Map:TPlay1Map;
+    fDarkLayer:TStaticTexture;
   end;
 
 implementation
 
-uses mk_sdl2, sdl2, FNSShared, MKToolbox;
+uses sdl2, FNSShared, MKToolbox, ARGBImageUnit;
 
 { TMapSelect }
 
 constructor TMapSelect.Create(iStartMapNo:integer);
+var tmp:TARGBImage;
 begin
   fCurrentMapNo:=iStartMapNo;
   fPlay1Map:=TPlay1Map.Create(fCurrentMapNo);
+  tmp:=TARGBImage.Create(LOGICALWINDOWWIDTH,LOGICALWINDOWHEIGHT-24);
+  try
+    tmp.Clear($80000000);
+    fDarkLayer:=TStaticTexture.Create(tmp);
+  finally
+    tmp.Free;
+  end;
 end;
 
 destructor TMapSelect.Destroy;
 begin
-  if Assigned(fPlay1Map) then fPlay1Map.Free;
+  fDarkLayer.Free;
+  fPlay1Map.Free;
   inherited Destroy;
 end;
 
 function TMapSelect.Run:integer;
-var pre,now:uint64;
 begin
-  Result:=0;
+  Result:=RES_NONE;
   ClearKeys;
   ClearControllerButtons;
-  pre:=GetTickCount64;
   repeat
-    now:=GetTickCount64;
-    fPlay1Map.Move((now-pre)/1000);
-    pre:=now;
-
     fPlay1Map.Draw;
-    MM.Fonts['White'].OutText(st(FPS,3,'0'),0,0,0);
+    PutTexture(0,0,fDarkLayer);
+    bar(0,LOGICALWINDOWHEIGHT-24,LOGICALWINDOWWIDTH,24,0,0,0);
+    MM.Fonts['White'].OutText(MapList.MapNames[fCurrentMapNo],128,168,1);
+    MM.Fonts.OutText(#1'BY '#3+MapList.Authors[fCurrentMapNo],128,176,1);
+    if fCurrentMapNo>0 then MM.Fonts['White'].OutText(#130,4,172,0);
+    if fCurrentMapNo<MapList.Count-1 then MM.Fonts['White'].OutText(#131,244,172,0);
+    if Assigned(Controller) then begin
+      MM.Fonts['Purple'].OutText(#128' PLAY',0,184,0);
+      MM.Fonts['Purple'].OutText(#129' BACK',LOGICALWINDOWWIDTH,184,2);
+    end else begin
+      MM.Fonts.OutText(#6'SPACE'#5' PLAY',0,184,0);
+      MM.Fonts.OutText(#6'ESC'#5' BACK',LOGICALWINDOWWIDTH,184,2);
+    end;
 
     {$ifndef LimitFPS} FlipNoLimit; {$else} Flip; {$endif}
     HandleMessages;
-    if keys[SDL_SCANCODE_ESCAPE] then Result:=-1;
-//    if keys[SDL_SCANCODE_RETURN] or keys[SDL_SCANCODE_SPACE] then Result:=1;
-//    if controllerbuttons[SDL_CONTROLLER_BUTTON_A] then Result:=1;
-    if controllerbuttons[SDL_CONTROLLER_BUTTON_B] then Result:=-1;
-    if Terminate then Result:=-1;
-  until Result<>0;
+    if (controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT] or keys[SDL_SCANCODE_LEFT])
+       and (fCurrentMapNo>0) then begin
+      fPlay1Map.Free;
+      dec(fCurrentMapNo);
+      fPlay1Map:=TPlay1Map.Create(fCurrentMapNo);
+      keys[SDL_SCANCODE_LEFT]:=false;
+      controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT]:=false;
+    end;
+    if (controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT] or keys[SDL_SCANCODE_RIGHT])
+       and (fCurrentMapNo<MapList.Count-1) then begin
+      fPlay1Map.Free;
+      inc(fCurrentMapNo);
+      fPlay1Map:=TPlay1Map.Create(fCurrentMapNo);
+      keys[SDL_SCANCODE_RIGHT]:=false;
+      controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT]:=false;
+    end;
+    if keys[SDL_SCANCODE_RETURN] or keys[SDL_SCANCODE_SPACE] or
+       controllerbuttons[SDL_CONTROLLER_BUTTON_A] then Result:=fCurrentMapNo+1;
+    if keys[SDL_SCANCODE_ESCAPE] or
+       controllerbuttons[SDL_CONTROLLER_BUTTON_B] then Result:=RES_BACK;
+    if Terminate then Result:=RES_TERMINATE;
+  until Result<>RES_NONE;
   ClearKeys;
   ClearControllerButtons;
 end;

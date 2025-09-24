@@ -9,7 +9,7 @@ unit FNSShared;
 
 interface
 
-uses MediaManagerUnit, sdl2, FNSVMU, FNSJsonMap;
+uses SysUtils, MediaManagerUnit, sdl2, FNSVMU, FNSJsonMap;
 
 const
   LOGICALWINDOWWIDTH=256;
@@ -48,6 +48,7 @@ const
   // If one game loop uses more than this time, consider it lag and skip it.
   MINLAG=1;
 
+  RES_BACK=-2;
   RES_TERMINATE=-1;
   RES_NONE=0;
   RES_SUCCESS=1;
@@ -80,6 +81,7 @@ begin
   Log.LogStatus('Loading assets...');
   MM:=TMediaManager.Create;
   Log.LogStatus('  Fonts...');
+  Log.Trace('Before fonts: '+inttostr(GetHeapStatus.TotalAllocated));
   LoadFont('White',255,255,255);
   LoadFont('Blue',40,128,240);
   LoadFont('Green',40,240,128);
@@ -87,23 +89,30 @@ begin
   LoadFont('Pink',240,40,128);
   LoadFont('Purple',128,40,240);
   LoadFont('Lime',128,240,40);
+  Log.Trace('After fonts: '+inttostr(GetHeapStatus.TotalAllocated));
   Log.LogStatus('  Logo...');
   MM.Load('logo.png','Logo',MM_CREATETEXTUREONLY);
   MM.Load('spectrum.png','Speccy',MM_CREATETEXTUREONLY);
+  Log.Trace('After logo: '+inttostr(GetHeapStatus.TotalAllocated));
   Log.LogStatus('  Sprites...');
   MM.Load('sprites.png','Sprites');
   MM.Load('msprites.png','MaskedSprites',MM_CREATEMASKFORANIMATIONFRAMES);
+  Log.Trace('After sprites: '+inttostr(GetHeapStatus.TotalAllocated));
   Log.LogStatus('  Decorations...');
   MM.Load('backwall.png','Stones');
   MM.Load('tiles.png','Tiles');
+  Log.Trace('After decorations: '+inttostr(GetHeapStatus.TotalAllocated));
   Log.LogStatus('  Music...');
   MM.LoadMusic('music\rb_theme.mo3','Main');
+  Log.Trace('After music: '+inttostr(GetHeapStatus.TotalAllocated));
   Log.LogStatus('  Maps metadata...');
   MapList:=TMapList.Create;
   MapList.Load;
+  Log.Trace('After maps: '+inttostr(GetHeapStatus.TotalAllocated));
   Log.LogStatus('Loading VMU...');
   VMU:=TVMU.Create;
   VMU.MapCount:=MapList.Count;
+  Log.Trace('After VMU: '+inttostr(GetHeapStatus.TotalAllocated));
 //  Log.LogStatus('Creating common classes...');
 //  Springs:=TSprings.Create;
 end;

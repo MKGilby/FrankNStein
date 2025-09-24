@@ -40,13 +40,17 @@ containing your fpc.exe
    At the time of writing of this document the latest SDL2 version is 2.32.8.
 
 ## Compiled binaries from current build with datafiles and DLLs
-[x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.22.zip "Download x64 version") or
-[x86](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_x86_0.0.0.22.zip "Download x86 version").
+[x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.23.zip "Download x64 version") or
+[x86](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_x86_0.0.0.23.zip "Download x86 version").
 
 ## What's new
 
+### 2025.09.24 - Build 23
+- After selecting slot you go to map selector. Use left/right or controller to
+  select map, press space/enter or A to play, escape or B to go back.
+
 ### 2025.09.23 - Build 22
-- Added first build monsted sprite.
+- Added first build monster sprite.
 - Lever pushes when armed and prof stands beside.
 - Built monster appears after lever pushed.
 

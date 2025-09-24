@@ -51,15 +51,18 @@ type
     procedure UpdateLastUsed;
   private
     fLastUsed:TDateTime;
+    fLastPlayedMap:integer;
     fMapCompleted:array of boolean;
     procedure LoadFromStream_V1(pSource:TStream);
     function fGetMapCompleted(index:integer):boolean;
     function fGetMapCount:integer;
     procedure fSetMapCount(value:integer);
     function fGetCompletedMapCount:integer;
+    procedure fSetLastPlayedMap(value:integer);
   public
     IsUsed:boolean;
     property LastUsed:TDateTime read fLastUsed;
+    property LastPlayedMap:integer read fLastPlayedMap write fSetLastPlayedMap;
     property MapCompleted[index:integer]:boolean read fGetMapCompleted;
     property MapCount:integer read fGetMapCount write fSetMapCount;
     property CompletedMapCount:integer read fGetCompletedMapCount;
@@ -231,6 +234,7 @@ begin
     b:=1;
     pTarget.Write(b,1);
     pTarget.Write(fLastUsed,SizeOf(TDateTime));
+    pTarget.Write(fLastPlayedMap,1);
     b:=length(fMapCompleted);
     pTarget.Write(b,1);
     if b>0 then begin
@@ -254,7 +258,7 @@ begin
 end;
 
 procedure TSlot.LoadFromStream_V1(pSource:TStream);
-//<state(b)><last_save_time(dt)><map_count><map_completion_data(r)>
+//<state(b)><last_save_time(dt)><last_played_map(b)><map_count><map_completion_data(r)>
 var
   b:byte=0;
   b2:byte=0;
@@ -264,6 +268,8 @@ begin
   IsUsed:=b<>0;
   if IsUsed then begin
     pSource.Read(fLastUsed,sizeof(TDateTime));
+    fLastPlayedMap:=0;
+    pSource.Read(fLastPlayedMap,1);
     pSource.Read(b,1);  // MapCount
     if b>0 then begin
       SetLength(fMapCompleted,b);
@@ -304,6 +310,13 @@ begin
   Result:=0;
   for i:=0 to length(fMapCompleted)-1 do
     if fMapCompleted[i] then inc(Result);
+end;
+
+procedure TSlot.fSetLastPlayedMap(value:integer);
+begin
+  if (value<>fLastPlayedMap) and (value>=0) and (value<length(fMapCompleted)) then begin
+    fLastPlayedMap:=value;
+  end;
 end;
 
 {$endregion}
@@ -604,8 +617,10 @@ end.
      5-7 - Not used, can be anything
 
   One save slot data format (version 1):
-    0           1         2                   6          7
-    <version(b)><state(b)><last_save_time(dt)><map_count><map_completion_data(r)>
+    0           1         2                   6
+    <version(b)><state(b)><last_save_time(dt)><last_played_map(b)>
+    7             8
+    <map_count(b)><map_completion_data(r)>
 
   State:
     0     - unused - the remaining data does not present!

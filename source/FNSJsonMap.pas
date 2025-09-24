@@ -127,7 +127,7 @@ const platf='12345   123334512451233345';
 var Stream:TStream;JSON:TJSONData;tmp:TARGBImage;i:integer;s:string;
 begin
   fSprings:=iSprings;
-  Stream:=MKStreamOpener.OpenStream(Format('maps\%.2d.json',[iMapNo]));
+  Stream:=MKStreamOpener.OpenStream(Format('maps\%.2d.json',[iMapNo+1]));
   try
     JSON:=GetJSON(Stream);
   finally
@@ -446,10 +446,10 @@ end;
 procedure TMapList.Load;
 var i:integer;map:TJSONMap;
 begin
-  i:=1;
-  while MKStreamOpener.FileExists(Format('maps\%.2d.json',[i])) do begin
+  i:=0;
+  while MKStreamOpener.FileExists(Format('maps\%.2d.json',[i+1])) do begin
     map:=TJSONMap.Create(i,nil);
-    Add(Format('%s=%s',[map.Name,map.Author]));
+    Add(Format('%s=%s',[uppercase(map.Name),uppercase(map.Author)]));
     map.Free;
     inc(i);
   end;
@@ -457,7 +457,6 @@ end;
 
 function TMapList.fGetMapName(index:integer):string;
 begin
-  dec(index);  // Maps go 1..n, list goes 0..n-1
   if (index>=0) and (index<Count) then
     Result:=Names[index]
   else
@@ -466,7 +465,6 @@ end;
 
 function TMapList.fGetAuthor(index:integer):string;
 begin
-  dec(index);  // Maps go 1..n, list goes 0..n-1
   if (index>=0) and (index<Count) then
     Result:=ValueFromIndex[index]
   else

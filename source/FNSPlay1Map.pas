@@ -22,6 +22,7 @@ type
     destructor Destroy; override;
     procedure Draw;
     procedure Move(pTimeUsed:double);
+    function Run:integer;
   private
 //    fCurrentMapNo:integer;
     fMap:TJSONMap;
@@ -36,7 +37,7 @@ type
 
 implementation
 
-uses FNSShared;
+uses FNSShared, sdl2, mk_sdl2, MKToolbox;
 
 { TPlay1Map }
 
@@ -87,6 +88,30 @@ begin
     end;
     MoveEx(pTimeUsed);
   end;
+end;
+
+function TPlay1Map.Run:integer;
+var pre,now:uint64;
+begin
+  Result:=RES_NONE;
+  pre:=GetTickCount64;
+  repeat
+    now:=GetTickCount64;
+    Move((now-pre)/1000);
+    pre:=now;
+
+    Draw;
+    MM.Fonts['Purple'].OutText(st(FPS,3,'0'),0,0,0);
+
+    {$ifndef LimitFPS} FlipNoLimit; {$else} Flip; {$endif}
+    HandleMessages;
+
+    if keys[SDL_SCANCODE_ESCAPE] or
+       controllerbuttons[SDL_CONTROLLER_BUTTON_B] then Result:=RES_BACK;
+    if Terminate then Result:=RES_TERMINATE;
+  until Result<>RES_NONE;
+  ClearKeys;
+  ClearControllerButtons;
 end;
 
 procedure TPlay1Map.MoveEx(pTimeUsed:double);

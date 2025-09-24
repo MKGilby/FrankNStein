@@ -10,7 +10,7 @@ unit FNSMain;
 interface
 
 uses
-  SysUtils, mk_sdl2, FNSStartScreen, FNSSlotSelector, FNSMapSelect;
+  SysUtils, mk_sdl2;
 
 type
 
@@ -22,13 +22,12 @@ type
     procedure Run;
   private
     fMainWindow:TWindow;
-    fMapSelect:TMapSelect;
   end;
 
 implementation
 
 uses sdl2, MKToolbox, Logger, MKStream, FNSShared, MAD4MidLevelUnit, MKAudio,
-  Animation2Unit;
+  Animation2Unit, FNSStartScreen, FNSSlotSelector, FNSMapSelect, FNSPlay1Map;
 
 { TMain }
 
@@ -66,15 +65,12 @@ begin
   SetFPS(60);
 
   LoadAssets;
-
-  fMapSelect:=TMapSelect.Create(1);
 end;
 
 destructor TMain.Destroy;
 begin
-  if Assigned(fMapSelect) then fMapSelect.Free;
   FreeAssets;
-  if Assigned(fMainWindow) then fMainWindow.Free;
+  fMainWindow.Free;
   inherited Destroy;
 end;
 
@@ -89,7 +85,16 @@ begin
       if res=RES_SUCCESS then begin
         VMU.Slots[VMU.Config.LastUsedSlot].IsUsed:=true;
         VMU.Slots[VMU.Config.LastUsedSlot].UpdateLastUsed;
-        fMapSelect.Run;
+        repeat
+          with TMapSelect.Create(VMU.Slots[VMU.Config.LastUsedSlot].LastPlayedMap) do try res:=Run; finally Free; end;
+          if res>RES_NONE then begin
+            dec(res);
+            VMU.Slots[VMU.Config.LastUsedSlot].LastPlayedMap:=res;
+            with TPlay1Map.Create(res) do try res:=Run; finally Free; end;
+            if res=RES_BACK then res:=RES_NONE;
+          end;
+        until (res=RES_TERMINATE) or (res=RES_BACK);
+//        with TMapSelect.Create(VMU.Slots[VMU.Config.LastUsedSlot].) do try res:=Run;
       end;
     until res=RES_TERMINATE;
   end;
