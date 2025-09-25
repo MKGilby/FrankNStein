@@ -27,7 +27,7 @@
     "5------:----------:------!-----:",
     ""
   ],
-  "WallTileNo" : 2,
+  "WallTileIndex" : 0,
   "Monsters" : [
     { "Row" : 12,
       "Left" : 120,

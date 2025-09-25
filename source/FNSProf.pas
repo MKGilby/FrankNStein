@@ -45,6 +45,7 @@ const
   SPEEDY=64;  // pixel / sec
   SPEEDNORMX=SPEEDX/256;  // normalized to screen
   SPEEDNORMY=SPEEDY/192;  // normalized to screen
+  MUDSPEEDFACTOR=0.5;
   JUMPHEIGHT=32/192;
   ICESLIDEDISTANCE=8/256;
   POLESLIDEDISTANCE=8/192;
@@ -118,13 +119,21 @@ begin
       if (keys[SDL_SCANCODE_RIGHT] or controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT])
          and ((x mod 8>0)
          or (((x mod 8)=0) and (fMap.Tiles[px+1,py]=TILE_EMPTY) and (fMap.Tiles[px+1,py+1]=TILE_EMPTY))) then begin
-        fX+=SPEEDNORMX*pTimeUsed;
+        if ((x mod 8>=4) and (fMap.Tiles[px+1,py+2]=TILE_MUD)) or
+           ((x mod 8<4) and (fMap.Tiles[px,py+2]=TILE_MUD)) then
+          fX+=SPEEDNORMX*pTimeUsed*MUDSPEEDFACTOR
+        else
+          fX+=SPEEDNORMX*pTimeUsed;
         fDirX:=1;
       end;
       if (keys[SDL_SCANCODE_LEFT] or controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT])
          and ((x mod 8>0)
          or (((x mod 8)=0) and (fMap.Tiles[px-1,py]=TILE_EMPTY) and (fMap.Tiles[px-1,py+1]=TILE_EMPTY))) then begin
-        fX-=SPEEDNORMX*pTimeUsed;
+        if ((x mod 8>=4) and (fMap.Tiles[px+1,py+2]=TILE_MUD)) or
+           ((x mod 8<4) and (fMap.Tiles[px,py+2]=TILE_MUD)) then
+          fX-=SPEEDNORMX*pTimeUsed*MUDSPEEDFACTOR
+        else
+          fX-=SPEEDNORMX*pTimeUsed;
         fDirX:=-1;
       end;
       if (x mod 8=0) then begin

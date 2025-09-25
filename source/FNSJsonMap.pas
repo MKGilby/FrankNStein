@@ -183,7 +183,7 @@ begin
 end;
 
 procedure TJSONMap.LoadTiles(JSON:TJSONData; pImage:TARGBImage);
-const tileorder='x!()L></^|v';
+const tileorder='xx!()L></^|v{#}';
 var JA:TJSONArray;i,j,walltile,pc:integer;s:string;tiles:TARGBImage;
 begin
   walltile:=GetInteger(JSON,'WallTileIndex',0);
@@ -214,6 +214,10 @@ begin
               end;
           '^','|','v':begin  // Slider pole
                 fTileMap.Tiles[j,i]:=TILE_POLE;
+                tiles.CopyTo((pos(s[j+1],tileorder)-1)*8,0,8,8,j*8,i*8,pImage,true);
+              end;
+          '{','#','}':begin  // Mud
+                fTileMap.Tiles[j,i]:=TILE_MUD;
                 tiles.CopyTo((pos(s[j+1],tileorder)-1)*8,0,8,8,j*8,i*8,pImage,true);
               end;
           '!':begin  // Zapper

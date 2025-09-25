@@ -101,7 +101,7 @@ begin
     pre:=now;
 
     Draw;
-    MM.Fonts['Purple'].OutText(st(FPS,3,'0'),0,0,0);
+    MM.Fonts['Lime'].OutText(st(FPS,3,'0'),0,0,0);
 
     {$ifndef LimitFPS} FlipNoLimit; {$else} Flip; {$endif}
     HandleMessages;
