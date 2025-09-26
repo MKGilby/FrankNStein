@@ -88,10 +88,10 @@ begin
   end;
   Print('Blue',Format('SLOT %d',[fSlot+1]),SLOTWIDTH div 2,0,1);
   if fIsUsed then begin
-    Print('Purple','MAPS:',SLOTMARGIN,2,0);
+    Print('White','MAPS:',SLOTMARGIN,2,0);
     Print('Yellow',Format('%d/%d',[fCompletedMapCount,MapList.Count]),SLOTWIDTH-SLOTMARGIN,3,2);
-    Print('Purple','LAST',SLOTMARGIN,5,0);
-    Print('Purple','PLAYED:',SLOTWIDTH-SLOTMARGIN,6,2);
+    Print('White','LAST',SLOTMARGIN,5,0);
+    Print('White','PLAYED:',SLOTWIDTH-SLOTMARGIN,6,2);
     Print('Yellow',fLastDate,SLOTWIDTH div 2,7,1);
     Print('Yellow',fLastTime,SLOTWIDTH div 2,8,1);
     fProf.PutFrame(fLeft+SLOTWIDTH div 2-5,SLOTTOP+SLOTHEIGHT-6-16);
@@ -144,12 +144,12 @@ begin
     PutTexture(256-24,192-48,MM.Textures.ItemByName['Speccy']);
 
     MM.Fonts['White'].OutText('SELECT SAVE SLOT',LOGICALWINDOWWIDTH div 2,42,1);
-    if Assigned(Controller) then begin
-      MM.Fonts['White'].OutText('USE '#130' AND '#131' TO SELECT SLOT',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-20,1);
-      MM.Fonts['White'].OutText('PRESS '#128' TO CONTINUE',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-10,1);
+    if not Assigned(Controller) then begin
+      MM.Fonts['Purple'].OutText('USE '#130' AND '#131' TO SELECT SLOT',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-20,1);
+      MM.Fonts['Purple'].OutText('PRESS '#128' TO CONTINUE',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-10,1);
     end else begin
-      MM.Fonts['White'].OutText('USE ARROWS TO SELECT SLOT',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-20,1);
-      MM.Fonts['White'].OutText('PRESS SPACE TO CONTINUE',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-10,1);
+      MM.Fonts.OutText(#5'USE '#6'ARROWS'#5' TO SELECT SLOT',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-20,1);
+      MM.Fonts.OutText(#5'PRESS '#6'SPACE'#5' TO CONTINUE',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-10,1);
     end;
     PutTexture(57,8,MM.Textures.ItemByName['Logo']);
     for i:=0 to MAXSLOTS-1 do fSlots[i].Draw;

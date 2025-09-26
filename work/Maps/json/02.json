@@ -40,7 +40,7 @@
       "Left" : 0,
       "Right" : 192,
       "Start" : 120,
-      "PPS" : 10,
+      "PPS" : 11,
       "AnimationNo" : 2
     },
     { "Row" : 9,
@@ -49,6 +49,20 @@
       "Start" : 216,
       "PPS" : 10,
       "AnimationNo" : 3
+    }
+  ],
+  "Decorations" : [
+    { "Type" : "window",
+      "Left" : 12.5,
+      "Top" : 12
+    },
+    { "Type" : "window",
+      "Left" : 18.5,
+      "Top" : 12
+    },
+    { "Type" : "window2",
+      "Left" : 24.5,
+      "Top" : 12
     }
   ]
 }

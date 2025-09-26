@@ -51,7 +51,10 @@ begin
   fMonsters:=TMonsters.Create;
   for i:=0 to fMap.MonsterCount-1 do
     fMonsters.AddMonster(fMap.MonsterData[i]);
-  fMeter:=TMeter.Create;
+  case fMap.GameVersion of
+    gvOriginal: fMeter:=TOriginalMeter.Create;
+    gvRebooted: fMeter:=TRebootedMeter.Create;
+  end;
   fLever:=TLever.Create(fMap,25*8,2*8);
 end;
 

@@ -31,15 +31,8 @@ type
 
   TDecorationType=(dtWindow,dtDoor);
 
-  { TDecorationData }
-
-  TDecorationData=record
-    _type:TDecorationType;
-    _x,_y:integer;
-    constructor Init(iType:TDecorationType;iX,iY:integer);
-  end;
-
-  TDecorationDataList=array of TDecorationData;
+  TMapType=(mtConstructing,mtInterim,mtCongratulations);
+  TGameVersion=(gvOriginal,gvRebooted);
 
   { TJSONMap }
 
@@ -49,18 +42,16 @@ type
     procedure Draw;
   private
     fName,fAuthor:string;
-    fMapType:integer;
-    fGameVersion:integer;
+    fMapType:TMapType;
+    fGameVersion:TGameVersion;
     fTileMap:TTileMap;
     fTexture:TTexture;
     fSprings:TSprings;
     // Array of monster data
     fMonsters:TMonsterDataList;
-    // Array of decoration data
-    fDecorations:TDecorationDataList;
     procedure LoadTiles(JSON:TJSONData;pImage:TARGBImage);
     procedure LoadMonsters(JSON:TJSONData);
-    procedure LoadDecorations(JSON:TJSONData);
+    procedure LoadDecorations(JSON:TJSONData;pImage:TARGBImage);
     procedure FillBackWithStones(pImage:TARGBImage);
     procedure CreateTileMap;
     procedure LoadOverlay(pImage:TARGBImage;pName:string);
@@ -69,17 +60,14 @@ type
     function GetFloat(JSON:TJSONData;Path:string;Default:double=0):double;
     function fGetMonsterData(index:integer):TMonsterData;
     function fGetMonsterCount:integer;
-    function fGetDecorationData(index:integer):TDecorationData;
-    function fGetDecorationCount:integer;
   public
     property Name:string read fName;
     property Author:string read fAuthor;
-    property MapType:integer read fMapType;
+    property MapType:TMapType read fMapType;
+    property GameVersion:TGameVersion read fGameVersion;
     property TileMap:TTileMap read fTileMap;
     property MonsterData[index:integer]:TMonsterData read fGetMonsterData;
     property MonsterCount:integer read fGetMonsterCount;
-    property DecorationData[index:integer]:TDecorationData read fGetDecorationData;
-    property DecorationCount:integer read fGetDecorationCount;
   end;
 
   { TMapList }
@@ -111,14 +99,6 @@ begin
   _animationindex:=iAnimationIndex;
 end;
 
-{ TDecorationData }
-
-constructor TDecorationData.Init(iType:TDecorationType; iX,iY:integer);
-begin
-  _type:=iType;
-  _x:=iX;
-  _y:=iY;
-end;
 
 { TJSONMap }
 
@@ -135,13 +115,13 @@ begin
   end;
   try
     s:=uppercase(GetString(JSON,'Type','Constructing'));
-    if s='CONSTRUCTING' then fMapType:=MAPTYPECONSTRUCTING
-    else if s='INTERIM' then fMapType:=MAPTYPEINTERIM
-    else if s='CONGRATULATIONS' then fMapType:=MAPTYPECONGRATULATIONS
+    if s='CONSTRUCTING' then fMapType:=mtConstructing
+    else if s='INTERIM' then fMapType:=mtInterim
+    else if s='CONGRATULATIONS' then fMapType:=mtCongratulations
     else raise Exception.Create(Format('Unknown map type! (%s)',[GetString(JSON,'Type','Constructing')]));
     s:=uppercase(GetString(JSON,'Game','Original'));
-    if s='ORIGINAL' then fGameVersion:=GAMEVERSIONORIGINAL
-    else if s='REBOOTED' then fGameVersion:=GAMEVERSIONREBOOTED
+    if s='ORIGINAL' then fGameVersion:=gvOriginal
+    else if s='REBOOTED' then fGameVersion:=gvRebooted
     else raise Exception.Create(Format('Unknown game version! (%s)',[GetString(JSON,'Game','Original')]));
     fAuthor:=GetString(JSON,'Author','N/A');
     fName:=GetString(JSON,'Name','N/A');
@@ -150,16 +130,16 @@ begin
       try
         tmp.bar(0,0,tmp.Width,tmp.Height,0,0,0,255);
         FillBackWithStones(tmp);
-        if fMapType=MAPTYPECONSTRUCTING then LoadOverlay(tmp,'constr');
+        if fMapType=mtConstructing then LoadOverlay(tmp,'constr');
         CreateTileMap;
-        if maptype=MAPTYPECONSTRUCTING then begin
+        if maptype=mtConstructing then begin
           for i:=0 to 25 do begin
             if platf[i+1]<>' ' then fTileMap[i,4]:=TILE_WALL;
           end;
         end;
         LoadTiles(JSON,tmp);
         LoadMonsters(JSON);
-        LoadDecorations(JSON);
+        LoadDecorations(JSON,tmp);
         fTexture:=TStaticTexture.Create(tmp);
       finally
         tmp.Free;
@@ -263,25 +243,22 @@ begin
     end;
 end;
 
-procedure TJSONMap.LoadDecorations(JSON:TJSONData);
-var JA:TJSONArray;JD:TJSONData;tmpD:TDecorationData;i:integer;s:String;
+procedure TJSONMap.LoadDecorations(JSON:TJSONData; pImage:TARGBImage);
+var JA:TJSONArray;JD:TJSONData;x,y,i:integer;s:String;tmpI:TARGBImage;
 begin
-  SetLength(fDecorations,0);
   JA:=TJSONArray(JSON.FindPath('Decorations'));
   if Assigned(JA) then
     for i:=0 to JA.Count-1 do begin
       JD:=JA.Items[i];
-      s:=uppercase(JD.FindPath('Type').AsString);
-      if s='WINDOW' then tmpD:=TDecorationData.Init(
-        dtWindow,
-        JD.FindPath('Left').AsInteger*8,
-        JD.FindPath('Top').AsInteger*8)
-      else if s='DOOR' then tmpD:=TDecorationData.Init(
-        dtDoor,
-        JD.FindPath('Left').AsInteger*8,
-        JD.FindPath('Top').AsInteger*8);
-      SetLength(fDecorations,length(fDecorations)+1);
-      fDecorations[length(fDecorations)-1]:=tmpD;
+      s:=JD.FindPath('Type').AsString;
+      x:=trunc(JD.FindPath('Left').AsFloat*8);
+      y:=trunc(JD.FindPath('Top').AsFloat*8);
+      tmpI:=TARGBImage.Create(s+'.png');
+      try
+        pImage.PutImage(x,y,tmpI,true);
+      finally
+        tmpI.Free;
+      end;
     end;
 end;
 
@@ -384,9 +361,9 @@ end;
 procedure TJSONMap.LoadOverlay(pImage: TARGBImage; pName: string);
 var tmp:TARGBImage;
 begin
-  if fGameVersion=GAMEVERSIONORIGINAL then
+  if fGameVersion=gvOriginal then
     tmp:=TARGBImage.Create(Format('ovr_%s_org.png',[pName]))
-  else if fGameVersion=GAMEVERSIONREBOOTED then
+  else if fGameVersion=gvRebooted then
     tmp:=TARGBImage.Create(Format('ovr_%s_rbt.png',[pName]));
   try
     pImage.PutImage(0,0,tmp,true);
@@ -432,18 +409,6 @@ begin
   Result:=length(fMonsters);
 end;
 
-function TJSONMap.fGetDecorationData(index:integer):TDecorationData;
-begin
-  if (index>=0) and (index<length(fDecorations)) then
-    Result:=fDecorations[index]
-  else
-    Result:=TDecorationData.Init(dtWindow,0,0);
-end;
-
-function TJSONMap.fGetDecorationCount:integer;
-begin
-  Result:=length(fDecorations);
-end;
 
 { TMapList }
 

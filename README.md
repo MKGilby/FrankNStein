@@ -40,10 +40,17 @@ containing your fpc.exe
    At the time of writing of this document the latest SDL2 version is 2.32.8.
 
 ## Compiled binaries from current build with datafiles and DLLs
-[x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.24.zip "Download x64 version") or
-[x86](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_x86_0.0.0.24.zip "Download x86 version").
+[x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.25.zip "Download x64 version") or
+[x86](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_x86_0.0.0.25.zip "Download x86 version").
 
 ## What's new
+
+### 2025.09.26 - Build 25
+- Changed text colors here and there to be more consistent.
+- Moved map name and author to the center of the window on map select screen.
+- Added text to explain controls on map select screen.
+- Added rebooted type electro-meter. It shows remaining time in m:ss format.
+- Added windows to maps.
 
 ### 2025.09.25 - Build 24
 - Added mud. (Rebooted map 03)

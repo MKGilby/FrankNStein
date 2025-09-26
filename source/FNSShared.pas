@@ -24,13 +24,6 @@ const
   MAPWIDTHINBLOCKS=32;
   MAPHEIGHTINBLOCKS=22;
 
-  MAPTYPECONSTRUCTING=0;
-  MAPTYPEINTERIM=1;
-  MAPTYPECONGRATULATIONS=2;
-
-  GAMEVERSIONORIGINAL=0;
-  GAMEVERSIONREBOOTED=1;
-
   TILE_EMPTY=0;
   TILE_WALL=1;
   TILE_SPRING=2;
@@ -76,19 +69,30 @@ begin
   MM.Fonts[Name].SetColor(r,g,b);
 end;
 
+procedure LoadFont2(name:string;r,g,b:integer);
+begin
+  MM.Load('meterfont.png',Name,MM_DONTKEEPIMAGE);
+  MM.Fonts[Name].SpaceSpace:=3;
+  MM.Fonts[Name].SetColor(r,g,b);
+end;
+
 procedure LoadAssets;
 begin
   Log.LogStatus('Loading assets...');
   MM:=TMediaManager.Create;
   Log.LogStatus('  Fonts...');
   Log.Trace('Before fonts: '+inttostr(GetHeapStatus.TotalAllocated));
-  LoadFont('White',255,255,255);
-  LoadFont('Blue',40,128,240);
-  LoadFont('Green',40,240,128);
-  LoadFont('Yellow',240,128,40);
-  LoadFont('Pink',240,40,128);
-  LoadFont('Purple',128,40,240);
-  LoadFont('Lime',128,240,40);
+  LoadFont('White',255,255,255); // 0
+  LoadFont('Blue',40,128,240);   // 1
+  LoadFont('Green',40,240,128);  // 2
+  LoadFont('Yellow',240,128,40); // 3
+  LoadFont('Pink',240,40,128);   // 4
+  LoadFont('Purple',128,40,240); // 5
+  LoadFont('Lime',128,240,40);   // 6
+
+  LoadFont2('Meter',8,8,8);
+  LoadFont2('MeterShadow',144,144,140);
+
   Log.Trace('After fonts: '+inttostr(GetHeapStatus.TotalAllocated));
   Log.LogStatus('  Logo...');
   MM.Load('logo.png','Logo',MM_CREATETEXTUREONLY);

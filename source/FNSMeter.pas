@@ -5,7 +5,7 @@ unit FNSMeter;
 interface
 
 uses
-  Classes, SysUtils, Animation2Unit, mk_sdl2;
+  Classes, SysUtils, Animation2Unit, Font2Unit, mk_sdl2;
 
 type
 
@@ -13,12 +13,29 @@ type
 
   TMeter=class
     constructor Create;
-    destructor Destroy; override;
     procedure Move(pTimeUsed:double);
-    procedure Draw;
+    procedure Draw; virtual;abstract;
+  protected
+    fCurrentValue:double;
+  end;
+
+  { TOriginalMeter }
+
+  TOriginalMeter=class(TMeter)
+    constructor Create;
+    destructor Destroy; override;
+    procedure Draw; override;
   private
     fFront:TAnimation;
-    fCurrentValue:double;
+  end;
+
+  { TRebootedMeter }
+
+  TRebootedMeter=class(TMeter)
+    constructor Create;
+    procedure Draw; override;
+  private
+    fFont,fShadowFont:TFont;
   end;
 
 implementation
@@ -34,15 +51,7 @@ const
 
 constructor TMeter.Create;
 begin
-  fFront:=MM.Animations.ItemByName['Meter'].SpawnAnimation;
-  MM.Animations.ItemByName['Meter'].Animation.LogData;
   fCurrentValue:=MAXTIME;
-end;
-
-destructor TMeter.Destroy;
-begin
-  fFront.Free;
-  inherited Destroy;
 end;
 
 procedure TMeter.Move(pTimeUsed:double);
@@ -53,7 +62,21 @@ begin
   end;
 end;
 
-procedure TMeter.Draw;
+
+{ TOriginalMeter }
+
+constructor TOriginalMeter.Create;
+begin
+  fFront:=MM.Animations.ItemByName['Meter'].SpawnAnimation;
+end;
+
+destructor TOriginalMeter.Destroy;
+begin
+  fFront.Free;
+  inherited Destroy;
+end;
+
+procedure TOriginalMeter.Draw;
 const PIRAD=pi/180;
   C1=32;
   C2=64;
@@ -67,6 +90,24 @@ begin
   Line(METERLEFT+12,METERTOP+13,METERLEFT+12+x,METERTOP+13+y,C2,C2,C2,255);
   Line(METERLEFT+11,METERTOP+13,METERLEFT+11+x,METERTOP+13+y,C1,C1,C1,255);
   fFront.PutFrame(METERLEFT,METERTOP);
+end;
+
+{ TRebootedMeter }
+
+constructor TRebootedMeter.Create;
+begin
+  inherited Create;
+  fFont:=MM.Fonts['Meter'];
+  fShadowFont:=MM.Fonts['MeterShadow'];
+end;
+
+procedure TRebootedMeter.Draw;
+var secs:integer;txt:String;
+begin
+  secs:=trunc(fCurrentValue);
+  txt:=Format('%d:%.2d',[secs div 60,secs mod 60]);
+  fShadowFont.OutText(txt,METERLEFT+12,METERTOP+5,1);
+  fFont.OutText(txt,METERLEFT+11,METERTOP+4,1);
 end;
 
 end.

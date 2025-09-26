@@ -62,16 +62,24 @@ begin
     fPlay1Map.Draw;
     PutTexture(0,0,fDarkLayer);
     bar(0,LOGICALWINDOWHEIGHT-24,LOGICALWINDOWWIDTH,24,0,0,0);
-    MM.Fonts['White'].OutText(MapList.MapNames[fCurrentMapNo],128,168,1);
-    MM.Fonts.OutText(#1'BY '#3+MapList.Authors[fCurrentMapNo],128,176,1);
-    if fCurrentMapNo>0 then MM.Fonts['White'].OutText(#130,4,172,0);
-    if fCurrentMapNo<MapList.Count-1 then MM.Fonts['White'].OutText(#131,244,172,0);
+    PutTexturePart(32,80,0,0,LOGICALWINDOWWIDTH-32*2,32,fDarkLayer);
+    MM.Fonts['White'].OutText(MapList.MapNames[fCurrentMapNo],128,88,1);
+    MM.Fonts.OutText(#1'BY '#3+MapList.Authors[fCurrentMapNo],128,96,1);
+    if fCurrentMapNo>0 then begin
+      PutTexturePart(4,88,0,0,16,16,fDarkLayer);
+      MM.Fonts.OutText(#130,8,92,0);
+    end;
+    if fCurrentMapNo<MapList.Count-1 then begin
+      PutTexturePart(236,88,0,0,16,16,fDarkLayer);
+      MM.Fonts.OutText(#131,240,92,0);
+    end;
     if Assigned(Controller) then begin
       MM.Fonts['Purple'].OutText(#128' PLAY',0,184,0);
       MM.Fonts['Purple'].OutText(#129' BACK',LOGICALWINDOWWIDTH,184,2);
     end else begin
-      MM.Fonts.OutText(#6'SPACE'#5' PLAY',0,184,0);
-      MM.Fonts.OutText(#6'ESC'#5' BACK',LOGICALWINDOWWIDTH,184,2);
+      MM.Fonts.OutText(#5'USE '#6'ARROWS'#5' TO SELECT MAP',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-24,1);
+      MM.Fonts.OutText(#5'PRESS '#6'SPACE'#5' TO CONTINUE',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-16,1);
+      MM.Fonts.OutText(#6'ESCAPE'#5' TO GO BACK',LOGICALWINDOWWIDTH div 2,LOGICALWINDOWHEIGHT-8,1);
     end;
 
     {$ifndef LimitFPS} FlipNoLimit; {$else} Flip; {$endif}
