@@ -24,7 +24,9 @@
 // Version info:
 //
 //  V1.00: Gilby - 2023.12.13
-//     * Initial creation from Animation2Unit
+//     * Initial creation from Animation2Unit.
+//  V1.01: Gilby - 2025.10.28
+//     * Added frame data to logging.
 
 {$mode delphi}
 
@@ -124,7 +126,7 @@ uses SysUtils, MKStream, Logger;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.00';
+  Version='1.01';
 
 { TAnimationTimer }
 
@@ -154,7 +156,7 @@ begin
 end;
 
 procedure TAnimationTimer.LogData;
-var s:string;
+var s:string;i:integer;
 begin
   Log.LogDebug('------ AnimationTimer data starts ------');
   Log.LogDebug(Format('Name: %s',[name]));
@@ -174,6 +176,9 @@ begin
   if PingPong then s[4]:='X';
   if ReverseAnim then s[5]:='X';
   Log.LogDebug('Looped ['+s[1]+']  RandomStart ['+s[2]+']  Paused ['+s[3]+']  PingPong ['+s[4]+']  ReverseAnim ['+s[5]+']');
+  Log.LogDebug('Frames:');
+  for i:=0 to length(fFrames)-1 do
+    Log.LogDebug(Format('  %d,%d',[fFrames[i].Left,fFrames[i].Top]));
 end;
 
 function TAnimationTimer.fGetFrameCount:integer;
