@@ -42,6 +42,16 @@ m setcolorkey 0 0 0 1
 r json data\mons03.json 1
 m addall 1 2
 
+r png data\mons08.png 1
+m setcolorkey 0 0 0 1
+r json data\mons08.json 1
+m addall 1 2
+
+r png data\mons17.png 1
+m setcolorkey 0 0 0 1
+r json data\mons17.json 1
+m addall 1 2
+
 r png data\meter.png 1
 m setcolorkey 0 0 0 1
 r json data\meter.json 1

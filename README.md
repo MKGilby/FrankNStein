@@ -40,10 +40,20 @@ containing your fpc.exe
    At the time of writing of this document the latest SDL2 version is 2.32.8.
 
 ## Compiled binaries from current build with datafiles and DLLs
-[x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.25.zip "Download x64 version") or
-[x86](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_x86_0.0.0.25.zip "Download x86 version").
+[x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.26.zip "Download x64 version") or
+[x86](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_x86_0.0.0.26.zip "Download x86 version").
 
 ## What's new
+
+### 2025.10.23 - Build 26
+- Fixed flickering in monster creation animation.
+- Fixed a bug when sliding could stop in the middle of the pole.
+- Added bottom monster gfx for rebooted map 03.
+- Added octopus monster gfx. (Not yet used)
+- Added another wall gfx. (Not yet used)
+- You can pause/unpause the game with the Pause key.
+- For debugging purposes you can press A to show tile map values in hexadecimal.
+  (Only when compiled in debug mode.)
 
 ### 2025.09.26 - Build 25
 - Changed text colors here and there to be more consistent.

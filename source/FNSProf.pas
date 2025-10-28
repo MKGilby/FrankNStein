@@ -21,7 +21,7 @@ type
     constructor Create(iMap:TTileMap;iDevice:TDevice;iSprings:TSprings);
     destructor Destroy; override;
     procedure Draw;
-    function Move(pTimeUsed:double):TPlayerMoveRes;  // ellapsed time in secs.
+    function Move(pElapsedTime:double):TPlayerMoveRes;  // elapsed time in secs
   private
     fX,fY:double;
     fDirX:integer;
@@ -32,8 +32,6 @@ type
     fDevice:TDevice;
     fSprings:TSprings;
     fTempSpring:TSpring;
-    // This one is called in small steps
-//    procedure MoveEx(pTimeUsed:double);
   end;
 
 implementation
@@ -41,14 +39,13 @@ implementation
 uses FNSShared, mk_sdl2, sdl2, logger;
 
 const
-  SPEEDX=32;  // pixel / sec
-  SPEEDY=64;  // pixel / sec
-  SPEEDNORMX=SPEEDX/256;  // normalized to screen
-  SPEEDNORMY=SPEEDY/192;  // normalized to screen
+  SPEEDX=32;  // pixels / sec
+  SPEEDY=64;  // pixels / sec
   MUDSPEEDFACTOR=0.5;
-  JUMPHEIGHT=32/192;
-  ICESLIDEDISTANCE=8/256;
-  POLESLIDEDISTANCE=8/192;
+  JUMPHEIGHT=32;        // pixels
+  ICESLIDEDISTANCE=8;   // pixels
+  POLESLIDEDISTANCE=8;  // pixels
+
 
 { TProf }
 
@@ -59,15 +56,13 @@ begin
   fSlideLeft:=MM.Animations.ItemByName['ProfSlideLeft'].SpawnAnimation;
   fSlideRight:=MM.Animations.ItemByName['ProfSlideRight'].SpawnAnimation;
   fSlideDown:=MM.Animations.ItemByName['ProfSlideDown'].SpawnAnimation;
-  fX:=3*8/256;
-  fY:=2*8/192;
-//  fY:=11*8/192;
+  fX:=3*8;
+  fY:=2*8;
   fDirX:=1;
   fMap:=iMap;
   fDevice:=iDevice;
   fSprings:=iSprings;
   fTempSpring:=nil;
-//  MAXTIMESLICE:=1/max(SPEEDX,SPEEDY);
 end;
 
 destructor TProf.Destroy;
@@ -83,8 +78,8 @@ end;
 procedure TProf.Draw;
 var x,y:integer;
 begin
-  x:=trunc(fX*256);
-  y:=trunc(fy*192);
+  x:=trunc(fX);
+  y:=trunc(fy);
   if Assigned(fTempSpring) then inc(y);
   case fState of
     psSliding:begin
@@ -105,15 +100,14 @@ begin
   end;
 end;
 
-function TProf.Move(pTimeUsed:double):TPlayerMoveRes;
+function TProf.Move(pElapsedTime:double):TPlayerMoveRes;
 var x,y,px,py,i:integer;
 begin
   Result:=pmrNone;
-  x:=trunc(fX*256);
-  y:=trunc(fy*192);
+  x:=trunc(fX);
+  y:=trunc(fy);
   px:=x div 8;
   py:=y div 8;
-//  Log.Trace(Format('x (px)=%d (%d), y (py)=%d (%d)',[x,px,y,py]));
   case fState of
     psIdle:begin
       if (keys[SDL_SCANCODE_RIGHT] or controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT])
@@ -121,9 +115,9 @@ begin
          or (((x mod 8)=0) and (fMap.Tiles[px+1,py]=TILE_EMPTY) and (fMap.Tiles[px+1,py+1]=TILE_EMPTY))) then begin
         if ((x mod 8>=4) and (fMap.Tiles[px+1,py+2]=TILE_MUD)) or
            ((x mod 8<4) and (fMap.Tiles[px,py+2]=TILE_MUD)) then
-          fX+=SPEEDNORMX*pTimeUsed*MUDSPEEDFACTOR
+          fX+=SPEEDX*pElapsedTime*MUDSPEEDFACTOR
         else
-          fX+=SPEEDNORMX*pTimeUsed;
+          fX+=SPEEDX*pElapsedTime;
         fDirX:=1;
       end;
       if (keys[SDL_SCANCODE_LEFT] or controllerbuttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT])
@@ -131,9 +125,9 @@ begin
          or (((x mod 8)=0) and (fMap.Tiles[px-1,py]=TILE_EMPTY) and (fMap.Tiles[px-1,py+1]=TILE_EMPTY))) then begin
         if ((x mod 8>=4) and (fMap.Tiles[px+1,py+2]=TILE_MUD)) or
            ((x mod 8<4) and (fMap.Tiles[px,py+2]=TILE_MUD)) then
-          fX-=SPEEDNORMX*pTimeUsed*MUDSPEEDFACTOR
+          fX-=SPEEDX*pElapsedTime*MUDSPEEDFACTOR
         else
-          fX-=SPEEDNORMX*pTimeUsed;
+          fX-=SPEEDX*pElapsedTime;
         fDirX:=-1;
       end;
       if (x mod 8=0) then begin
@@ -173,30 +167,30 @@ begin
     end;
     psFalling:begin
       if (y mod 8<>0) then begin
-        fY+=SPEEDNORMY*pTimeUsed;
+        fY+=SPEEDY*pElapsedTime;
       end else begin
         if fMap.Tiles[pX,pY+2]<>TILE_EMPTY then
           fState:=psIdle
         else
-          fY+=SPEEDNORMY*pTimeUsed;
+          fY+=SPEEDY*pElapsedTime;
       end;
     end;
     psJumping:begin
-      if (SPEEDNORMY*pTimeUsed)<=fRemainingDistance then begin
-        fY-=SPEEDNORMY*pTimeUsed;
-        fRemainingDistance-=SPEEDNORMY*pTimeUsed;
+      if (SPEEDY*pElapsedTime)<=fRemainingDistance then begin
+        fY-=SPEEDY*pElapsedTime;
+        fRemainingDistance-=SPEEDY*pElapsedTime;
       end else begin
         fY-=fRemainingDistance;
         fState:=psIdle;
       end;
     end;
     psSliding:begin
-      if (SPEEDNORMX*pTimeUsed)<=fRemainingDistance then begin
-        fX+=SPEEDNORMX*pTimeUsed*fDirX;
-        fRemainingDistance-=SPEEDNORMX*pTimeUsed;
+      if (SPEEDX*pElapsedTime)<=fRemainingDistance then begin
+        fX+=SPEEDX*pElapsedTime*fDirX;
+        fRemainingDistance-=SPEEDX*pElapsedTime;
       end else begin
         fX+=fRemainingDistance*fDirX;
-        x:=trunc(fX*256);
+        x:=trunc(fX);
         px:=x div 8;
         if (x mod 8=0) and (fMap.Tiles[px,py+2]=TILE_ICE) then begin
           fState:=psSliding;
@@ -205,12 +199,15 @@ begin
       end;
     end;
     psSlidingDown:begin
-      if (SPEEDNORMY*pTimeUsed)<=fRemainingDistance then begin
-        fY+=SPEEDNORMY*pTimeUsed;
-        fRemainingDistance-=SPEEDNORMY*pTimeUsed;
+      if (SPEEDY*pElapsedTime)<=fRemainingDistance then begin
+        fY+=SPEEDY*pElapsedTime;
+        fRemainingDistance-=SPEEDY*pElapsedTime;
       end else begin
-        fY+=fRemainingDistance;
-        fState:=psIdle;
+        fY:=round(fy+fRemainingDistance);
+        if fMap.Tiles[pX,pY+2]<>TILE_EMPTY then
+          fState:=psIdle
+        else
+          fState:=psFalling;
       end;
     end;
   end;

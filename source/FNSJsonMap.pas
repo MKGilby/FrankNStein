@@ -163,7 +163,7 @@ begin
 end;
 
 procedure TJSONMap.LoadTiles(JSON:TJSONData; pImage:TARGBImage);
-const tileorder='xx!()L></^|v{#}';
+const tileorder='xxx!()L></^|v{#}';
 var JA:TJSONArray;i,j,walltile,pc:integer;s:string;tiles:TARGBImage;
 begin
   walltile:=GetInteger(JSON,'WallTileIndex',0);

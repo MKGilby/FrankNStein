@@ -158,6 +158,7 @@ begin
     end;
     dsAnimating: begin
       for i:=0 to fNextPiece-1 do fSkeleton[i].Draw;
+      bar(DEVICEINNERLEFT,DEVICEINNERTOP,16,trunc((32*fFase*0.5)),$19,$1a,$1c,$ff);
       fMonster.PutFramePart(DEVICEINNERLEFT,DEVICEINNERTOP,0,0,16,trunc(32*fFase*0.5));
       for i:=0 to 3 do fOverlay.PutFrame(DEVICEINNERLEFT,DEVICEINNERTOP+i*8);
     end;

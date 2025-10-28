@@ -10,8 +10,8 @@ unit FNSPlay1Map;
 interface
 
 uses
-  SysUtils, FNSDevice, FNSProf, FNSSpring, FNSMonster, FNSJsonMap, FNSMeter,
-  FNSLever;
+  SysUtils, mk_sdl2,
+  FNSDevice, FNSProf, FNSSpring, FNSMonster, FNSJsonMap, FNSMeter, FNSLever;
 
 type
 
@@ -32,17 +32,18 @@ type
     fMonsters:TMonsters;
     fMeter:TMeter;
     fLever:TLever;
+    fDarkLayer:TStaticTexture;
     procedure MoveEx(pTimeUsed:double);
   end;
 
 implementation
 
-uses FNSShared, sdl2, mk_sdl2, MKToolbox;
+uses FNSShared, sdl2, MKToolbox, ARGBImageUnit;
 
 { TPlay1Map }
 
 constructor TPlay1Map.Create(iMapNo: integer);
-var i:integer;
+var i:integer;tmp:TARGBImage;
 begin
   fSprings:=TSprings.Create;
   fMap:=TJSONMap.Create(iMapNo,fSprings,false);
@@ -56,10 +57,22 @@ begin
     gvRebooted: fMeter:=TRebootedMeter.Create;
   end;
   fLever:=TLever.Create(fMap,25*8,2*8);
+{$IFDEF DEBUG}
+  tmp:=TARGBImage.Create(LOGICALWINDOWWIDTH,LOGICALWINDOWHEIGHT-24);
+  try
+    tmp.Clear($a0000000);
+    fDarkLayer:=TStaticTexture.Create(tmp);
+  finally
+    tmp.Free;
+  end;
+{$ENDIF}
 end;
 
 destructor TPlay1Map.Destroy;
 begin
+{$IFDEF DEBUG}
+  fDarkLayer.Free;
+{$ENDIF}
   fLever.Free;
   fMeter.Free;
   fMonsters.Free;
@@ -94,20 +107,34 @@ begin
 end;
 
 function TPlay1Map.Run:integer;
-var pre,now:uint64;
+var pre,now:uint64;paused:boolean;i,j:integer;
 begin
   Result:=RES_NONE;
   pre:=GetTickCount64;
+  paused:=false;
   repeat
     now:=GetTickCount64;
-    Move((now-pre)/1000);
+    if not paused then Move((now-pre)/1000);
     pre:=now;
 
     Draw;
     MM.Fonts['Lime'].OutText(st(FPS,3,'0'),0,0,0);
 
-    {$ifndef LimitFPS} FlipNoLimit; {$else} Flip; {$endif}
+    {$IFDEF DEBUG}
+    if keys[SDL_SCANCODE_A] then begin
+      PutTexture(0,0,fDarkLayer);
+      for i:=0 to 31 do
+        for j:=0 to 21 do
+          MM.Fonts['MeterShadow'].OutText(hexstr(fMap.TileMap.Tiles[i,j],2),i*8,j*8,0);
+    end;
+    {$ENDIF}
+
+    FlipNoLimit;
     HandleMessages;
+    if keys[SDL_SCANCODE_PAUSE] then begin
+      paused:=not paused;
+      keys[SDL_SCANCODE_PAUSE]:=false;
+    end;
 
     if keys[SDL_SCANCODE_ESCAPE] or
        controllerbuttons[SDL_CONTROLLER_BUTTON_B] then Result:=RES_BACK;
