@@ -36,6 +36,8 @@
 //     * Removing unused variables.
 //   1.12 - Gilby - 2025.04.11
 //     * Following changes in used units.
+//   1.12a - Gilby - 2025.10.08
+//     * Modified code to remove Lazarus warnings.
 
 unit ARGBImagePNGWriterUnit;
 
@@ -59,7 +61,7 @@ uses Classes, SysUtils, ARGBImageUnit, CRC32Unit, FastPaletteUnit,
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.12';
+  Version='1.12a';
 
   HEADER=#137#80#78#71#13#10#26#10;
   IHDR:uint32=$52444849; //  #82#68#72#73;
@@ -263,7 +265,7 @@ begin
 
 //        Log.DumpMemory(palettedimage^,0,pWidth*pHeight,'','');
         scanlinesize:=pWidth;
-        getmem(scanlines,(scanlinesize+1)*pHeight);
+        scanlines:=getmem((scanlinesize+1)*pHeight);
         pp:=pRawdata;
         pr:=scanlines;
         for j:=0 to pHeight-1 do begin
@@ -294,7 +296,7 @@ begin
         end;
 
         scanlinesize:=pWidth*3;
-        getmem(scanlines,(scanlinesize+1)*pHeight);
+        scanlines:=getmem((scanlinesize+1)*pHeight);
         pp:=pRawData;
         pr:=scanlines;
         for j:=0 to pHeight-1 do begin
@@ -340,7 +342,7 @@ begin
 //        Log.DumpMemory(palettedimage^,0,pWidth*pHeight,'','');
 
         scanlinesize:=(pWidth-1) div (8 div bitdepth)+1;
-        getmem(scanlines,(scanlinesize+1)*pHeight);
+        scanlines:=getmem((scanlinesize+1)*pHeight);
         pp:=palettedimage;
         pr:=scanlines;
         for j:=0 to pHeight-1 do begin
@@ -377,7 +379,7 @@ begin
       end;
     4:begin
         scanlinesize:=pWidth*2;
-        getmem(scanlines,(scanlinesize+1)*pHeight);
+        scanlines:=getmem((scanlinesize+1)*pHeight);
         pp:=pRawdata;
         pr:=scanlines;
         for j:=0 to pHeight-1 do begin
@@ -393,7 +395,7 @@ begin
       end;
     6:begin
         scanlinesize:=pWidth*4;
-        getmem(scanlines,(scanlinesize+1)*pHeight);
+        scanlines:=getmem((scanlinesize+1)*pHeight);
         pp:=pRawData;
         pr:=scanlines;
         for j:=0 to pHeight-1 do begin
@@ -408,18 +410,22 @@ begin
           end;
         end;
       end;
+    else
+      raise Exception.Create(Format('Invalid ColourType value! (%d)',[ColourType]));
   end;
+  try
+    if palettedimage<>nil then begin   // Paletted
+      Freemem(pal,1024);
+      Freemem(palettedimage,pWidth*pHeight);
+    end;
 
-  if palettedimage<>nil then begin   // Paletted
-    Freemem(pal,1024);
-    Freemem(palettedimage,pWidth*pHeight);
+    ch.Clear;
+    ch.Write(IDAT,4);
+    compress(scanlines^,ch,(scanlinesize+1)*pHeight);
+    AddChunk(pTarget,ch);
+  finally
+    Freemem(scanlines);
   end;
-
-  ch.Clear;
-  ch.Write(IDAT,4);
-  compress(scanlines^,ch,(scanlinesize+1)*pHeight);
-  Freemem(scanlines,(scanlinesize+1)*pHeight);
-  AddChunk(pTarget,ch);
 
   if pAnimations.Count>0 then WriteAnimations(pTarget,pAnimations);
   if Assigned(pFontData) then WriteFontData(pTarget,pFontData);

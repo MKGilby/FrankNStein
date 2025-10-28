@@ -54,6 +54,8 @@
 //  V1.11: Gilby - 2025.08.06
 //     * Removed deprecation message from TTextureAtlasGenerator.
 //     * Fixed SearchForPlace mixed visibility.
+//  V1.12: Gilby - 2025.10.08
+//     * Fixed deduplication. (Did not work within one animation)
 
 unit TextureAtlasGeneratorUnit;
 
@@ -163,7 +165,7 @@ uses sysutils, AnimationDataUnit, Logger, MKToolbox;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.11';
+  Version='1.12';
 
 { TTextureLine }
 {$region /fold}
@@ -234,10 +236,9 @@ end;
 
 procedure TTextureAtlasGeneratorBase.AddImage(pImage:TARGBImage;pAnimationName:string);
 var
-  anim,frame:integer;
+  anim,frame,x,y:integer;
   tmpAnim:TBaseAnimationData;
   tmpFrame:TARGBImage;
-  x,y:integer;
 begin
   // Iterate trough all animations
   for anim:=0 to pImage.Animations.Count-1 do begin
@@ -248,6 +249,9 @@ begin
         tmpAnim:=TFrameBasedAnimationData(pImage.Animations.Items[anim]).Clone(true)
       else if pImage.Animations.Items[anim] is TTimeBasedAnimationData then
         tmpAnim:=TTimeBasedAnimationData(pImage.Animations.Items[anim]).Clone(true);
+      // Add tmpAnim to atlas (You must do this at this point, so the deduplication
+      // will check against frames already added to this animation too.)
+      fTextureAtlas.Animations.AddObject(tmpAnim.Name,tmpAnim);
       // Create temporary image for one frame
       tmpFrame:=TARGBImage.Create(pImage.Animations.Items[anim].Width,pImage.Animations.Items[anim].Height);
       try
@@ -274,8 +278,6 @@ begin
         // Free temporary image of one frame
         tmpFrame.Free;
       end;
-      // Add tmpAnim to atlas
-      fTextureAtlas.Animations.AddObject(tmpAnim.Name,tmpAnim);
     end;
   end;
 end;
