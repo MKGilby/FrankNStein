@@ -1,11 +1,11 @@
 { "Animations" :
   [
     { "Type" : "TimeBased",
-      "Name" : "ShockedLeft",
+      "Name" : "ShockingLeft",
       "Width" : 12,
       "Height" : 16,
       "HotPoint" : { "x" : 0, "y" : 0 },
-      "FPS" : 4,
+      "FPS" : 9,
       "LoopDelay" : 0,
       "Paused" : false,
       "Looped" : true,
@@ -16,11 +16,11 @@
         ]
     },
     { "Type" : "TimeBased",
-      "Name" : "ShockedRight",
+      "Name" : "ShockingRight",
       "Width" : 12,
       "Height" : 16,
       "HotPoint" : { "x" : 0, "y" : 0 },
-      "FPS" : 4,
+      "FPS" : 9,
       "LoopDelay" : 0,
       "StartFrame" : 0,
       "Paused" : false,

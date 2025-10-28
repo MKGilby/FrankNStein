@@ -48,14 +48,14 @@ begin
   fSprings:=TSprings.Create;
   fMap:=TJSONMap.Create(iMapNo,fSprings,false);
   fDevice:=TDevice.Create(fMap);
-  fProf:=TProf.Create(fMap.TileMap,fDevice,fSprings);
-  fMonsters:=TMonsters.Create;
-  for i:=0 to fMap.MonsterCount-1 do
-    fMonsters.AddMonster(fMap.MonsterData[i]);
   case fMap.GameVersion of
     gvOriginal: fMeter:=TOriginalMeter.Create;
     gvRebooted: fMeter:=TRebootedMeter.Create;
   end;
+  fProf:=TProf.Create(fMap.TileMap,fDevice,fMeter,fSprings);
+  fMonsters:=TMonsters.Create;
+  for i:=0 to fMap.MonsterCount-1 do
+    fMonsters.AddMonster(fMap.MonsterData[i]);
   fLever:=TLever.Create(fMap,25*8,2*8);
 {$IFDEF DEBUG}
   tmp:=TARGBImage.Create(LOGICALWINDOWWIDTH,LOGICALWINDOWHEIGHT-24);

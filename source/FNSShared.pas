@@ -101,6 +101,7 @@ begin
   Log.LogStatus('  Sprites...');
   MM.Load('sprites.png','Sprites');
   MM.Load('msprites.png','MaskedSprites',MM_CREATEMASKFORANIMATIONFRAMES);
+  MM.Load('shocking.png','Shocking',MM_CREATEMASKFORANIMATIONFRAMES);
   Log.Trace('After sprites: '+inttostr(GetHeapStatus.TotalAllocated));
   Log.LogStatus('  Decorations...');
   MM.Load('backwall.png','Stones');
@@ -117,15 +118,11 @@ begin
   VMU:=TVMU.Create;
   VMU.MapCount:=MapList.Count;
   Log.Trace('After VMU: '+inttostr(GetHeapStatus.TotalAllocated));
-//  Log.LogStatus('Creating common classes...');
-//  Springs:=TSprings.Create;
 end;
 
 procedure FreeAssets;
 begin
   Log.LogStatus('Freeing...');
-//  Log.LogStatus('  Common classes...');
-//  if Assigned(Springs) then Springs.Free;
   Log.LogStatus('  VMU...');
   if Assigned(VMU) then VMU.Free;
   Log.LogStatus('  Maps...');

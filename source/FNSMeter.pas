@@ -13,7 +13,8 @@ type
 
   TMeter=class
     constructor Create;
-    procedure Move(pTimeUsed:double);
+    procedure Move(pElapsedTime:double);
+    procedure Refill(pTime:double);
     procedure Draw; virtual;abstract;
   protected
     fCurrentValue:double;
@@ -51,15 +52,21 @@ const
 
 constructor TMeter.Create;
 begin
-  fCurrentValue:=MAXTIME;
+  fCurrentValue:=MAXTIME/2;
 end;
 
-procedure TMeter.Move(pTimeUsed:double);
+procedure TMeter.Move(pElapsedTime:double);
 begin
   if fCurrentValue>0 then begin
-    fCurrentValue:=fCurrentValue-pTimeUsed;
+    fCurrentValue:=fCurrentValue-pElapsedTime;
     if fCurrentValue<0 then fCurrentValue:=0;
   end;
+end;
+
+procedure TMeter.Refill(pTime:double);
+begin
+  fCurrentValue:=fCurrentValue+pTime;
+  if fCurrentValue>MAXTIME then fCurrentValue:=MAXTIME;
 end;
 
 
@@ -67,6 +74,7 @@ end;
 
 constructor TOriginalMeter.Create;
 begin
+  inherited Create;
   fFront:=MM.Animations.ItemByName['Meter'].SpawnAnimation;
 end;
 
