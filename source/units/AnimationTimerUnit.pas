@@ -24,9 +24,16 @@
 // Version info:
 //
 //  V1.00: Gilby - 2023.12.13
-//     * Initial creation from Animation2Unit.
-//  V1.01: Gilby - 2025.10.28
-//     * Added frame data to logging.
+//    * Initial creation from Animation2Unit
+//  V1.01: Gilby - 2024.10.23
+//    * BUGFIX: There was a hang when time based animation finished and there
+//              was more time to use.
+//  V1.02: Gilby - 2025.03.13
+//    * Fix in logging timer type.
+//  V1.03: Gilby - 2025.04.03
+//    * Added logging frame coordinates.
+//  V1.04: Gilby - 2025.04.04
+//    * BUGFIX: There was a hang when restarted a finished time based animation.
 
 {$mode delphi}
 
@@ -126,7 +133,7 @@ uses SysUtils, MKStream, Logger;
 
 const
   Fstr={$I %FILE%}+', ';
-  Version='1.01';
+  Version='1.04';
 
 { TAnimationTimer }
 
@@ -161,7 +168,6 @@ begin
   Log.LogDebug('------ AnimationTimer data starts ------');
   Log.LogDebug(Format('Name: %s',[name]));
   Log.LogDebug(Format('Dimensions: %dx%d',[fWidth,fHeight]));
-  Log.LogDebug('Type: Time-based');
   Log.LogDebug(Format('Hotpoint: %d, %d',[HotPointX,HotPointY]));
   Log.LogDebug(Format('Framecount: %d',[length(fFrames)]));
   Log.LogDebug(Format('StartFrame: %d',[StartFrame]));
@@ -176,9 +182,9 @@ begin
   if PingPong then s[4]:='X';
   if ReverseAnim then s[5]:='X';
   Log.LogDebug('Looped ['+s[1]+']  RandomStart ['+s[2]+']  Paused ['+s[3]+']  PingPong ['+s[4]+']  ReverseAnim ['+s[5]+']');
-  Log.LogDebug('Frames:');
-  for i:=0 to length(fFrames)-1 do
-    Log.LogDebug(Format('  %d,%d',[fFrames[i].Left,fFrames[i].Top]));
+  s:='';
+  for i:=0 to length(fFrames)-1 do s:=s+Format('(%d,%d) ',[Frames[i].Left,Frames[i].Top]);
+  Log.LogDebug('Frames: '+s);
 end;
 
 function TAnimationTimer.fGetFrameCount:integer;
@@ -260,6 +266,7 @@ end;
 procedure TFrameBasedAnimationTimer.LogData;
 begin
   inherited LogData;
+  Log.LogDebug('Type: Frame-based');
   Log.LogDebug(Format('FrameDelay=%d',[fFramedelay]));
   Log.LogDebug(Format('LoopDelay=%d',[fLoopdelay]));
 end;
@@ -340,6 +347,7 @@ end;
 procedure TTimeBasedAnimationTimer.LogData;
 begin
   inherited LogData;
+  Log.LogDebug('Type: Time-based');
   Log.LogDebug(Format('Frame/sec: %.2f',[FPS]));
   Log.LogDebug(Format('Loopdelay: %.2f secs',[LoopDelay]));
 end;
@@ -363,6 +371,7 @@ begin
   inherited ResetFrameIndex;
   fFrameDelayCount:=fFrameDelay;
   fLoopDelayCount:=fLoopDelay;
+  fState:=sFrame;
 end;
 
 procedure TTimeBasedAnimationTimer.AnimateEx(var pTimeUsed:double);
@@ -373,6 +382,7 @@ begin
         pTimeUsed-=fFrameDelayCount;
         AnimateOneFrame;
         fFrameDelayCount:=fFrameDelay;
+        if fFinished then pTimeUsed:=0;
       end else begin
         fFrameDelayCount-=pTimeUsed;
         pTimeUsed:=0;
