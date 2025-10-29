@@ -40,14 +40,17 @@ containing your fpc.exe
    At the time of writing of this document the latest SDL2 version is 2.32.8.
 
 ## Compiled binaries from current build with datafiles and DLLs
-[x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.27.zip "Download x64 version") or
-[x86](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_x86_0.0.0.27.zip "Download x86 version").
+[x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.28.zip "Download x64 version") or
+[x86](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_x86_0.0.0.28.zip "Download x86 version").
 
 ## What's new
 
+### 2025.10.29 - Build 28
+- Added bat monster gfx.
+
 ### 2025.10.28 - Build 27
 - Zapper (! thingie) now works. It shocks professor but regenerates
-  60 seconds of time.
+  60 seconds of time. (It should disappear or change appearance after zapping.)
 
 ### 2025.10.28 - Build 26
 - Fixed flickering in monster creation animation.

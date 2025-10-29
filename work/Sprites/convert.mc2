@@ -42,6 +42,11 @@ m setcolorkey 0 0 0 1
 r json data\mons08.json 1
 m addall 1 2
 
+r png data\bat.png 1
+m setcolorkey 0 0 0 1
+r json data\mons13.json 1
+m addall 1 2
+
 r png data\mons17.png 1
 m setcolorkey 0 0 0 1
 r json data\mons17.json 1

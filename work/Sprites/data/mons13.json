@@ -1,0 +1,38 @@
+{ "Animations" : [
+  { "Type" : "TimeBased",
+    "Name" : "Mons13Right",
+    "Width" : 18,
+    "Height" : 9,
+    "HotPoint" : { "x" : 1, "y" : 1 },
+    "FPS" : 10,
+    "LoopDelay" : 0,
+    "StartFrame" : 0,
+    "Looped" : true,
+    "RandomStart" : true,
+    "Frames" : [
+      { "x" : 0, "y" : 0 },
+      { "x" : 18, "y" : 0 },
+      { "x" : 36, "y" : 0 },
+      { "x" : 54, "y" : 0 },
+      { "x" : 36, "y" : 0 },
+      { "x" : 18, "y" : 0 }
+    ] },
+  { "Type" : "TimeBased",
+    "Name" : "Mons13Left",
+    "Width" : 18,
+    "Height" : 9,
+    "HotPoint" : { "x" : 1, "y" : 1 },
+    "FPS" : 10,
+    "LoopDelay" : 0,
+    "StartFrame" : 0,
+    "Looped" : true,
+    "RandomStart" : true,
+    "Frames" : [
+      { "x" : 0, "y" : 0 },
+      { "x" : 18, "y" : 0 },
+      { "x" : 36, "y" : 0 },
+      { "x" : 54, "y" : 0 },
+      { "x" : 36, "y" : 0 },
+      { "x" : 18, "y" : 0 }
+    ] }
+] }
