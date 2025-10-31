@@ -25,7 +25,6 @@ Win64/
 *.a
 *.~inc
 backup/
-*.res
 *.pas;1
 *.pas;2
 *.pas;3
