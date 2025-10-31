@@ -1,5 +1,6 @@
 @echo off
-call ..\..\work\setenv.bat
+call ..\work\setenv.bat
+cd source
 if not exist lib\ (mkdir lib) else (del /Q lib\*)
 echo Compiling MKConv2...
 %FPCDIR%\fpc.exe -l- -MDelphi -Scghi -CX -O3 -XX -v0 -vm6058,5024 -Filib -Fu..\..\source\units -Fu..\..\source\units\* -Fu. -FUlib -FE..\ -omkconv2.exe mkconv2.lpr
@@ -15,3 +16,4 @@ echo Compiling SkeletonPrep...
 %FPCDIR%\fpc.exe -l- -MDelphi -Scghi -CX -O3 -XX -v0 -vm6058,5024 -Filib -Fu..\..\source\units -Fu..\..\source\units\* -Fu. -FUlib -FE..\ -oSkeletonPrep.exe SkeletonPrep.lpr
 
 RMDIR "lib" /S /Q
+cd ..
