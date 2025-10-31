@@ -144,3 +144,8 @@ w png window.png 1
 r png data\window2.png 1
 m setcolorkey 0 0 0 1
 w png window2.png 1
+
+
+; Other things
+r png data\backwall.png 1
+w png backwall.png 1
