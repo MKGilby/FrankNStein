@@ -26,7 +26,7 @@ Graphics is created by me and licensed under CC BY-NC 4.0
 
 Main font are drawn by me based on the original font by Colin Stewart.
 
-## Compiling in windows environment
+## Compiling in windows environment (presuming you have Lazarus installed)
 1. Go into folder "work" and edit setenv.bat, set FPCDIR to point to the folder
 containing your fpc.exe
 2. Go into folder "tools\source" and run BuildTools.bat
@@ -34,10 +34,17 @@ containing your fpc.exe
 4. Go into folder "source" and run BuildRelease_x64.bat (or x86 as you wish.)
    You need Lazarus cross compiler libraries to be installed
    to compile x64 on x86 systems and vice-versa.
-5. Download and extract the latest SDL2.dll into \release\x64 or x86
+5. Still in the folder "source" run BuildDatafile.bat
+6. Download and extract the latest SDL2.dll into \release\x64 or x86
    (be aware of bitness!). The latest DLLs can be found on the [SDL releases page](https://github.com/libsdl-org/SDL/releases).
    Scroll down to the latest 2.xx version, click assets and download file.
    At the time of writing of this document the latest SDL2 version is 2.32.8.
+7. Download and extract the latest bass.dll into \release\x64 of x86
+   (be aware of bitness!). The latest DLLs can be found on
+   [BASS Homepage](https://www.un4seen.com/) or
+   [direct-link](https://www.un4seen.com/files/bass24.zip). For the x86 version
+   you need the bass.dll in the root of the .ZIP, for the x64 version go into
+   the x64 folder in the .ZIP and use the bass.dll from there.
 
 ## Compiled binaries from current build with datafiles and DLLs
 [x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.28.zip "Download x64 version") or
