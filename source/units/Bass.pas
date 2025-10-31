@@ -721,9 +721,9 @@ type
 const
 {$IFDEF MSWINDOWS}
   {$IFDEF CPUx86_64}
-    bassdll = 'bass_x64.dll';
+    bassdll = 'bass.dll';
   {$else}
-    bassdll = 'bass_x86.dll';
+    bassdll = 'bass.dll';
   {$ENDIF}
 {$ENDIF}
 {$IFDEF LINUX}
