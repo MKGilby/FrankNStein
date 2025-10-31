@@ -10,4 +10,6 @@ cd ..\logo
 call run.bat
 cd ..\sprites
 call run.bat
+cd ..\music
+call run.bat
 cd ..
