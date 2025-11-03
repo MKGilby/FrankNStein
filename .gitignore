@@ -52,3 +52,4 @@ work/Decorations/convert_old.mc2
 /release
 source/BuildAndUpload.ps1
 work/.burdockpaint_/settings.ini
+source/lib/x86_64-win64/FrankNStein.res
