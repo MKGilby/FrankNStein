@@ -105,7 +105,7 @@ procedure TSlot.UpdateData;
 begin
   fIsUsed:=VMU.Slots[fSlot].IsUsed;
   if fIsUsed then begin
-    fLastDate:=DateToStr(VMU.Slots[fSlot].LastUsed,FS);
+    fLastDate:=StringReplace(DateToStr(VMU.Slots[fSlot].LastUsed,FS),'.','_',[rfReplaceAll]);
     fLastTime:=TimeToStr(VMU.Slots[fSlot].LastUsed,FS);
   end else begin
     fLastDate:='';
