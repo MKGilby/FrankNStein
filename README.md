@@ -44,10 +44,14 @@ Main font are drawn by me based on the original font by Colin Stewart.
    the x64 folder in the .ZIP and use the bass.dll from there.
 
 ## Compiled binaries from current build with datafiles and DLLs
-[x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.28.zip "Download x64 version") or
-[x86](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_x86_0.0.0.28.zip "Download x86 version").
+[x64](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_0.0.0.29.zip "Download x64 version") or
+[x86](https://mksztsz.hu/tmpfiles/FrankNStein_Refurbished_x86_0.0.0.29.zip "Download x86 version").
 
 ## What's new
+
+### 2025.11.04 - Build 29
+- Added 3rd map (the second from original game) with placeholder monsters.
+- Added snail monster gfx.
 
 ### 2025.10.29 - Build 28
 - Added bat monster gfx.

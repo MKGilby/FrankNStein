@@ -66,8 +66,6 @@ begin
   fSlideDown:=MM.Animations.ItemByName['ProfSlideDown'].SpawnAnimation;
   fShockingLeft:=MM.Animations.ItemByName['ShockingLeft'].SpawnAnimation;
   fShockingRight:=MM.Animations.ItemByName['ShockingRight'].SpawnAnimation;
-  fShockingLeft.LogData;
-  fShockingRight.LogData;
   fX:=3*8;
   fY:=2*8;
   fDirX:=1;

@@ -1,86 +1,92 @@
-; masked sprites
-m createatlas 310 200 1 2
-; non masked sprites
-m createatlas 320 200 1 4
-
-r png data\prof.png 1
+; Macro for adding monster to masked sprites
+; Parameter: monster number padded to 2 digits.
+; ---------------------------------------------
+@ mons
+r png data\mons%1.png 1
 m setcolorkey 0 0 0 1
-r json data\player.json 1
+r json data\mons%1.json 1
+m addall 1 2
+@
+
+
+; Macro for adding any sprite with animation
+; Parameter:
+;   %1 - PNG filename without extension
+;   %2 - JSON filename without extension
+;   %3 - memory number of target textureatlas
+; ---------------------------------------------
+@ addsprite
+r png data\%1.png 1
+m setcolorkey 0 0 0 1
+r json data\%2.json 1
+m addall 1 %3
+@
+
+
+; Masked sprites
+; ---------------------------------------------
+m createatlas 310 200 1 2
+
+; Player
+! addsprite prof player 2
+
+; Monsters
+! mons 01
+! mons 02
+! mons 03
+! mons 08
+! mons 13
+! mons 16
+! mons 17
+
+; Save
+m crop2 2
+w png msprites.png 2
+
+
+; Non masked sprites
+; ---------------------------------------------
+m createatlas 320 200 1 2
+
+; Skeleton
+r png skeletonsprite.png 1
 m addall 1 2
 
-r png skeletonsprite.png 1
-m addall 1 4
+; Spring
+! addsprite spring spring 2
 
-r png data\spring.png 1
-m setcolorkey 0 0 0 1
-r json data\spring.json 1
-m addall 1 4
-
+; Green device overlay
 r png data\deviceoverlay.png 1
 m create 16 8 3
 m copyto 0 0 16 8 0 0 1 3
 m addframebasedanim DeviceOverlay 16 8 1 0 0 0 4  0 0  3
 m addall 3 4
 
-r png data\mons01.png 1
-m setcolorkey 0 0 0 1
-r json data\mons01.json 1
-m addall 1 2
+; Meter
+! addsprite meter meter 2
 
-r png data\mons02.png 1
-m setcolorkey 0 0 0 1
-r json data\mons02.json 1
-m addall 1 2
+; Lever
+! addsprite lever lever 2
 
-r png data\mons03.png 1
-m setcolorkey 0 0 0 1
-r json data\mons03.json 1
-m addall 1 2
+; Built monster 1
+! addsprite builtmons01 builtmons01 2
 
-r png data\mons08.png 1
-m setcolorkey 0 0 0 1
-r json data\mons08.json 1
-m addall 1 2
-
-r png data\bat.png 1
-m setcolorkey 0 0 0 1
-r json data\mons13.json 1
-m addall 1 2
-
-r png data\mons17.png 1
-m setcolorkey 0 0 0 1
-r json data\mons17.json 1
-m addall 1 2
-
-r png data\meter.png 1
-m setcolorkey 0 0 0 1
-r json data\meter.json 1
-m addall 1 4
-
-r png data\lever.png 1
-m setcolorkey 0 0 0 1
-r json data\lever.json 1
-m addall 1 4
-
-r png data\builtmons01.png 1
-m setcolorkey 0 0 0 1
-r json data\builtmons01.json 1
-m addall 1 4
-
+; Save
 m crop2 2
-w png msprites.png 2
-m crop2 4
-w png sprites.png 4
+w png sprites.png 2
 
+
+; Tiles
+; ---------------------------------------------
 r png data\tiles.png 1
 m setcolorkey 0 0 0 1
 w png tiles.png 1
 
-; Shocking animation must be in a separate image, we will play it's alpha value
+
+; Shocking animation
+; It must be in a separate image, we will play with it's alpha value
+; ---------------------------------------------
 m createatlas 100 100 1 2
-r png data\shockedprof.png 1
-m setcolorkey 0 0 0 1
-r json data\shocking.json 1
-m addall 1 2
+! addsprite shockedprof shocking 2
 m crop2 2
 w png shocking.png 2

@@ -103,7 +103,6 @@ end;
 { TJSONMap }
 
 constructor TJSONMap.Create(iMapNo:integer;iSprings:TSprings;iMetaDataOnly:boolean);
-const platf='12345   123334512451233345';
 var Stream:TStream;JSON:TJSONData;tmp:TARGBImage;i:integer;s:string;
 begin
   fSprings:=iSprings;
@@ -132,10 +131,11 @@ begin
         FillBackWithStones(tmp);
         if fMapType=mtConstructing then LoadOverlay(tmp,'constr');
         CreateTileMap;
-        if maptype=mtConstructing then begin
-          for i:=0 to 25 do begin
-            if platf[i+1]<>' ' then fTileMap[i,4]:=TILE_WALL;
-          end;
+        if maptype=mtConstructing then begin  // Add map tiles of upper platform
+          for i:=0 to 4 do
+            fTileMap[i,4]:=TILE_WALL;
+          for i:=8 to 25 do
+            fTileMap[i,4]:=TILE_WALL;
         end;
         LoadTiles(JSON,tmp);
         LoadMonsters(JSON);
